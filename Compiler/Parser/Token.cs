@@ -1,8 +1,8 @@
 ﻿namespace YaJS.Compiler.Parser {
 	public enum TokenType {
-		Unknown,		// unknown
+		Unknown,		// неизвестный
 
-		Ident,			// identifier
+		Ident,			// идентификатор
 
 		// Ключевые слова
 		Break,			// break
@@ -103,9 +103,11 @@
 		BitOrAssign,	// |=
 		BitXorAssign,	// ^=
 
-		Number,			// integer or float number
+		Integer,		// целое число
+		HexInteger,		// шестнацатеричное целое число
+		Float,			// вещественное число
 
-		String			// string
+		String			// строка
 	}
 
 	public sealed class Token {
@@ -117,7 +119,7 @@
 
 		public TokenType Type { get; set; }
 		/// <summary>
-		/// Необходимо для автоматической расстановки ;
+		/// Необходимо для автоматической расстановки ; (см. http://ecma-international.org/ecma-262/5.1/#sec-7.9)
 		/// </summary>
 		public bool IsAfterLineTerminator { get; set; }
 		public string Value { get; set; }
