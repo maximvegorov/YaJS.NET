@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7FB8A4C3-3B73-45B9-B97E-B86A769C7D40}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>YaJS.Runtime</RootNamespace>
+    <AssemblyName>YaJS.Runtime</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ByteCodeReader.cs" />
+    <Compile Include="CallStackFrame.cs" />
+    <Compile Include="CallStackFrameView.cs" />
+    <Compile Include="CompiledFunction.cs" />
+    <Compile Include="Constructors\Errors\JSReferenceErrorConstructor.cs" />
+    <Compile Include="Constructors\Errors\JSSyntaxErrorException.cs" />
+    <Compile Include="Constructors\Errors\JSTypeErrorConstructor.cs" />
+    <Compile Include="Constructors\JSArrayConstructor.cs" />
+    <Compile Include="Constructors\JSBooleanConstructor.cs" />
+    <Compile Include="Constructors\JSErrorConstructor.cs" />
+    <Compile Include="Constructors\JSFunctionConstructor.cs" />
+    <Compile Include="Constructors\JSNumberConstructor.cs" />
+    <Compile Include="Constructors\JSObjectConstructor.cs" />
+    <Compile Include="Constructors\JSStringConstructor.cs" />
+    <Compile Include="ExceptionObject.cs" />
+    <Compile Include="Exceptions\InternalErrorException.cs" />
+    <Compile Include="Exceptions\InvalidVariableNameException.cs" />
+    <Compile Include="Exceptions\UnrecoverableErrorException.cs" />
+    <Compile Include="Exceptions\InvalidEvalStackStateException.cs" />
+    <Compile Include="Exceptions\InvalidThreadStateException.cs" />
+    <Compile Include="Exceptions\InvalidGotoOffsetException.cs" />
+    <Compile Include="Exceptions\NegativeStringConstLengthException.cs" />
+    <Compile Include="Exceptions\ReferenceErrorException.cs" />
+    <Compile Include="Exceptions\RuntimeErrorException.cs" />
+    <Compile Include="Exceptions\RuntimeException.cs" />
+    <Compile Include="Exceptions\SyntaxErrorException.cs" />
+    <Compile Include="Exceptions\TypeErrorException.cs" />
+    <Compile Include="Exceptions\UnexpectedEndOfCodeException.cs" />
+    <Compile Include="Exceptions\UnexpectedEndTryException.cs" />
+    <Compile Include="Exceptions\UnhandledExceptionException.cs" />
+    <Compile Include="Exceptions\UnknownOpCodeException.cs" />
+    <Compile Include="ExecutionThread.cs" />
+    <Compile Include="ICompilerServices.cs" />
+    <Compile Include="JSValue.cs" />
+    <Compile Include="LocalScope.cs" />
+    <Compile Include="Objects\Errors\JSInternalError.cs" />
+    <Compile Include="Objects\Errors\JSReferenceError.cs" />
+    <Compile Include="Objects\Errors\JSSyntaxError.cs" />
+    <Compile Include="Objects\Errors\JSTypeError.cs" />
+    <Compile Include="Objects\JSArray.cs" />
+    <Compile Include="Objects\JSBoolean.cs" />
+    <Compile Include="Objects\JSError.cs" />
+    <Compile Include="Objects\JSFunction.cs" />
+    <Compile Include="Objects\JSManagedFunction.cs" />
+    <Compile Include="Objects\JSNativeFunction.cs" />
+    <Compile Include="Objects\JSNumber.cs" />
+    <Compile Include="Objects\JSObject.cs" />
+    <Compile Include="Objects\JSString.cs" />
+    <Compile Include="OpCode.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TryBlockInfo.cs" />
+    <Compile Include="Values\JSBooleanValue.cs" />
+    <Compile Include="Values\JSFloatValue.cs" />
+    <Compile Include="Values\JSIntegerValue.cs" />
+    <Compile Include="Values\JSNullValue.cs" />
+    <Compile Include="Values\JSNumberValue.cs" />
+    <Compile Include="Values\JSStringValue.cs" />
+    <Compile Include="Values\JSUndefinedValue.cs" />
+    <Compile Include="VirtualMachine.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Functions\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

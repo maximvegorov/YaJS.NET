@@ -1,0 +1,17 @@
+﻿using System.Diagnostics.Contracts;
+using System.Globalization;
+
+namespace YaJS.Compiler.Helpers {
+	internal static class LogHelper {
+		internal static string Error(int lineNo, int columnNo, string message) {
+			Contract.Requires(lineNo > 0);
+			Contract.Requires(columnNo > 0);
+			Contract.Requires(!string.IsNullOrEmpty(message));
+			return (string.Format(
+				"[Error] - {0} at {1},{2}",
+				lineNo.ToString(CultureInfo.InvariantCulture),
+				columnNo.ToString(CultureInfo.InvariantCulture)
+			));
+		}
+	}
+}
