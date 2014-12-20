@@ -9,6 +9,7 @@ namespace YaJS.Compiler.Helpers {
 			Contract.Requires(!string.IsNullOrEmpty(message));
 			return (string.Format(
 				"[Error] - {0} at {1},{2}",
+				message,
 				lineNo.ToString(CultureInfo.InvariantCulture),
 				columnNo.ToString(CultureInfo.InvariantCulture)
 			));
