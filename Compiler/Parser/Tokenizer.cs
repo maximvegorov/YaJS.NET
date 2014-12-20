@@ -191,12 +191,47 @@ namespace YaJS.Compiler.Parser {
 		}
 
 		private void SkipSingleLineComment() {
+			do {
+				Source.ReadChar();
+			}
+			while (Source.CurChar != '\n' && Source.CurChar != -1);
+		}
+
+		private void ThrowUnexpectedEndOfFile() {
+			throw new UnexpectedEndOfFileException(
+				LogHelper.Error(
+					Source.LineNo,
+					Source.ColumnNo,
+					"Unexpected end of file"
+				)
+			);
 		}
 
 		private void SkipMultiLineComment() {
+			for(;;) {
+				Source.ReadChar();
+				switch (Source.CurChar) {
+					case -1:
+						ThrowUnexpectedEndOfFile();
+						break;
+					case '\n':
+						// Если многострочный комментарий содержит символ окончания строки,
+						// то считаем что следующей лексеме предшествует символ окончания строки
+						// см. http://ecma-international.org/ecma-262/5.1/#sec-7.4
+						CurToken.IsAfterLineTerminator = true;
+						break;
+					case '*':
+						Source.ReadChar();
+						if (Source.CurChar == '/') {
+							Source.ReadChar();
+							return;
+						}
+						break;
+				}
+			}
 		}
 
-		private void Read_Slash_or_SlashAssign(bool isRegexAllowed) {
+		private void TryRead_Slash_or_SlashAssign(bool isRegexAllowed) {
 			Source.ReadChar();
 			if (!isRegexAllowed && Source.CurChar == '=') {
 				CurToken.Type = TokenType.SlashAssign;
@@ -258,12 +293,6 @@ namespace YaJS.Compiler.Parser {
 				CurToken.Type = TokenType.BitXor;
 		}
 
-		private void ReadNumber() {
-		}
-
-		private void ReadString(char quoteChar) {
-		}
-
 		private void ThrowUnexpectedChar() {
 			throw new UnexpectedCharException(
 				LogHelper.Error(
@@ -274,12 +303,152 @@ namespace YaJS.Compiler.Parser {
 			);
 		}
 
+		private void ReadIntegerOrFloatNumber() {
+			CurToken.Type = TokenType.Integer;
+			StringBuilder builder = new StringBuilder();
+			while (char.IsDigit((char)Source.CurChar)) {
+				builder.Append((char)Source.CurChar);
+				Source.ReadChar();
+			}
+			// Ноль может быть удален при попытке распознать HexInteger
+			if (builder.Length == 0)
+				builder.Append('0');
+			if (Source.CurChar == '.') {
+				CurToken.Type = TokenType.Float;
+				builder.Append((char)Source.CurChar);
+				Source.ReadChar();
+				if (!char.IsDigit((char)Source.CurChar))
+					ThrowUnexpectedChar();
+				do {
+					builder.Append((char)Source.CurChar);
+					Source.ReadChar();
+				} while (char.IsDigit((char)Source.CurChar));
+			}
+			if (Source.CurChar == 'e' || Source.CurChar == 'E') {
+				CurToken.Type = TokenType.Float;
+				builder.Append((char)Source.CurChar);
+				Source.ReadChar();
+				if (Source.CurChar == '-' || Source.CurChar == '+') {
+					builder.Append((char)Source.CurChar);
+					Source.ReadChar();
+				}
+				if (!char.IsDigit((char)Source.CurChar))
+					ThrowUnexpectedChar();
+				do {
+					builder.Append((char)Source.CurChar);
+					Source.ReadChar();
+				} while (char.IsDigit((char)Source.CurChar));
+			}
+			// Число и идентификатор не могут должны быть разделены хотя бы одним символом
+			// см. http://ecma-international.org/ecma-262/5.1/#sec-7.8.3
+			if (IsIdentStartChar((char)Source.CurChar))
+				ThrowUnexpectedChar();
+			CurToken.Value = builder.ToString();
+		}
+
+		private static bool IsHexDigit(char c) {
+			return (char.IsDigit(c) || ('a' <= c && c <= 'f') || ('A' <= c && c <= 'F'));
+		}
+
+		private void ReadHexIntegerNumber() {
+			if (!IsHexDigit((char)Source.CurChar))
+				ThrowUnexpectedChar();
+			StringBuilder builder = new StringBuilder();
+			do {
+				builder.Append((char)Source.CurChar);
+			}
+			while (IsHexDigit((char)Source.CurChar));
+			CurToken.Type = TokenType.HexInteger;
+			CurToken.Value = builder.ToString();
+		}
+
+		private char ReadEscapeSequence(int length) {
+			Source.ReadChar();
+			int result = 0;
+			for (int i = 0; i < length; i++) {
+				int hexDigit = 0;
+				if ('0' <= Source.CurChar && Source.CurChar <= '9')
+					hexDigit = Source.CurChar - '0';
+				else if ('a' <= Source.CurChar && Source.CurChar <= 'f')
+					hexDigit = Source.CurChar - 'a';
+				else if ('A' <= Source.CurChar && Source.CurChar <= 'F')
+					hexDigit = Source.CurChar - 'A';
+				else
+					ThrowUnexpectedChar();
+				Source.ReadChar();
+				result = hexDigit << 4 + result;
+			}
+			return ((char)result);
+		}
+
+		private void ReadString(char endQuoteChar) {
+			StringBuilder builder = new StringBuilder();
+			Source.ReadChar();
+			while (Source.CurChar != endQuoteChar) {
+				if (Source.CurChar == -1)
+					ThrowUnexpectedEndOfFile();
+				else if (Source.CurChar != '\\') {
+					builder.Append(Source.CurChar);
+					Source.ReadChar();
+				}
+				else {
+					Source.ReadChar();
+					switch (Source.CurChar) {
+						case '"':
+						case '\\':
+						case '/':
+							builder.Append(Source.CurChar);
+							Source.ReadChar();
+							break;
+						case 'b':
+							builder.Append('\b');
+							Source.ReadChar();
+							break;
+						case 'f':
+							builder.Append('\f');
+							Source.ReadChar();
+							break;
+						case 'n':
+							builder.Append('\n');
+							Source.ReadChar();
+							break;
+						case 'r':
+							builder.Append('\r');
+							Source.ReadChar();
+							break;
+						case 't':
+							builder.Append('\t');
+							Source.ReadChar();
+							break;
+						case 'x':
+							builder.Append(ReadEscapeSequence(2));
+							break;
+						case 'u':
+							builder.Append(ReadEscapeSequence(4));
+							break;
+						default:
+							ThrowUnexpectedChar();
+							break;
+					}
+				}
+			}
+			CurToken.Type = TokenType.String;
+			CurToken.Value = builder.ToString();
+			Source.ReadChar();
+		}
+
+		/// <summary>
+		/// Прочитать очередную лексему
+		/// </summary>
+		/// <param name="isRegexAllowed">Регулярные выражения допустимы? Влияет на обработку /</param>
 		public void ReadToken(bool isRegexAllowed = false) {
 			CurToken.SetUnknown();
+			// Используется цикл так как могут встретится комментарии, которые необходимо пропускать
 			while (!Source.IsEOF && CurToken.Type == TokenType.Unknown) {
 				// Пропускаем пробельные символы
 				while (char.IsWhiteSpace((char)Source.CurChar)) {
 					// Запоминаем если встретили символ окончания строки (нужно для автоматической расстановки ;)
+					// см. http://ecma-international.org/ecma-262/5.1/#sec-7.9
 					if (Source.CurChar == '\n')
 						CurToken.IsAfterLineTerminator = true;
 					Source.ReadChar();
@@ -313,8 +482,13 @@ namespace YaJS.Compiler.Parser {
 							Source.ReadChar();
 							break;
 						case '.':
-							CurToken.Type = TokenType.Dot;
-							Source.ReadChar();
+							// Число также может начинаться с точки
+							if (char.IsDigit((char)Source.PeekChar()))
+								ReadIntegerOrFloatNumber();
+							else {
+								CurToken.Type = TokenType.Dot;
+								Source.ReadChar();
+							}
 							break;
 						case ';':
 							CurToken.Type = TokenType.Semicolon;
@@ -343,7 +517,7 @@ namespace YaJS.Compiler.Parser {
 							Read_Star_or_StarAssign();
 							break;
 						case '/':
-							Read_Slash_or_SlashAssign(isRegexAllowed);
+							TryRead_Slash_or_SlashAssign(isRegexAllowed);
 							break;
 						case '%':
 							Read_Mod_or_ModAssign();
@@ -375,6 +549,12 @@ namespace YaJS.Compiler.Parser {
 							break;
 
 						case '0':
+							Source.ReadChar();
+							if (Source.CurChar == 'x' || Source.CurChar == 'X')
+								ReadHexIntegerNumber();
+							else
+								ReadIntegerOrFloatNumber();
+							break;
 						case '1':
 						case '2':
 						case '3':
@@ -384,7 +564,7 @@ namespace YaJS.Compiler.Parser {
 						case '7':
 						case '8':
 						case '9':
-							ReadNumber();
+							ReadIntegerOrFloatNumber();
 							break;
 
 						case '\'':
