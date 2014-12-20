@@ -11,6 +11,8 @@ namespace YaJS.Compiler.Parser {
 			Contract.Requires(reader != null);
 			Reader = reader;
 			LineNo = 1;
+			// ВАЖНО!!! Всегда надо иметь один прочитанный вперед символ
+			ReadChar();
 		}
 
 		/// <summary>
