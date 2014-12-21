@@ -4,8 +4,8 @@ using System.IO;
 using System.Text;
 
 namespace YaJS.Compiler.Parser {
-	using Compiler.Exceptions;
-	using Compiler.Helpers;
+	using YaJS.Compiler.Exceptions;
+	using YaJS.Compiler.Helpers;
 
 	/// <summary>
 	/// Сканер
@@ -69,7 +69,7 @@ namespace YaJS.Compiler.Parser {
 		}
 
 		private static bool IsIdentStartChar(char c) {
-			return (char.IsLetterOrDigit(c) || c == '$' || c == '_');
+			return (char.IsLetter(c) || c == '$' || c == '_');
 		}
 
 		private void ReadIdentOrKeyword() {
@@ -275,7 +275,7 @@ namespace YaJS.Compiler.Parser {
 				CurToken.Type = TokenType.BitOrAssign;
 				Source.ReadChar();
 			}
-			else if (Source.CurChar == '&') {
+			else if (Source.CurChar == '|') {
 				CurToken.Type = TokenType.Or;
 				Source.ReadChar();
 			}
@@ -291,6 +291,21 @@ namespace YaJS.Compiler.Parser {
 			}
 			else
 				CurToken.Type = TokenType.BitXor;
+		}
+
+		private void Read_Not_or_Neq_or_StrictNeq() {
+			Source.ReadChar();
+			if (Source.CurChar == '=') {
+				Source.ReadChar();
+				if (Source.CurChar == '=') {
+					CurToken.Type = TokenType.StrictNeq;
+					Source.ReadChar();
+				}
+				else
+					CurToken.Type = TokenType.Neq;
+			}
+			else
+				CurToken.Type = TokenType.Not;
 		}
 
 		private void ThrowUnexpectedChar() {
@@ -339,7 +354,7 @@ namespace YaJS.Compiler.Parser {
 					Source.ReadChar();
 				} while (char.IsDigit((char)Source.CurChar));
 			}
-			// Число и идентификатор не могут должны быть разделены хотя бы одним символом
+			// Число и идентификатор должны быть разделены хотя бы одним символом
 			// см. http://ecma-international.org/ecma-262/5.1/#sec-7.8.3
 			if (IsIdentStartChar((char)Source.CurChar))
 				ThrowUnexpectedChar();
@@ -351,13 +366,20 @@ namespace YaJS.Compiler.Parser {
 		}
 
 		private void ReadHexIntegerNumber() {
+			// Пропустить x или X
+			Source.ReadChar();
 			if (!IsHexDigit((char)Source.CurChar))
 				ThrowUnexpectedChar();
 			StringBuilder builder = new StringBuilder();
 			do {
 				builder.Append((char)Source.CurChar);
+				Source.ReadChar();
 			}
 			while (IsHexDigit((char)Source.CurChar));
+			// Число и идентификатор должны быть разделены хотя бы одним символом
+			// см. http://ecma-international.org/ecma-262/5.1/#sec-7.8.3
+			if (IsIdentStartChar((char)Source.CurChar))
+				ThrowUnexpectedChar();
 			CurToken.Type = TokenType.HexInteger;
 			CurToken.Value = builder.ToString();
 		}
@@ -370,13 +392,13 @@ namespace YaJS.Compiler.Parser {
 				if ('0' <= Source.CurChar && Source.CurChar <= '9')
 					hexDigit = Source.CurChar - '0';
 				else if ('a' <= Source.CurChar && Source.CurChar <= 'f')
-					hexDigit = Source.CurChar - 'a';
+					hexDigit = Source.CurChar - 'a' + 10;
 				else if ('A' <= Source.CurChar && Source.CurChar <= 'F')
-					hexDigit = Source.CurChar - 'A';
+					hexDigit = Source.CurChar - 'A' + 10;
 				else
 					ThrowUnexpectedChar();
 				Source.ReadChar();
-				result = hexDigit << 4 + result;
+				result = (result << 4) + hexDigit;
 			}
 			return ((char)result);
 		}
@@ -388,7 +410,7 @@ namespace YaJS.Compiler.Parser {
 				if (Source.CurChar == -1)
 					ThrowUnexpectedEndOfFile();
 				else if (Source.CurChar != '\\') {
-					builder.Append(Source.CurChar);
+					builder.Append((char)Source.CurChar);
 					Source.ReadChar();
 				}
 				else {
@@ -397,7 +419,7 @@ namespace YaJS.Compiler.Parser {
 						case '"':
 						case '\\':
 						case '/':
-							builder.Append(Source.CurChar);
+							builder.Append((char)Source.CurChar);
 							Source.ReadChar();
 							break;
 						case 'b':
@@ -420,6 +442,10 @@ namespace YaJS.Compiler.Parser {
 							builder.Append('\t');
 							Source.ReadChar();
 							break;
+						case 'v':
+							builder.Append('\v');
+							Source.ReadChar();
+							break;
 						case 'x':
 							builder.Append(ReadEscapeSequence(2));
 							break;
@@ -427,7 +453,10 @@ namespace YaJS.Compiler.Parser {
 							builder.Append(ReadEscapeSequence(4));
 							break;
 						default:
-							ThrowUnexpectedChar();
+							// Учесть возможность слияния частей строкового литерала расположенных на разных строках
+							if (Source.CurChar != '\n')
+								builder.Append((char)Source.CurChar);
+							Source.ReadChar();
 							break;
 					}
 				}
@@ -453,6 +482,9 @@ namespace YaJS.Compiler.Parser {
 						CurToken.IsAfterLineTerminator = true;
 					Source.ReadChar();
 				}
+
+				CurToken.StartPosition = new TokenPosition(Source.LineNo, Source.ColumnNo);
+
 				if (IsIdentStartChar((char)Source.CurChar))
 					ReadIdentOrKeyword();
 				else {
@@ -536,8 +568,7 @@ namespace YaJS.Compiler.Parser {
 							Read_BitXor_or_BitXorAssign();
 							break;
 						case '!':
-							CurToken.Type = TokenType.Not;
-							Source.ReadChar();
+							Read_Not_or_Neq_or_StrictNeq();
 							break;
 						case '?':
 							CurToken.Type = TokenType.QuestionMark;

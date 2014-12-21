@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Text;
 
@@ -14,7 +13,7 @@ namespace YaJS.Runtime.Objects {
 
 		internal JSArray(List<JSValue> items, JSObject inherited)
 			: base(inherited) {
-			Contract.Requires<ArgumentNullException>(items != null, "items");
+			Contract.Requires(items != null);
 			Contract.Requires(inherited != null);
 			Items = items;
 		}
