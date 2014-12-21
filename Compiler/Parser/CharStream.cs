@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics.Contracts;
+﻿using System.Diagnostics.Contracts;
 using System.IO;
 
 namespace YaJS.Compiler.Parser {
@@ -11,6 +10,8 @@ namespace YaJS.Compiler.Parser {
 			Contract.Requires(reader != null);
 			Reader = reader;
 			LineNo = 1;
+			// ВАЖНО!!! Всегда надо иметь один прочитанный вперед символ
+			ReadChar();
 		}
 
 		/// <summary>
@@ -19,6 +20,9 @@ namespace YaJS.Compiler.Parser {
 		public int ReadChar() {
 			if (!IsEOF) {
 				CurChar = Reader.Read();
+#if DEBUG
+				Offset++;
+#endif
 				if (CurChar == -1) {
 					IsEOF = true;
 				}
@@ -33,7 +37,7 @@ namespace YaJS.Compiler.Parser {
 						else
 							CurChar = '\n';
 						LineNo++;
-						ColumnNo = 1;
+						ColumnNo = 0;
 					}
 					else
 						ColumnNo++;
@@ -51,6 +55,9 @@ namespace YaJS.Compiler.Parser {
 
 		private TextReader Reader { get; set; }
 		public int CurChar { get; private set; }
+#if DEBUG
+		public int Offset { get; private set; }
+#endif
 		public int LineNo { get; private set; }
 		public int ColumnNo { get; private set; }
 		public bool IsEOF { get; private set; }

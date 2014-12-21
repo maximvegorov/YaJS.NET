@@ -1,4 +1,6 @@
-﻿namespace YaJS.Compiler.Parser {
+﻿using System.Diagnostics.Contracts;
+
+namespace YaJS.Compiler.Parser {
 	public enum TokenType {
 		Unknown,		// неизвестный
 
@@ -110,6 +112,21 @@
 		String			// строка
 	}
 
+	public struct TokenPosition {
+		private int _lineNo;
+		private int _columnNo;
+
+		public TokenPosition(int lineNo, int columnNo) {
+			Contract.Requires(lineNo > 0);
+			Contract.Requires(columnNo > 0);
+			_lineNo = lineNo;
+			_columnNo = columnNo;
+		}
+
+		public int LineNo { get { return (_lineNo); } }
+		public int ColumnNo { get { return (_columnNo); } }
+	}
+
 	public sealed class Token {
 		public void SetUnknown() {
 			Type = TokenType.Unknown;
@@ -117,11 +134,27 @@
 			Value = null;
 		}
 
+		public override string ToString() {
+			if (string.IsNullOrEmpty(Value))
+				return (Type.ToString());
+			return (string.Format("{0} ({1})", Type.ToString(), Value));
+		}
+
+		/// <summary>
+		/// Тип лексемы
+		/// </summary>
 		public TokenType Type { get; set; }
+		/// <summary>
+		/// Позиция в потоке символов
+		/// </summary>
+		public TokenPosition StartPosition { get; set; }
 		/// <summary>
 		/// Необходимо для автоматической расстановки ; (см. http://ecma-international.org/ecma-262/5.1/#sec-7.9)
 		/// </summary>
 		public bool IsAfterLineTerminator { get; set; }
+		/// <summary>
+		/// Сама лексема
+		/// </summary>
 		public string Value { get; set; }
 	}
 }
