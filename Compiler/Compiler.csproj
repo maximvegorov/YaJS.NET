@@ -84,14 +84,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AST\Expression.cs" />
+    <Compile Include="AST\Function.cs" />
+    <Compile Include="AST\NestedFunctionCollection.cs" />
+    <Compile Include="AST\Statement.cs" />
+    <Compile Include="AST\Statements\DeclareStatement.cs" />
     <Compile Include="ByteCodeEmitter.cs" />
     <Compile Include="Exceptions\UnexpectedCharException.cs" />
     <Compile Include="Exceptions\ParserException.cs" />
     <Compile Include="Exceptions\UnexpectedEndOfFileException.cs" />
     <Compile Include="Helpers\LogHelper.cs" />
-    <Compile Include="Parser\CharStream.cs" />
-    <Compile Include="Parser\Token.cs" />
-    <Compile Include="Parser\Tokenizer.cs" />
+    <Compile Include="CharStream.cs" />
+    <Compile Include="Parser.cs" />
+    <Compile Include="Parser.Expressions.cs" />
+    <Compile Include="Parser.Statements.cs" />
+    <Compile Include="Token.cs" />
+    <Compile Include="Tokenizer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -101,7 +109,15 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="AST\" />
+    <Folder Include="AST\Operators\Additive\" />
+    <Folder Include="AST\Operators\Assignment\" />
+    <Folder Include="AST\Operators\Bitwise\" />
+    <Folder Include="AST\Operators\Equality\" />
+    <Folder Include="AST\Operators\Logical\" />
+    <Folder Include="AST\Operators\Multiplicative\" />
+    <Folder Include="AST\Operators\Relational\" />
+    <Folder Include="AST\Operators\Shift\" />
+    <Folder Include="AST\Operators\Unary\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

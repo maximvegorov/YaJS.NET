@@ -203,10 +203,10 @@ namespace YaJS.Runtime {
 							currentFrame.EndScope();
 							break;
 
-						case OpCode.BeginTry:
+						case OpCode.EnterTry:
 							currentFrame.BeginTry();
 							break;
-						case OpCode.EndTry:
+						case OpCode.LeaveTry:
 							currentFrame.EndTry();
 							break;
 
