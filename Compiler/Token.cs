@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.Contracts;
 
-namespace YaJS.Compiler.Parser {
+namespace YaJS.Compiler {
 	public enum TokenType {
 		Unknown,		// неизвестный
 

@@ -3,7 +3,7 @@ using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text;
 
-namespace YaJS.Compiler.Parser {
+namespace YaJS.Compiler {
 	using YaJS.Compiler.Exceptions;
 	using YaJS.Compiler.Helpers;
 

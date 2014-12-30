@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.Contracts;
 using System.IO;
 
-namespace YaJS.Compiler.Parser {
+namespace YaJS.Compiler {
 	/// <summary>
 	/// Входной поток символов
 	/// </summary>
