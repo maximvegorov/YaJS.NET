@@ -1,31 +1,49 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
 namespace YaJS.Compiler.AST {
-	using YaJS.Runtime;
-
+	/// <summary>
+	/// Представляет в AST дереве функцию
+	/// </summary>
 	public sealed class Function {
-		public Function(string name, List<string> formalArguments) {
-			Contract.Requires(!string.IsNullOrEmpty(name));
+		public Function(string name, List<string> formalArguments, bool isDeclaration) {
+			Contract.Requires(isDeclaration && !string.IsNullOrEmpty(name));
 			Contract.Requires(formalArguments != null);
 			Name = name;
 			FormalArguments = formalArguments;
-			Index = -1;
-			Variables = new HashSet<string>();
-			Functions = new NestedFunctionCollection();
-			Statements = new List<Statement>();
+			IsDeclaration = isDeclaration;
+			DeclaredVariables = new List<string>();
+			NestedFunctions = new List<Function>();
+			FunctionBody = new List<Statement>();
 		}
 
-		public CompiledFunction Compile() {
-			throw new NotImplementedException();
-		}
-
+		/// <summary>
+		/// Имя функции. Обязательно для FunctionDeclaration
+		/// </summary>
 		public string Name { get; private set; }
+		/// <summary>
+		/// Список имен параметров функции
+		/// </summary>
 		public List<string> FormalArguments { get; private set; }
+		/// <summary>
+		/// Является ли функция FunctionDeclaration
+		/// </summary>
+		public bool IsDeclaration { get; set; }
+		/// <summary>
+		/// Список объявленных переменных
+		/// </summary>
+		public List<string> DeclaredVariables { get; private set; }
+		/// <summary>
+		/// Список вложенных функций
+		/// </summary>
+		public List<Function> NestedFunctions { get; private set; }
+		/// <summary>
+		/// Тело функции
+		/// </summary>
+		public List<Statement> FunctionBody { get; private set; }
+		/// <summary>
+		/// Индекс функции в списке вложенных функций внешней функции
+		/// </summary>
 		public int Index { get; internal set; }
-		public HashSet<string> Variables { get; private set; }
-		public NestedFunctionCollection Functions { get; private set; }
-		public List<Statement> Statements { get; private set; }
 	}
 }

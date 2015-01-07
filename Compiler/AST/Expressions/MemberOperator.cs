@@ -27,6 +27,6 @@ namespace YaJS.Compiler.AST.Expressions {
 		public override bool CanBeDeleted { get { return (true); } }
 
 		public Expression BaseValue { get; private set; }
-		public Expression Member { get; private set; }
+		public new Expression Member { get; private set; }
 	}
 }

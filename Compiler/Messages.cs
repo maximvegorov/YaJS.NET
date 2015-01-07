@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics.Contracts;
 using System.Globalization;
 
-namespace YaJS.Compiler.Helpers {
-	internal static class LogHelper {
+namespace YaJS.Compiler {
+	internal static class Messages {
 		internal static string Error(int lineNo, int columnNo, string message) {
 			Contract.Requires(lineNo > 0);
 			Contract.Requires(columnNo > 0);

@@ -5,7 +5,7 @@ namespace YaJS.Compiler.AST.Expressions {
 	internal sealed class InOperator : BinaryOperator {
 		public InOperator(Expression leftOperand, Expression rightOperand)
 			: base(leftOperand, rightOperand) {
-			Contract.Requires(RightOperand.CanHaveMembers);
+			Contract.Requires(rightOperand.CanHaveMembers);
 		}
 
 		public override string ToString() {
@@ -13,5 +13,7 @@ namespace YaJS.Compiler.AST.Expressions {
 			result.Append(LeftOperand.ToString()).Append(" in ").Append(RightOperand.ToString());
 			return (result.ToString());
 		}
+
+		public override bool CanHaveMembers { get { return (true); } }
 	}
 }

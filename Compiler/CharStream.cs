@@ -6,9 +6,11 @@ namespace YaJS.Compiler {
 	/// Входной поток символов
 	/// </summary>
 	public sealed class CharStream {
+		private TextReader _reader;
+
 		public CharStream(TextReader reader) {
 			Contract.Requires(reader != null);
-			Reader = reader;
+			_reader = reader;
 			LineNo = 1;
 			// ВАЖНО!!! Всегда надо иметь один прочитанный вперед символ
 			ReadChar();
@@ -19,7 +21,7 @@ namespace YaJS.Compiler {
 		/// </summary>
 		public int ReadChar() {
 			if (!IsEOF) {
-				CurChar = Reader.Read();
+				CurChar = _reader.Read();
 #if DEBUG
 				Offset++;
 #endif
@@ -31,8 +33,8 @@ namespace YaJS.Compiler {
 					if (CurChar == '\n' || CurChar == '\r' || CurChar == '\u2028' || CurChar == '\u2029') {
 						if (CurChar == '\n') {
 							// Преобразовать последовательность \n\r в \n
-							if (Reader.Peek() == '\r')
-								Reader.Read();
+							if (_reader.Peek() == '\r')
+								_reader.Read();
 						}
 						else
 							CurChar = '\n';
@@ -50,10 +52,9 @@ namespace YaJS.Compiler {
 		/// Подсмотреть следующий символ
 		/// </summary>
 		public int PeekChar() {
-			return (Reader.Peek());
+			return (_reader.Peek());
 		}
 
-		private TextReader Reader { get; set; }
 		public int CurChar { get; private set; }
 #if DEBUG
 		public int Offset { get; private set; }

@@ -5,6 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace YaJS.Compiler.AST.Statements {
-	class TryCatchStatement {
+	class IfElseStatement {
 	}
 }

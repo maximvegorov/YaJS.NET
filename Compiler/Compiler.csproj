@@ -89,7 +89,18 @@
     <Compile Include="AST\Expressions\GroupingOperator.cs" />
     <Compile Include="AST\Expressions\StringLiteral.cs" />
     <Compile Include="AST\Function.cs" />
-    <Compile Include="AST\NestedFunctionCollection.cs" />
+    <Compile Include="AST\LabelSet.cs" />
+    <Compile Include="AST\Statements\CompoundStatement.cs" />
+    <Compile Include="AST\Statements\EmptyStatement.cs" />
+    <Compile Include="AST\Statements\RootStatement.cs" />
+    <Compile Include="Exceptions\FunctionAlreadyDeclaredException.cs" />
+    <Compile Include="Exceptions\DuplicatedLabelException.cs" />
+    <Compile Include="Exceptions\ParameterAlreadyDeclaredException.cs" />
+    <Compile Include="Exceptions\ExpectedConstructorException.cs" />
+    <Compile Include="Exceptions\ExpectedFunctionException.cs" />
+    <Compile Include="Exceptions\ExpectedObjectException.cs" />
+    <Compile Include="Exceptions\ExpectedReferenceException.cs" />
+    <Compile Include="FunctionCollection.cs" />
     <Compile Include="AST\Expressions\Arguments.cs" />
     <Compile Include="AST\Expressions\ArrayLiteral.cs" />
     <Compile Include="AST\Expressions\BinaryOperator.cs" />
@@ -159,24 +170,24 @@
     <Compile Include="AST\Statements\BlockStatement.cs" />
     <Compile Include="AST\Statements\ContinueStatement.cs" />
     <Compile Include="AST\Statements\DoWhileStatement.cs" />
-    <Compile Include="AST\Statements\EmptyStatement.cs" />
     <Compile Include="AST\Statements\ExpressionStatement.cs" />
-    <Compile Include="AST\Statements\ForeachStatement.cs" />
+    <Compile Include="AST\Statements\ForInStatement.cs" />
     <Compile Include="AST\Statements\ForStatement.cs" />
-    <Compile Include="AST\Statements\IfThenElseStatement.cs" />
-    <Compile Include="AST\Statements\IfThenStatement.cs" />
-    <Compile Include="AST\Statements\LabelledStatement.cs" />
+    <Compile Include="AST\Statements\IfElseStatement.cs" />
+    <Compile Include="AST\Statements\IfStatement.cs" />
     <Compile Include="AST\Statements\ReturnStatement.cs" />
     <Compile Include="AST\Statements\SwitchStatement.cs" />
     <Compile Include="AST\Statements\ThrowStatement.cs" />
-    <Compile Include="AST\Statements\TryCatchStatement.cs" />
-    <Compile Include="AST\Statements\TryFinallyStatement.cs" />
+    <Compile Include="AST\Statements\TryStatement.cs" />
     <Compile Include="AST\Statements\WhileStatement.cs" />
-    <Compile Include="ByteCodeEmitter.cs" />
+    <Compile Include="VariableCollection.cs" />
     <Compile Include="Exceptions\UnexpectedCharException.cs" />
     <Compile Include="Exceptions\ParserException.cs" />
     <Compile Include="Exceptions\UnexpectedEndOfFileException.cs" />
-    <Compile Include="Helpers\LogHelper.cs" />
+    <Compile Include="Exceptions\InvalidTokenException.cs" />
+    <Compile Include="Exceptions\UnmatchedTokenException.cs" />
+    <Compile Include="FunctionContext.cs" />
+    <Compile Include="Messages.cs" />
     <Compile Include="CharStream.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Parser.Expressions.cs" />
@@ -184,12 +195,6 @@
     <Compile Include="Token.cs" />
     <Compile Include="Tokenizer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Runtime\Runtime.csproj">
-      <Project>{7fb8a4c3-3b73-45b9-b97e-b86a769c7d40}</Project>
-      <Name>Runtime</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

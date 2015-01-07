@@ -11,5 +11,7 @@ namespace YaJS.Compiler.AST.Expressions {
 			result.Append(LeftOperand.ToString()).Append(" | ").Append(RightOperand.ToString());
 			return (result.ToString());
 		}
+
+		public override bool CanHaveMembers { get { return (true); } }
 	}
 }

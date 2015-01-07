@@ -11,11 +11,12 @@ namespace YaJS.Compiler.AST.Expressions {
 			return (result.ToString());
 		}
 
-		public override bool CanHaveMembers { get { return (true); } }
+		public override bool CanHaveMembers { get { return (Operand.CanHaveMembers); } }
 		public override bool CanHaveMutableMembers { get { return (Operand.CanHaveMutableMembers); } }
 		public override bool CanBeConstructor { get { return (Operand.CanBeConstructor); } }
 		public override bool CanBeFunction { get { return (Operand.CanBeFunction); } }
 		public override bool CanBeDeleted { get { return (Operand.CanBeDeleted); } }
+		public override bool IsConstant { get { return (Operand.IsConstant); } }
 
 		public Expression Operand { get; private set; }
 	}

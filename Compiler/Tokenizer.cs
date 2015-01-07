@@ -5,7 +5,6 @@ using System.Text;
 
 namespace YaJS.Compiler {
 	using YaJS.Compiler.Exceptions;
-	using YaJS.Compiler.Helpers;
 
 	/// <summary>
 	/// Сканер
@@ -60,12 +59,18 @@ namespace YaJS.Compiler {
 			Keywords.Add("package", TokenType.Package);
 			Keywords.Add("protected", TokenType.Protected);
 			Keywords.Add("static", TokenType.Static);
+
+			Keywords.Add("undefined", TokenType.Undefined);
+			Keywords.Add("eval", TokenType.Eval);
+			Keywords.Add("arguments", TokenType.Arguments);
 		}
 
-		public Tokenizer(TextReader source) {
-			Contract.Requires(source != null);
-			Source = new CharStream(source);
-			CurToken = new Token();
+		public CharStream _input;
+
+		public Tokenizer(TextReader reader) {
+			Contract.Requires(reader != null);
+			_input = new CharStream(reader);
+			Lookahead = new Token();
 		}
 
 		private static bool IsIdentStartChar(char c) {
@@ -74,143 +79,143 @@ namespace YaJS.Compiler {
 
 		private void ReadIdentOrKeyword() {
 			StringBuilder builder = new StringBuilder();
-			builder.Append((char)Source.CurChar);
-			Source.ReadChar();
-			while (char.IsLetterOrDigit((char)Source.CurChar) || Source.CurChar == '$' || Source.CurChar == '_' || Source.CurChar == '\u200C' || Source.CurChar == '\u200D') {
-				builder.Append((char)Source.CurChar);
-				Source.ReadChar();
+			builder.Append((char)_input.CurChar);
+			_input.ReadChar();
+			while (char.IsLetterOrDigit((char)_input.CurChar) || _input.CurChar == '$' || _input.CurChar == '_' || _input.CurChar == '\u200C' || _input.CurChar == '\u200D') {
+				builder.Append((char)_input.CurChar);
+				_input.ReadChar();
 			}
 			var value = builder.ToString();
 			TokenType keyword;
 			if (Keywords.TryGetValue(value, out keyword))
-				CurToken.Type = keyword;
+				Lookahead.Type = keyword;
 			else {
-				CurToken.Type = TokenType.Ident;
-				CurToken.Value = value;
+				Lookahead.Type = TokenType.Ident;
+				Lookahead.Value = value;
 			}
 		}
 
 		private void Read_Lt_or_Lte_or_Shl_or_ShlAssign() {
-			Source.ReadChar();
-			if (Source.CurChar == '=') {
-				CurToken.Type = TokenType.Lte;
-				Source.ReadChar();
+			_input.ReadChar();
+			if (_input.CurChar == '=') {
+				Lookahead.Type = TokenType.Lte;
+				_input.ReadChar();
 			}
-			else if (Source.CurChar == '<') {
-				Source.ReadChar();
-				if (Source.CurChar == '=') {
-					CurToken.Type = TokenType.ShlAssign;
-					Source.ReadChar();
+			else if (_input.CurChar == '<') {
+				_input.ReadChar();
+				if (_input.CurChar == '=') {
+					Lookahead.Type = TokenType.ShlAssign;
+					_input.ReadChar();
 				}
 				else
-					CurToken.Type = TokenType.Shl;
+					Lookahead.Type = TokenType.Shl;
 			}
 			else
-				CurToken.Type = TokenType.Lt;
+				Lookahead.Type = TokenType.Lt;
 		}
 
 		private void Read_Gt_or_Gte_or_ShrS_or_ShrSAssign_or_ShrU_or_ShrUAssign() {
-			Source.ReadChar();
-			if (Source.CurChar == '=') {
-				CurToken.Type = TokenType.Gte;
-				Source.ReadChar();
+			_input.ReadChar();
+			if (_input.CurChar == '=') {
+				Lookahead.Type = TokenType.Gte;
+				_input.ReadChar();
 			}
-			else if (Source.CurChar == '>') {
-				Source.ReadChar();
-				if (Source.CurChar == '=') {
-					CurToken.Type = TokenType.ShrSAssign;
-					Source.ReadChar();
+			else if (_input.CurChar == '>') {
+				_input.ReadChar();
+				if (_input.CurChar == '=') {
+					Lookahead.Type = TokenType.ShrSAssign;
+					_input.ReadChar();
 				}
-				else if (Source.CurChar == '>') {
-					Source.ReadChar();
-					if (Source.CurChar == '=') {
-						CurToken.Type = TokenType.ShrUAssign;
-						Source.ReadChar();
+				else if (_input.CurChar == '>') {
+					_input.ReadChar();
+					if (_input.CurChar == '=') {
+						Lookahead.Type = TokenType.ShrUAssign;
+						_input.ReadChar();
 					}
 					else
-						CurToken.Type = TokenType.ShrU;
+						Lookahead.Type = TokenType.ShrU;
 				}
 				else
-					CurToken.Type = TokenType.ShrS;
+					Lookahead.Type = TokenType.ShrS;
 			}
 			else
-				CurToken.Type = TokenType.Gt;
+				Lookahead.Type = TokenType.Gt;
 		}
 
 		private void Read_Eq_or_Assign_or_StrictEq() {
-			Source.ReadChar();
-			if (Source.CurChar == '=') {
-				Source.ReadChar();
-				if (Source.CurChar == '=') {
-					CurToken.Type = TokenType.StrictEq;
-					Source.ReadChar();
+			_input.ReadChar();
+			if (_input.CurChar == '=') {
+				_input.ReadChar();
+				if (_input.CurChar == '=') {
+					Lookahead.Type = TokenType.StrictEq;
+					_input.ReadChar();
 				}
 				else
-					CurToken.Type = TokenType.Eq;
+					Lookahead.Type = TokenType.Eq;
 			}
 			else
-				CurToken.Type = TokenType.Assign;
+				Lookahead.Type = TokenType.Assign;
 		}
 
 		private void Read_Plus_or_PlusAssign_or_Inc() {
-			Source.ReadChar();
-			if (Source.CurChar == '=') {
-				CurToken.Type = TokenType.PlusAssign;
-				Source.ReadChar();
+			_input.ReadChar();
+			if (_input.CurChar == '=') {
+				Lookahead.Type = TokenType.PlusAssign;
+				_input.ReadChar();
 			}
-			else if (Source.CurChar == '+') {
-				CurToken.Type = TokenType.Inc;
-				Source.ReadChar();
+			else if (_input.CurChar == '+') {
+				Lookahead.Type = TokenType.Inc;
+				_input.ReadChar();
 			}
 			else
-				CurToken.Type = TokenType.Plus;
+				Lookahead.Type = TokenType.Plus;
 		}
 
 		private void Read_Minus_or_MinusAssign_or_Dec() {
-			Source.ReadChar();
-			if (Source.CurChar == '=') {
-				CurToken.Type = TokenType.MinusAssign;
-				Source.ReadChar();
+			_input.ReadChar();
+			if (_input.CurChar == '=') {
+				Lookahead.Type = TokenType.MinusAssign;
+				_input.ReadChar();
 			}
-			else if (Source.CurChar == '-') {
-				CurToken.Type = TokenType.Dec;
-				Source.ReadChar();
+			else if (_input.CurChar == '-') {
+				Lookahead.Type = TokenType.Dec;
+				_input.ReadChar();
 			}
 			else
-				CurToken.Type = TokenType.Minus;
+				Lookahead.Type = TokenType.Minus;
 		}
 
 		private void Read_Star_or_StarAssign() {
-			Source.ReadChar();
-			if (Source.CurChar == '=') {
-				CurToken.Type = TokenType.StarAssign;
-				Source.ReadChar();
+			_input.ReadChar();
+			if (_input.CurChar == '=') {
+				Lookahead.Type = TokenType.StarAssign;
+				_input.ReadChar();
 			}
 			else
-				CurToken.Type = TokenType.Star;
+				Lookahead.Type = TokenType.Star;
 		}
 
 		private void SkipSingleLineComment() {
 			do {
-				Source.ReadChar();
+				_input.ReadChar();
 			}
-			while (Source.CurChar != '\n' && Source.CurChar != -1);
+			while (_input.CurChar != '\n' && _input.CurChar != -1);
 		}
 
 		private void ThrowUnexpectedEndOfFile() {
 			throw new UnexpectedEndOfFileException(
-				LogHelper.Error(
-					Source.LineNo,
-					Source.ColumnNo,
-					"Unexpected end of file"
+				Messages.Error(
+					_input.LineNo,
+					_input.ColumnNo,
+					"Unexpected end of file."
 				)
 			);
 		}
 
 		private void SkipMultiLineComment() {
 			for(;;) {
-				Source.ReadChar();
-				switch (Source.CurChar) {
+				_input.ReadChar();
+				switch (_input.CurChar) {
 					case -1:
 						ThrowUnexpectedEndOfFile();
 						break;
@@ -218,12 +223,12 @@ namespace YaJS.Compiler {
 						// Если многострочный комментарий содержит символ окончания строки,
 						// то считаем что следующей лексеме предшествует символ окончания строки
 						// см. http://ecma-international.org/ecma-262/5.1/#sec-7.4
-						CurToken.IsAfterLineTerminator = true;
+						Lookahead.IsAfterLineTerminator = true;
 						break;
 					case '*':
-						Source.ReadChar();
-						if (Source.CurChar == '/') {
-							Source.ReadChar();
+						_input.ReadChar();
+						if (_input.CurChar == '/') {
+							_input.ReadChar();
 							return;
 						}
 						break;
@@ -232,133 +237,133 @@ namespace YaJS.Compiler {
 		}
 
 		private void TryRead_Slash_or_SlashAssign(bool isRegexAllowed) {
-			Source.ReadChar();
-			if (!isRegexAllowed && Source.CurChar == '=') {
-				CurToken.Type = TokenType.SlashAssign;
-				Source.ReadChar();
+			_input.ReadChar();
+			if (!isRegexAllowed && _input.CurChar == '=') {
+				Lookahead.Type = TokenType.SlashAssign;
+				_input.ReadChar();
 			}
-			else if (Source.CurChar == '/')
+			else if (_input.CurChar == '/')
 				SkipSingleLineComment();
-			else if (Source.CurChar == '*')
+			else if (_input.CurChar == '*')
 				SkipMultiLineComment();
 			else
-				CurToken.Type = TokenType.Slash;
+				Lookahead.Type = TokenType.Slash;
 		}
 
 		private void Read_Mod_or_ModAssign() {
-			Source.ReadChar();
-			if (Source.CurChar == '=') {
-				CurToken.Type = TokenType.ModAssign;
-				Source.ReadChar();
+			_input.ReadChar();
+			if (_input.CurChar == '=') {
+				Lookahead.Type = TokenType.ModAssign;
+				_input.ReadChar();
 			}
 			else
-				CurToken.Type = TokenType.Mod;
+				Lookahead.Type = TokenType.Mod;
 		}
 
 		private void Read_BitAnd_or_BitAndAssign_or_And() {
-			Source.ReadChar();
-			if (Source.CurChar == '=') {
-				CurToken.Type = TokenType.BitAndAssign;
-				Source.ReadChar();
+			_input.ReadChar();
+			if (_input.CurChar == '=') {
+				Lookahead.Type = TokenType.BitAndAssign;
+				_input.ReadChar();
 			}
-			else if (Source.CurChar == '&') {
-				CurToken.Type = TokenType.And;
-				Source.ReadChar();
+			else if (_input.CurChar == '&') {
+				Lookahead.Type = TokenType.And;
+				_input.ReadChar();
 			}
 			else
-				CurToken.Type = TokenType.BitAnd;
+				Lookahead.Type = TokenType.BitAnd;
 		}
 
 		private void Read_BitOr_or_BitOrAssign_or_Or() {
-			Source.ReadChar();
-			if (Source.CurChar == '=') {
-				CurToken.Type = TokenType.BitOrAssign;
-				Source.ReadChar();
+			_input.ReadChar();
+			if (_input.CurChar == '=') {
+				Lookahead.Type = TokenType.BitOrAssign;
+				_input.ReadChar();
 			}
-			else if (Source.CurChar == '|') {
-				CurToken.Type = TokenType.Or;
-				Source.ReadChar();
+			else if (_input.CurChar == '|') {
+				Lookahead.Type = TokenType.Or;
+				_input.ReadChar();
 			}
 			else
-				CurToken.Type = TokenType.BitOr;
+				Lookahead.Type = TokenType.BitOr;
 		}
 
 		private void Read_BitXor_or_BitXorAssign() {
-			Source.ReadChar();
-			if (Source.CurChar == '=') {
-				CurToken.Type = TokenType.BitXorAssign;
-				Source.ReadChar();
+			_input.ReadChar();
+			if (_input.CurChar == '=') {
+				Lookahead.Type = TokenType.BitXorAssign;
+				_input.ReadChar();
 			}
 			else
-				CurToken.Type = TokenType.BitXor;
+				Lookahead.Type = TokenType.BitXor;
 		}
 
 		private void Read_Not_or_Neq_or_StrictNeq() {
-			Source.ReadChar();
-			if (Source.CurChar == '=') {
-				Source.ReadChar();
-				if (Source.CurChar == '=') {
-					CurToken.Type = TokenType.StrictNeq;
-					Source.ReadChar();
+			_input.ReadChar();
+			if (_input.CurChar == '=') {
+				_input.ReadChar();
+				if (_input.CurChar == '=') {
+					Lookahead.Type = TokenType.StrictNeq;
+					_input.ReadChar();
 				}
 				else
-					CurToken.Type = TokenType.Neq;
+					Lookahead.Type = TokenType.Neq;
 			}
 			else
-				CurToken.Type = TokenType.Not;
+				Lookahead.Type = TokenType.Not;
 		}
 
 		private void ThrowUnexpectedChar() {
 			throw new UnexpectedCharException(
-				LogHelper.Error(
-					Source.LineNo,
-					Source.ColumnNo,
-					string.Format("Unexpected char \"{0}\"", Source.CurChar.ToString())
+				Messages.Error(
+					_input.LineNo,
+					_input.ColumnNo,
+					string.Format("Unexpected char \"{0}\".", _input.CurChar.ToString())
 				)
 			);
 		}
 
 		private void ReadIntegerOrFloatNumber() {
-			CurToken.Type = TokenType.Integer;
+			Lookahead.Type = TokenType.Integer;
 			StringBuilder builder = new StringBuilder();
-			while (char.IsDigit((char)Source.CurChar)) {
-				builder.Append((char)Source.CurChar);
-				Source.ReadChar();
+			while (char.IsDigit((char)_input.CurChar)) {
+				builder.Append((char)_input.CurChar);
+				_input.ReadChar();
 			}
 			// Ноль может быть удален при попытке распознать HexInteger
 			if (builder.Length == 0)
 				builder.Append('0');
-			if (Source.CurChar == '.') {
-				CurToken.Type = TokenType.Float;
-				builder.Append((char)Source.CurChar);
-				Source.ReadChar();
-				if (!char.IsDigit((char)Source.CurChar))
+			if (_input.CurChar == '.') {
+				Lookahead.Type = TokenType.Float;
+				builder.Append((char)_input.CurChar);
+				_input.ReadChar();
+				if (!char.IsDigit((char)_input.CurChar))
 					ThrowUnexpectedChar();
 				do {
-					builder.Append((char)Source.CurChar);
-					Source.ReadChar();
-				} while (char.IsDigit((char)Source.CurChar));
+					builder.Append((char)_input.CurChar);
+					_input.ReadChar();
+				} while (char.IsDigit((char)_input.CurChar));
 			}
-			if (Source.CurChar == 'e' || Source.CurChar == 'E') {
-				CurToken.Type = TokenType.Float;
-				builder.Append((char)Source.CurChar);
-				Source.ReadChar();
-				if (Source.CurChar == '-' || Source.CurChar == '+') {
-					builder.Append((char)Source.CurChar);
-					Source.ReadChar();
+			if (_input.CurChar == 'e' || _input.CurChar == 'E') {
+				Lookahead.Type = TokenType.Float;
+				builder.Append((char)_input.CurChar);
+				_input.ReadChar();
+				if (_input.CurChar == '-' || _input.CurChar == '+') {
+					builder.Append((char)_input.CurChar);
+					_input.ReadChar();
 				}
-				if (!char.IsDigit((char)Source.CurChar))
+				if (!char.IsDigit((char)_input.CurChar))
 					ThrowUnexpectedChar();
 				do {
-					builder.Append((char)Source.CurChar);
-					Source.ReadChar();
-				} while (char.IsDigit((char)Source.CurChar));
+					builder.Append((char)_input.CurChar);
+					_input.ReadChar();
+				} while (char.IsDigit((char)_input.CurChar));
 			}
 			// Число и идентификатор должны быть разделены хотя бы одним символом
 			// см. http://ecma-international.org/ecma-262/5.1/#sec-7.8.3
-			if (IsIdentStartChar((char)Source.CurChar))
+			if (IsIdentStartChar((char)_input.CurChar))
 				ThrowUnexpectedChar();
-			CurToken.Value = builder.ToString();
+			Lookahead.Value = builder.ToString();
 		}
 
 		private static bool IsHexDigit(char c) {
@@ -367,37 +372,37 @@ namespace YaJS.Compiler {
 
 		private void ReadHexIntegerNumber() {
 			// Пропустить x или X
-			Source.ReadChar();
-			if (!IsHexDigit((char)Source.CurChar))
+			_input.ReadChar();
+			if (!IsHexDigit((char)_input.CurChar))
 				ThrowUnexpectedChar();
 			StringBuilder builder = new StringBuilder();
 			do {
-				builder.Append((char)Source.CurChar);
-				Source.ReadChar();
+				builder.Append((char)_input.CurChar);
+				_input.ReadChar();
 			}
-			while (IsHexDigit((char)Source.CurChar));
+			while (IsHexDigit((char)_input.CurChar));
 			// Число и идентификатор должны быть разделены хотя бы одним символом
 			// см. http://ecma-international.org/ecma-262/5.1/#sec-7.8.3
-			if (IsIdentStartChar((char)Source.CurChar))
+			if (IsIdentStartChar((char)_input.CurChar))
 				ThrowUnexpectedChar();
-			CurToken.Type = TokenType.HexInteger;
-			CurToken.Value = builder.ToString();
+			Lookahead.Type = TokenType.HexInteger;
+			Lookahead.Value = builder.ToString();
 		}
 
 		private char ReadEscapeSequence(int length) {
-			Source.ReadChar();
+			_input.ReadChar();
 			int result = 0;
 			for (int i = 0; i < length; i++) {
 				int hexDigit = 0;
-				if ('0' <= Source.CurChar && Source.CurChar <= '9')
-					hexDigit = Source.CurChar - '0';
-				else if ('a' <= Source.CurChar && Source.CurChar <= 'f')
-					hexDigit = Source.CurChar - 'a' + 10;
-				else if ('A' <= Source.CurChar && Source.CurChar <= 'F')
-					hexDigit = Source.CurChar - 'A' + 10;
+				if ('0' <= _input.CurChar && _input.CurChar <= '9')
+					hexDigit = _input.CurChar - '0';
+				else if ('a' <= _input.CurChar && _input.CurChar <= 'f')
+					hexDigit = _input.CurChar - 'a' + 10;
+				else if ('A' <= _input.CurChar && _input.CurChar <= 'F')
+					hexDigit = _input.CurChar - 'A' + 10;
 				else
 					ThrowUnexpectedChar();
-				Source.ReadChar();
+				_input.ReadChar();
 				result = (result << 4) + hexDigit;
 			}
 			return ((char)result);
@@ -405,46 +410,46 @@ namespace YaJS.Compiler {
 
 		private void ReadString(char endQuoteChar) {
 			StringBuilder builder = new StringBuilder();
-			Source.ReadChar();
-			while (Source.CurChar != endQuoteChar) {
-				if (Source.CurChar == -1)
+			_input.ReadChar();
+			while (_input.CurChar != endQuoteChar) {
+				if (_input.CurChar == -1)
 					ThrowUnexpectedEndOfFile();
-				else if (Source.CurChar != '\\') {
-					builder.Append((char)Source.CurChar);
-					Source.ReadChar();
+				else if (_input.CurChar != '\\') {
+					builder.Append((char)_input.CurChar);
+					_input.ReadChar();
 				}
 				else {
-					Source.ReadChar();
-					switch (Source.CurChar) {
+					_input.ReadChar();
+					switch (_input.CurChar) {
 						case '"':
 						case '\\':
 						case '/':
-							builder.Append((char)Source.CurChar);
-							Source.ReadChar();
+							builder.Append((char)_input.CurChar);
+							_input.ReadChar();
 							break;
 						case 'b':
 							builder.Append('\b');
-							Source.ReadChar();
+							_input.ReadChar();
 							break;
 						case 'f':
 							builder.Append('\f');
-							Source.ReadChar();
+							_input.ReadChar();
 							break;
 						case 'n':
 							builder.Append('\n');
-							Source.ReadChar();
+							_input.ReadChar();
 							break;
 						case 'r':
 							builder.Append('\r');
-							Source.ReadChar();
+							_input.ReadChar();
 							break;
 						case 't':
 							builder.Append('\t');
-							Source.ReadChar();
+							_input.ReadChar();
 							break;
 						case 'v':
 							builder.Append('\v');
-							Source.ReadChar();
+							_input.ReadChar();
 							break;
 						case 'x':
 							builder.Append(ReadEscapeSequence(2));
@@ -454,81 +459,81 @@ namespace YaJS.Compiler {
 							break;
 						default:
 							// Учесть возможность слияния частей строкового литерала расположенных на разных строках
-							if (Source.CurChar != '\n')
-								builder.Append((char)Source.CurChar);
-							Source.ReadChar();
+							if (_input.CurChar != '\n')
+								builder.Append((char)_input.CurChar);
+							_input.ReadChar();
 							break;
 					}
 				}
 			}
-			CurToken.Type = TokenType.String;
-			CurToken.Value = builder.ToString();
-			Source.ReadChar();
+			Lookahead.Type = TokenType.String;
+			Lookahead.Value = builder.ToString();
+			_input.ReadChar();
 		}
 
 		/// <summary>
 		/// Прочитать очередную лексему
 		/// </summary>
 		/// <param name="isRegexAllowed">Регулярные выражения допустимы? Влияет на обработку /</param>
-		public void ReadToken(bool isRegexAllowed = false) {
-			CurToken.SetUnknown();
+		public Token ReadToken(bool isRegexAllowed = false) {
+			Lookahead.SetUnknown();
 			// Используется цикл так как могут встретится комментарии, которые необходимо пропускать
-			while (!Source.IsEOF && CurToken.Type == TokenType.Unknown) {
+			while (!_input.IsEOF && Lookahead.Type == TokenType.Unknown) {
 				// Пропускаем пробельные символы
-				while (char.IsWhiteSpace((char)Source.CurChar)) {
+				while (char.IsWhiteSpace((char)_input.CurChar)) {
 					// Запоминаем если встретили символ окончания строки (нужно для автоматической расстановки ;)
 					// см. http://ecma-international.org/ecma-262/5.1/#sec-7.9
-					if (Source.CurChar == '\n')
-						CurToken.IsAfterLineTerminator = true;
-					Source.ReadChar();
+					if (_input.CurChar == '\n')
+						Lookahead.IsAfterLineTerminator = true;
+					_input.ReadChar();
 				}
 
-				CurToken.StartPosition = new TokenPosition(Source.LineNo, Source.ColumnNo);
+				Lookahead.StartPosition = new TokenPosition(_input.LineNo, _input.ColumnNo);
 
-				if (IsIdentStartChar((char)Source.CurChar))
+				if (IsIdentStartChar((char)_input.CurChar))
 					ReadIdentOrKeyword();
 				else {
-					switch (Source.CurChar) {
+					switch (_input.CurChar) {
 						case '{':
-							CurToken.Type = TokenType.LCurlyBrace;
-							Source.ReadChar();
+							Lookahead.Type = TokenType.LCurlyBrace;
+							_input.ReadChar();
 							break;
 						case '}':
-							CurToken.Type = TokenType.RCurlyBrace;
-							Source.ReadChar();
+							Lookahead.Type = TokenType.RCurlyBrace;
+							_input.ReadChar();
 							break;
 						case '(':
-							CurToken.Type = TokenType.LParenthesis;
-							Source.ReadChar();
+							Lookahead.Type = TokenType.LParenthesis;
+							_input.ReadChar();
 							break;
 						case ')':
-							CurToken.Type = TokenType.RParenthesis;
-							Source.ReadChar();
+							Lookahead.Type = TokenType.RParenthesis;
+							_input.ReadChar();
 							break;
 						case '[':
-							CurToken.Type = TokenType.LBracket;
-							Source.ReadChar();
+							Lookahead.Type = TokenType.LBracket;
+							_input.ReadChar();
 							break;
 						case ']':
-							CurToken.Type = TokenType.RBracket;
-							Source.ReadChar();
+							Lookahead.Type = TokenType.RBracket;
+							_input.ReadChar();
 							break;
 						case '.':
 							// Число также может начинаться с точки
-							if (char.IsDigit((char)Source.PeekChar()))
+							if (char.IsDigit((char)_input.PeekChar()))
 								ReadIntegerOrFloatNumber();
 							else {
-								CurToken.Type = TokenType.Dot;
-								Source.ReadChar();
+								Lookahead.Type = TokenType.Dot;
+								_input.ReadChar();
 							}
 							break;
 						case ';':
-							CurToken.Type = TokenType.Semicolon;
-							Source.ReadChar();
+							Lookahead.Type = TokenType.Semicolon;
+							_input.ReadChar();
 							break;
 						case ',':
-							CurToken.Type = TokenType.Comma;
-							Source.ReadChar();
+							Lookahead.Type = TokenType.Comma;
+							_input.ReadChar();
 							break;
 						case '<':
 							Read_Lt_or_Lte_or_Shl_or_ShlAssign();
@@ -555,8 +560,8 @@ namespace YaJS.Compiler {
 							Read_Mod_or_ModAssign();
 							break;
 						case '~':
-							CurToken.Type = TokenType.BitNot;
-							Source.ReadChar();
+							Lookahead.Type = TokenType.BitNot;
+							_input.ReadChar();
 							break;
 						case '&':
 							Read_BitAnd_or_BitAndAssign_or_And();
@@ -571,17 +576,17 @@ namespace YaJS.Compiler {
 							Read_Not_or_Neq_or_StrictNeq();
 							break;
 						case '?':
-							CurToken.Type = TokenType.QuestionMark;
-							Source.ReadChar();
+							Lookahead.Type = TokenType.QuestionMark;
+							_input.ReadChar();
 							break;
 						case ':':
-							CurToken.Type = TokenType.Colon;
-							Source.ReadChar();
+							Lookahead.Type = TokenType.Colon;
+							_input.ReadChar();
 							break;
 
 						case '0':
-							Source.ReadChar();
-							if (Source.CurChar == 'x' || Source.CurChar == 'X')
+							_input.ReadChar();
+							if (_input.CurChar == 'x' || _input.CurChar == 'X')
 								ReadHexIntegerNumber();
 							else
 								ReadIntegerOrFloatNumber();
@@ -606,15 +611,15 @@ namespace YaJS.Compiler {
 							break;
 
 						default:
-							if (Source.CurChar != -1)
+							if (_input.CurChar != -1)
 								ThrowUnexpectedChar();
 							break;
 					}
 				}
 			}
+			return (Lookahead);
 		}
 
-		public CharStream Source { get; private set; }
-		public Token CurToken { get; private set; }
+		public Token Lookahead { get; private set; }
 	}
 }

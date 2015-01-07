@@ -3,7 +3,7 @@ using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace YaJS.Compiler.Tests {
-	using YaJS.Compiler.Parser;
+	using YaJS.Compiler;
 	using YaJS.Compiler.Exceptions;
 
 	[TestClass]
@@ -11,7 +11,7 @@ namespace YaJS.Compiler.Tests {
 		private static Token RunTokenizer(string source) {
 			var tokenizer = new Tokenizer(new StringReader(source));
 			tokenizer.ReadToken();
-			return (tokenizer.CurToken);
+			return (tokenizer.Lookahead);
 		}
 
 		private static void RunTokenizer(string source, TokenType expectedType) {

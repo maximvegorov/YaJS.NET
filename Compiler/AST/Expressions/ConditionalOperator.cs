@@ -22,10 +22,11 @@ namespace YaJS.Compiler.AST.Expressions {
 			return (result.ToString());
 		}
 
-		public override bool CanHaveMembers { get { return (TrueOperand.CanHaveMembers && FalseOperand.CanHaveMembers); } }
-		public override bool CanHaveMutableMembers { get { return (TrueOperand.CanHaveMutableMembers && FalseOperand.CanHaveMutableMembers); } }
-		public override bool CanBeConstructor { get { return (TrueOperand.CanBeConstructor && FalseOperand.CanBeConstructor); } }
-		public override bool CanBeFunction { get { return (TrueOperand.CanBeFunction && FalseOperand.CanBeFunction); } }
+		public override bool CanHaveMembers { get { return (TrueOperand.CanHaveMembers || FalseOperand.CanHaveMembers); } }
+		public override bool CanHaveMutableMembers { get { return (TrueOperand.CanHaveMutableMembers || FalseOperand.CanHaveMutableMembers); } }
+		public override bool CanBeConstructor { get { return (TrueOperand.CanBeConstructor || FalseOperand.CanBeConstructor); } }
+		public override bool CanBeFunction { get { return (TrueOperand.CanBeFunction || FalseOperand.CanBeFunction); } }
+		public override bool IsConstant { get { return (Condition.IsConstant && TrueOperand.IsConstant && FalseOperand.IsConstant); } }
 
 		public Expression Condition { get; private set; }
 		public Expression TrueOperand { get; private set; }

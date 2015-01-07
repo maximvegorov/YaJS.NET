@@ -8,6 +8,9 @@
 			return (Value ? "true" : "false");
 		}
 
+		public override bool CanHaveMembers { get { return (true); } }
+		public override bool IsConstant { get { return (true); } }
+
 		public bool Value { get; private set; }
 	}
 }

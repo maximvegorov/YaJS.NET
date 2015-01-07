@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.Contracts;
+﻿using System;
+using System.Diagnostics.Contracts;
 
 namespace YaJS.Compiler {
 	public enum TokenType {
@@ -55,6 +56,11 @@ namespace YaJS.Compiler {
 		Protected,		// protected
 		Static,			// static
 
+		// Слова, зарезервированные в данной реализации
+		Undefined,		// undefined
+		Eval,			// eval
+		Arguments,		// arguments
+
 		// Знаки пунктуации
 		LCurlyBrace,	// {
 		RCurlyBrace,	// }
@@ -85,8 +91,8 @@ namespace YaJS.Compiler {
 		ShrU,			// >>>
 		BitNot,			// ~
 		BitAnd,			// &
-		BitOr,			// |
 		BitXor,			// ^
+		BitOr,			// |
 		Not,			// !
 		And,			// &&
 		Or,				// ||
@@ -102,8 +108,8 @@ namespace YaJS.Compiler {
 		ShrSAssign,		// >>=
 		ShrUAssign,		// >>>=
 		BitAndAssign,	// &=
-		BitOrAssign,	// |=
 		BitXorAssign,	// ^=
+		BitOrAssign,	// |=
 
 		Integer,		// целое число
 		HexInteger,		// шестнацатеричное целое число
@@ -138,6 +144,10 @@ namespace YaJS.Compiler {
 			if (string.IsNullOrEmpty(Value))
 				return (Type.ToString());
 			return (string.Format("{0} ({1})", Type.ToString(), Value));
+		}
+
+		public Token Clone() {
+			return ((Token)MemberwiseClone());
 		}
 
 		/// <summary>

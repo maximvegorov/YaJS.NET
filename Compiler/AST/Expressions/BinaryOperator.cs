@@ -12,6 +12,8 @@ namespace YaJS.Compiler.AST.Expressions {
 			RightOperand = rightOperand;
 		}
 
+		public override bool IsConstant { get { return (LeftOperand.IsConstant && RightOperand.IsConstant); } }
+
 		public Expression LeftOperand { get; private set; }
 		public Expression RightOperand { get; private set; }
 	}

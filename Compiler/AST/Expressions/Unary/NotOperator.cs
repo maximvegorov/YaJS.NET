@@ -7,5 +7,7 @@
 		public override string ToString() {
 			return ("!" + Operand.ToString());
 		}
+
+		public override bool CanHaveMembers { get { return (true); } }
 	}
 }

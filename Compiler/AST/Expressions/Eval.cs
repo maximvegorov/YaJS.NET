@@ -4,6 +4,7 @@
 			return ("eval");
 		}
 
+		public override bool CanHaveMembers { get { return (true); } }
 		public override bool CanBeFunction { get { return (true); } }
 	}
 }

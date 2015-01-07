@@ -33,6 +33,6 @@ namespace YaJS.Compiler.AST.Expressions {
 		public override bool CanBeFunction { get { return (true); } }
 
 		public Expression Constructor { get; private set; }
-		public List<Expression> Arguments { get; private set; }
+		public new List<Expression> Arguments { get; private set; }
 	}
 }

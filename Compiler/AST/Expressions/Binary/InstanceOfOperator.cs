@@ -2,10 +2,10 @@
 using System.Text;
 
 namespace YaJS.Compiler.AST.Expressions {
-	internal sealed class InOperator : BinaryOperator {
-		public InOperator(Expression leftOperand, Expression rightOperand)
+	internal sealed class InstanceOfOperator : BinaryOperator {
+		public InstanceOfOperator(Expression leftOperand, Expression rightOperand)
 			: base(leftOperand, rightOperand) {
-			Contract.Requires(RightOperand.CanBeConstructor);
+			Contract.Requires(rightOperand.CanBeConstructor);
 		}
 
 		public override string ToString() {
@@ -13,5 +13,7 @@ namespace YaJS.Compiler.AST.Expressions {
 			result.Append(LeftOperand.ToString()).Append(" instanceof ").Append(RightOperand.ToString());
 			return (result.ToString());
 		}
+
+		public override bool CanHaveMembers { get { return (true); } }
 	}
 }
