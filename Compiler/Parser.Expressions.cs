@@ -112,7 +112,7 @@ namespace YaJS.Compiler {
 		}
 
 		private Expression ParseFunctionLiteral() {
-			throw new NotImplementedException();
+			return (Expression.Function(ParseFunction(false)));
 		}
 
 		private Expression ParseGrouping() {

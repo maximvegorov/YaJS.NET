@@ -1,5 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Diagnostics.Contracts;
+using System.Globalization;
 
 namespace YaJS.Compiler.AST {
 	using YaJS.Compiler.AST.Expressions;
@@ -32,13 +33,59 @@ namespace YaJS.Compiler.AST {
 			return (_true);
 		}
 		public static Expression Integer(string value) {
-			throw new NotImplementedException();
+			Contract.Requires(!string.IsNullOrEmpty(value));
+			var prevIntegerValue = 0;
+			var integerValue = 0;
+			for (var i = 0; i < value.Length; i++) {
+				var digit = (value[i] - '0');
+				Contract.Assert(0 <= digit && digit <= 9);
+				integerValue = unchecked(10 * prevIntegerValue + digit);
+				if (integerValue < prevIntegerValue) {
+					var floatValue = (double)prevIntegerValue;
+					for (var j = i; j < value.Length; j++) {
+						digit = (value[j] - '0');
+						Contract.Assert(0 <= digit && digit <= 9);
+						floatValue = 10 * floatValue + digit;
+					}
+					return (new FloatLiteral(floatValue));
+				}
+				prevIntegerValue = integerValue;
+			}
+			return (new IntegerLiteral(integerValue));
+		}
+		private static int ToHexDigit(char c) {
+			if ('0' <= c && c <= '9')
+				return (c - '0');
+			else if ('a' <= c && c <= 'f')
+				return (c - 'a');
+			else if ('A' <= c && c <= 'F')
+				return (c - 'A');
+			else
+				Contract.Assert(false);
+			return (0);
 		}
 		public static Expression HexInteger(string value) {
-			throw new NotImplementedException();
+			Contract.Requires(!string.IsNullOrEmpty(value));
+			var prevIntegerValue = 0;
+			var integerValue = 0;
+			for (var i = 0; i < value.Length; i++) {
+				int digit = ToHexDigit(value[i]);
+				integerValue = unchecked((prevIntegerValue << 4) | digit);
+				if (integerValue < prevIntegerValue) {
+					var floatValue = (double)prevIntegerValue;
+					for (var j = i; j < value.Length; j++) {
+						digit = ToHexDigit(value[j]);
+						floatValue = 16 * floatValue + digit;
+					}
+					return (new FloatLiteral(floatValue));
+				}
+				prevIntegerValue = integerValue;
+			}
+			return (new IntegerLiteral(integerValue));
 		}
 		public static Expression Float(string value) {
-			throw new NotImplementedException();
+			Contract.Requires(!string.IsNullOrEmpty(value));
+			return (new FloatLiteral(double.Parse(value, CultureInfo.InvariantCulture)));
 		}
 		public static Expression String(string value) {
 			if (string.IsNullOrEmpty(value))
@@ -50,14 +97,19 @@ namespace YaJS.Compiler.AST {
 			return (new Identifier(value));
 		}
 		public static Expression Object(List<KeyValuePair<string, Expression>> properties) {
+			Contract.Requires(properties != null);
 			if (properties.Count == 0)
 				properties = _emptyObject;
 			return (new ObjectLiteral(properties));
 		}
 		public static Expression Array(List<Expression> items) {
+			Contract.Requires(items != null);
 			if (items.Count == 0)
 				items = _emptyArray;
 			return (new ArrayLiteral(items));
+		}
+		public static Expression Function(Function function) {
+			return (new FunctionLiteral(function));
 		}
 		public static Expression This() {
 			return (_this);

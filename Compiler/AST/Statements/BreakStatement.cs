@@ -2,13 +2,13 @@
 
 namespace YaJS.Compiler.AST.Statements {
 	/// <summary>
-	/// Оператор continue (См. http://www.ecma-international.org/ecma-262/5.1/#sec-12.7)
+	/// Оператор break (См. http://www.ecma-international.org/ecma-262/5.1/#sec-12.8)
 	/// </summary>
-	internal sealed class ContinueStatement : Statement {
+	internal sealed class BreakStatement : Statement {
 		private Statement _target;
 
-		public ContinueStatement(Statement parent, Statement target)
-			: base(parent, StatementType.Continue) {
+		public BreakStatement(Statement parent, Statement target)
+			: base(parent, StatementType.Break) {
 			Contract.Requires(target != null);
 			_target = target;
 		}

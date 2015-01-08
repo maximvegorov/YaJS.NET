@@ -1,27 +1,45 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
 namespace YaJS.Compiler.AST {
 	/// <summary>
 	/// Набор меток оператора
 	/// </summary>
+	[ContractClass(typeof(ContractClassForILabelSet))]
 	public interface ILabelSet {
+		[Pure]
 		bool Contains(string label);
 		ILabelSet UnionWith(string label);
+	}
+
+	[ContractClassFor(typeof(ILabelSet))]
+	internal abstract class ContractClassForILabelSet : ILabelSet {
+		public bool Contains(string label) {
+			Contract.Requires(label != null);
+			throw new NotImplementedException();
+		}
+		public ILabelSet UnionWith(string label) {
+			Contract.Requires(!Contains(label));
+			throw new NotImplementedException();
+		}
 	}
 
 	/// <summary>
 	/// Пустой набор меток
 	/// </summary>
 	internal sealed class EmptyLabelSet : ILabelSet {
+		private static readonly ILabelSet _oneEmptyStringLabelSet = new SingletonLabelSet(string.Empty);
+
 		public bool Contains(string label) {
-			Contract.Requires(label != null);
 			return (false);
 		}
 
 		public ILabelSet UnionWith(string label) {
-			Contract.Requires(label != null);
-			return (new SingletonLabelSet(label));
+			if (string.IsNullOrEmpty(label))
+				return (_oneEmptyStringLabelSet);
+			else
+				return (new SingletonLabelSet(label));
 		}
 	}
 
@@ -38,12 +56,10 @@ namespace YaJS.Compiler.AST {
 
 		[Pure]
 		public bool Contains(string label) {
-			Contract.Requires(label != null);
 			return (string.CompareOrdinal(_label, label) == 0);
 		}
 
 		public ILabelSet UnionWith(string label) {
-			Contract.Requires(!Contains(label));
 			return (new TwoLabelSet(_label, label));
 		}
 	}
@@ -64,12 +80,10 @@ namespace YaJS.Compiler.AST {
 
 		[Pure]
 		public bool Contains(string label) {
-			Contract.Requires(label != null);
 			return (string.CompareOrdinal(_label1, label) == 0 || string.CompareOrdinal(_label2, label) == 0);
 		}
 
 		public ILabelSet UnionWith(string label) {
-			Contract.Requires(!Contains(label));
 			return (new HashLabelSet(_label1, _label2, label));
 		}
 	}
@@ -89,12 +103,10 @@ namespace YaJS.Compiler.AST {
 
 		[Pure]
 		public bool Contains(string label) {
-			Contract.Requires(label != null);
 			return (_set.Contains(label));
 		}
 
 		public ILabelSet UnionWith(string label) {
-			Contract.Requires(!Contains(label));
 			_set.Add(label);
 			return (this);
 		}

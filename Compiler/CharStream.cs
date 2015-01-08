@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.Contracts;
+﻿using System;
+using System.Diagnostics.Contracts;
 using System.IO;
 
 namespace YaJS.Compiler {
@@ -9,7 +10,7 @@ namespace YaJS.Compiler {
 		private TextReader _reader;
 
 		public CharStream(TextReader reader) {
-			Contract.Requires(reader != null);
+			Contract.Requires<ArgumentNullException>(reader != null, "reader");
 			_reader = reader;
 			LineNo = 1;
 			// ВАЖНО!!! Всегда надо иметь один прочитанный вперед символ

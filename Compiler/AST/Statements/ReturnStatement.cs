@@ -1,10 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics.Contracts;
 
 namespace YaJS.Compiler.AST.Statements {
-	class ReturnStatement {
+	/// <summary>
+	/// Оператор return (См. http://www.ecma-international.org/ecma-262/5.1/#sec-12.9)
+	/// </summary>
+	internal sealed class ReturnStatement : Statement {
+		private Expression _expression;
+
+		public ReturnStatement(Statement parent, Expression expression)
+			: base(parent, StatementType.Return) {
+			Contract.Requires(expression != null);
+			_expression = expression;
+		}
 	}
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics.Contracts;
+﻿using System.Diagnostics.Contracts;
 
 namespace YaJS.Compiler.AST {
 	/// <summary>
@@ -14,7 +13,6 @@ namespace YaJS.Compiler.AST {
 		Empty,
 		Expression,
 		If,
-		IfElse,
 		For,
 		ForIn,
 		Return,
@@ -29,34 +27,38 @@ namespace YaJS.Compiler.AST {
 	/// </summary>
 	public abstract class Statement {
 		internal static readonly ILabelSet EmptyLabelSet = new EmptyLabelSet();
-		internal static readonly ILabelSet OneEmptyStringLabelSet = new SingletonLabelSet(string.Empty);
 
-		private ILabelSet _labelSet;
-
-		public Statement(Statement parent, StatementType type, ILabelSet labelSet) {
-			Contract.Requires(labelSet != null);
+		public Statement(Statement parent, StatementType type) {
 			Parent = parent;
 			Type = type;
-			_labelSet = labelSet;
 		}
 
-		internal bool ContainsLabel(string label) {
-			return (_labelSet.Contains(label));
+		public virtual bool IsBreakTarget(string targetLabel) {
+			Contract.Requires(targetLabel != null);
+			return (false);
 		}
-		internal void AddLabel(string label) {
-			_labelSet = _labelSet.UnionWith(label);
-		}
-
-		public virtual bool CanContainBreak(string target) {
-			Contract.Requires(target != null);
-			return (Parent != null ? Parent.CanContainBreak(target) : false);
-		}
-		public virtual bool CanContainContinue(string target) {
-			Contract.Requires(target != null);
-			return (Parent != null ? Parent.CanContainContinue(target) : false);
+		public virtual bool IsContinueTarget(string targetLabel) {
+			Contract.Requires(targetLabel != null);
+			return (false);
 		}
 		public virtual bool CanContainReturn() {
 			return (Parent != null ? Parent.CanContainReturn() : true);
+		}
+
+		public virtual bool IsTarget(Statement target) {
+			return (false);
+		}
+
+		protected virtual void RegisterAsExitPoint(Statement exitPoint) {
+		}
+
+		/// <summary>
+		/// Зарегистрировать оператор как точку выхода. Используется для правильной обработки блоков finally оператора try
+		/// </summary>
+		public void RegisterAsExitPoint() {
+			for (var current = Parent; current != null && !current.IsTarget(this); current = current.Parent) {
+				current.RegisterAsExitPoint(this);
+			}
 		}
 
 		/// <summary>

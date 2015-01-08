@@ -1,10 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics.Contracts;
 
 namespace YaJS.Compiler.AST.Statements {
-	class DoWhileStatement {
+	/// <summary>
+	/// Оператор do-while (См. http://www.ecma-international.org/ecma-262/5.1/#sec-12.6.1)
+	/// </summary>
+	internal sealed class DoWhileStatement : IterationStatement {
+		private Expression _condition;
+
+		public DoWhileStatement(Statement parent, ILabelSet labelSet)
+			: base(parent, StatementType.DoWhile, labelSet) {
+		}
+
+		public Expression Condition {
+			get { return (_condition); }
+			set {
+				Contract.Requires(value != null);
+				Contract.Assert(_condition == null);
+				_condition = value;
+			}
+		}
 	}
 }

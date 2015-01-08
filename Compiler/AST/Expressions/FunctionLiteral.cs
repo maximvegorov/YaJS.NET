@@ -16,6 +16,6 @@ namespace YaJS.Compiler.AST.Expressions {
 		public override bool CanBeConstructor { get { return (true); } }
 		public override bool CanBeFunction { get { return (true); } }
 
-		public Function Function { get; private set; }
+		public new Function Function { get; private set; }
 	}
 }

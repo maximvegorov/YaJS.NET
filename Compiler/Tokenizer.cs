@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text;
@@ -68,7 +69,7 @@ namespace YaJS.Compiler {
 		public CharStream _input;
 
 		public Tokenizer(TextReader reader) {
-			Contract.Requires(reader != null);
+			Contract.Requires<ArgumentNullException>(reader != null, "reader");
 			_input = new CharStream(reader);
 			Lookahead = new Token();
 		}

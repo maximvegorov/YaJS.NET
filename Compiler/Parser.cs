@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 
@@ -17,7 +18,7 @@ namespace YaJS.Compiler {
 		private FunctionContext _currentFunction;
 
 		public Parser(Tokenizer tokenizer) {
-			Contract.Requires(tokenizer != null);
+			Contract.Requires<ArgumentNullException>(tokenizer != null, "tokenizer");
 			_tokenizer = tokenizer;
 			_peekTokens = new LinkedList<Token>();
 			ReadNextToken();
@@ -49,7 +50,7 @@ namespace YaJS.Compiler {
 			_lookahead = _tokenizer.ReadToken();
 		}
 
-		private void ParseFunction(bool isDeclaration) {
+		private Function ParseFunction(bool isDeclaration) {
 			Contract.Requires(_currentFunction != null);
 			Contract.Ensures(_currentFunction != null);
 
@@ -99,8 +100,10 @@ namespace YaJS.Compiler {
 			ParseStatementList(_currentFunction.RootStatement);
 			Match(TokenType.RCurlyBrace);
 
-			_currentFunction.Outer.NestedFunctions.Add(_currentFunction.ToFunction());
+			var result = _currentFunction.ToFunction();
 			_currentFunction = _currentFunction.Outer;
+			_currentFunction.NestedFunctions.Add(result);
+			return (result);
 		}
 
 		public Function ParseGlobal() {
@@ -121,8 +124,8 @@ namespace YaJS.Compiler {
 		}
 
 		public Function ParseFunction(string functionName, IEnumerable<string> parameterNames) {
-			Contract.Requires(!string.IsNullOrEmpty(functionName));
-			Contract.Requires(parameterNames != null);
+			Contract.Requires<ArgumentNullException>(!string.IsNullOrEmpty(functionName), "functionName");
+			Contract.Requires<ArgumentNullException>(parameterNames != null, "parameterNames");
 			_currentFunction = new FunctionContext(
 				functionName, ToVariableCollection(parameterNames), new RootStatement(true)
 			);
@@ -232,6 +235,47 @@ namespace YaJS.Compiler {
 			throw new FunctionAlreadyDeclaredException(
 				Messages.Error(
 					position.LineNo, position.ColumnNo, string.Format("Function \"{0}\" was already declared.", functionName)
+				)
+			);
+		}
+
+		private static void ThrowUnreachableLabel(TokenPosition position, string label) {
+			Contract.Requires(label != null);
+			throw new UnreachableLabelException(
+				Messages.Error(
+					position.LineNo, position.ColumnNo, string.Format("Can't find target of label \"{0}\".", label)
+				)
+			);
+		}
+
+		private static void ThrowExpectedStatement(TokenPosition position) {
+			throw new ExpectedStatementException(
+				Messages.Error(
+					position.LineNo, position.ColumnNo, "Expected statement."
+				)
+			);
+		}
+
+		private static void ThrowInvalidStatement(TokenPosition position) {
+			throw new InvalidStatementException(
+				Messages.Error(
+					position.LineNo, position.ColumnNo, "Invalid statement."
+				)
+			);
+		}
+
+		private static void ThrowUnexpectedLineTerminator(TokenPosition position) {
+			throw new UnexpectedLineTerminatorException(
+				Messages.Error(
+					position.LineNo, position.ColumnNo, "Unexpected line terminator."
+				)
+			);
+		}
+
+		private static void ThrowExpectedCatchOrFinally(TokenPosition position) {
+			throw new ExpectedCatchOrFinallyException(
+				Messages.Error(
+					position.LineNo, position.ColumnNo, "Expected catch or finally block."
 				)
 			);
 		}

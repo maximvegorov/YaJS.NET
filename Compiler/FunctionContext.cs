@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
 namespace YaJS.Compiler {
@@ -9,6 +9,8 @@ namespace YaJS.Compiler {
 	/// Контекст parsing-га функции
 	/// </summary>
 	internal sealed class FunctionContext {
+		private List<TryStatement> _tryBlocks;
+
 		public FunctionContext(RootStatement rootStatement) {
 			Initialize("global", VariableCollection.Empty, rootStatement);
 		}
@@ -44,8 +46,20 @@ namespace YaJS.Compiler {
 			RootStatement = rootStatement;
 		}
 
+		public void RegisterTryBlock(TryStatement tryBlock) {
+			Contract.Requires(tryBlock != null);
+			_tryBlocks.Add(tryBlock);
+		}
+
 		public Function ToFunction() {
-			throw new NotImplementedException();
+			return (new Function(
+				Name,
+				ParameterNames.ToList(),
+				DeclaredVariables.ToList(),
+				NestedFunctions.ToList(),
+				RootStatement,
+				IsDeclaration
+			));
 		}
 
 		public FunctionContext Outer { get; private set; }
