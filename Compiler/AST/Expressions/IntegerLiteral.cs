@@ -12,6 +12,7 @@ namespace YaJS.Compiler.AST.Expressions {
 
 		public override bool CanHaveMembers { get { return (true); } }
 		public override bool IsConstant { get { return (true); } }
+		public override bool CanBeUsedInCaseClause { get { return (true); } }
 
 		public int Value { get; private set; }
 	}

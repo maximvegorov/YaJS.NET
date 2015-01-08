@@ -97,7 +97,7 @@ namespace YaJS.Compiler {
 				_currentFunction, name, parameterNames, new RootStatement(true), isDeclaration
 			);
 			Match(TokenType.LCurlyBrace);
-			ParseStatementList(_currentFunction.RootStatement);
+			ParseSourceElements(_currentFunction.RootStatement);
 			Match(TokenType.RCurlyBrace);
 
 			var result = _currentFunction.ToFunction();
@@ -108,7 +108,7 @@ namespace YaJS.Compiler {
 
 		public Function ParseGlobal() {
 			_currentFunction = new FunctionContext(new RootStatement(false));
-			ParseStatementList(_currentFunction.RootStatement);
+			ParseSourceElements(_currentFunction.RootStatement);
 			Contract.Assert(_lookahead.Type == TokenType.Unknown);
 			return (_currentFunction.ToFunction());
 		}
@@ -129,7 +129,7 @@ namespace YaJS.Compiler {
 			_currentFunction = new FunctionContext(
 				functionName, ToVariableCollection(parameterNames), new RootStatement(true)
 			);
-			ParseStatementList(_currentFunction.RootStatement);
+			ParseSourceElements(_currentFunction.RootStatement);
 			Contract.Assert(_lookahead.Type == TokenType.Unknown);
 			return (_currentFunction.ToFunction());
 		}
@@ -276,6 +276,22 @@ namespace YaJS.Compiler {
 			throw new ExpectedCatchOrFinallyException(
 				Messages.Error(
 					position.LineNo, position.ColumnNo, "Expected catch or finally block."
+				)
+			);
+		}
+
+		private static void ThrowUnsupportedCaseClauseExpression(TokenPosition position) {
+			throw new UnsupportedCaseClauseExpressionException(
+				Messages.Error(
+					position.LineNo, position.ColumnNo, "Unsupported case clause expression."
+				)
+			);
+		}
+
+		private static void ThrowExpectedCaseClause(TokenPosition position) {
+			throw new ExpectedCaseClauseException(
+				Messages.Error(
+					position.LineNo, position.ColumnNo, "Expected case clause."
 				)
 			);
 		}

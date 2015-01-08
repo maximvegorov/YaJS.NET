@@ -318,5 +318,9 @@ namespace YaJS.Compiler.AST {
 		/// Выражение является константным
 		/// </summary>
 		public virtual bool IsConstant { get { return (false); } }
+		/// <summary>
+		/// Может ли использоваться в качестве Selector-а в CaseClause
+		/// </summary>
+		public virtual bool CanBeUsedInCaseClause { get { return (false); } }
 	}
 }

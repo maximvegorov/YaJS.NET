@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
 namespace YaJS.Compiler {
+	using System.Linq;
 	using YaJS.Compiler.AST;
 	using YaJS.Compiler.AST.Statements;
 
@@ -11,21 +12,27 @@ namespace YaJS.Compiler {
 			ParseFunction(true);
 		}
 
-		private BlockStatement ParseBlockStatement(Statement parent) {
-			var result = new BlockStatement(parent);
-			Match(TokenType.LCurlyBrace);
+		private IEnumerable<Statement> ParseStatementList(Statement parent) {
 			for (
-				var statement = ParseStatement(result, false);
+				var statement = ParseStatement(parent, false);
 				statement != null;
-				statement = ParseStatement(result, false)
+				statement = ParseStatement(parent, false)
 			) {
-				result.AddStatement(statement);
+				yield return statement;
 				if (_lookahead.Type == TokenType.RCurlyBrace)
 					break;
 				else if (_lookahead.Type == TokenType.Semicolon)
 					ReadNextToken();
 				else if (!_lookahead.IsAfterLineTerminator)
 					ThrowUnmatchedToken(TokenType.Semicolon, _lookahead);
+			}
+		}
+
+		private BlockStatement ParseBlockStatement(Statement parent) {
+			var result = new BlockStatement(parent);
+			Match(TokenType.LCurlyBrace);
+			foreach (var statement in ParseStatementList(result)) {
+				result.AddStatement(statement);
 			}
 			Match(TokenType.RCurlyBrace);
 			return (result);
@@ -215,8 +222,8 @@ namespace YaJS.Compiler {
 		}
 
 		private Statement ParseTryStatement(Statement parent) {
-			Match(TokenType.Try);
 			var result = new TryStatement(parent);
+			Match(TokenType.Try);
 			result.TryBlock = ParseBlockStatement(result);
 			var hasCatch = _lookahead.Type == TokenType.Catch;
 			if (hasCatch) {
@@ -240,8 +247,68 @@ namespace YaJS.Compiler {
 			return (result);
 		}
 
+		private IEnumerable<Statement> ParseCaseClauseStatementList(Statement parent) {
+			var result = ParseStatementList(parent).ToList();
+			if (result.Count == 0)
+				return (Enumerable.Empty<Statement>());
+			else
+				return (result);
+		}
+
+		private CaseClause ParseCaseClause(Statement parent) {
+			Match(TokenType.Case);
+			var startPosition = _lookahead.StartPosition;
+			var expression = ParseExpression();
+			if (!expression.CanBeUsedInCaseClause)
+				ThrowUnsupportedCaseClauseExpression(startPosition);
+			Match(TokenType.Colon);
+			return (new CaseClause(
+				expression, ParseCaseClauseStatementList(parent)
+			));
+		}
+
 		private Statement ParseSwitchStatement(Statement parent, ILabelSet labelSet) {
-			throw new NotImplementedException();
+			var result = new SwitchStatement(parent, labelSet);
+
+			Match(TokenType.Switch);
+
+			Match(TokenType.LParenthesis);
+			result.Expression = ParseExpression();
+			Match(TokenType.RParenthesis);
+
+			Match(TokenType.LCurlyBrace);
+
+			List<CaseClause> beforeDefaultClauses = new List<CaseClause>();
+			while (_lookahead.Type == TokenType.Case) {
+				beforeDefaultClauses.Add(ParseCaseClause(result));
+			}
+			if (beforeDefaultClauses.Count == 0)
+				result.BeforeDefaultClauses = Enumerable.Empty<CaseClause>();
+			else
+				result.BeforeDefaultClauses = beforeDefaultClauses;
+
+			var hasDefaultClause = _lookahead.Type == TokenType.Default;
+			if (hasDefaultClause) {
+				ReadNextToken();
+				Match(TokenType.Colon);
+				result.DefaultClause = ParseCaseClauseStatementList(result);
+
+				List<CaseClause> afterDefaultClauses = new List<CaseClause>();
+				while (_lookahead.Type == TokenType.Case) {
+					afterDefaultClauses.Add(ParseCaseClause(result));
+				}
+				if (afterDefaultClauses.Count == 0)
+					result.AfterDefaultClauses = Enumerable.Empty<CaseClause>();
+				else
+					result.AfterDefaultClauses = afterDefaultClauses;
+			}
+
+			if (beforeDefaultClauses.Count == 0 && !hasDefaultClause)
+				ThrowExpectedCaseClause(_lookahead.StartPosition);
+
+			Match(TokenType.RCurlyBrace);
+
+			return (result);
 		}
 
 		private Statement ParseVariableDeclarationStatement(Statement parent) {
@@ -282,6 +349,8 @@ namespace YaJS.Compiler {
 			// Разобрать оператор
 			switch (_lookahead.Type) {
 				case TokenType.Unknown:
+				case TokenType.Case:
+				case TokenType.Default:
 				case TokenType.RCurlyBrace:
 					if (isRequired)
 						ThrowExpectedStatement(_lookahead.StartPosition);
@@ -317,7 +386,7 @@ namespace YaJS.Compiler {
 			}
 		}
 
-		private void ParseStatementList(RootStatement root) {
+		private void ParseSourceElements(RootStatement root) {
 			Contract.Requires(root != null);
 			for (; ; ) {
 				if (_lookahead.Type == TokenType.Function) {

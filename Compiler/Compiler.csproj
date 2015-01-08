@@ -96,9 +96,11 @@
     <Compile Include="AST\Statements\BreakStatement.cs" />
     <Compile Include="AST\Statements\EmptyStatement.cs" />
     <Compile Include="AST\Statements\RootStatement.cs" />
+    <Compile Include="Exceptions\ExpectedCaseClauseException.cs" />
     <Compile Include="Exceptions\ExpectedStatementException.cs" />
     <Compile Include="Exceptions\FunctionAlreadyDeclaredException.cs" />
     <Compile Include="Exceptions\DuplicatedLabelException.cs" />
+    <Compile Include="Exceptions\UnsupportedCaseClauseExpressionException.cs" />
     <Compile Include="Exceptions\InvalidStatementException.cs" />
     <Compile Include="Exceptions\ExpectedCatchOrFinallyException.cs" />
     <Compile Include="Exceptions\ParameterAlreadyDeclaredException.cs" />
