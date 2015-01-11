@@ -9,7 +9,7 @@ namespace YaJS.Runtime {
 	/// Reader byte-кода
 	/// </summary>
 	internal struct ByteCodeReader {
-		private byte[] _compiledCode;
+		private readonly byte[] _compiledCode;
 		private int _offset;
 
 		public ByteCodeReader(byte[] compiledCode) {

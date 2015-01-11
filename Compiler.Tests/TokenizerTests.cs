@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using JetBrains.Annotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace YaJS.Compiler.Tests {
-	using YaJS.Compiler;
-	using YaJS.Compiler.Exceptions;
+	using Compiler;
+	using Exceptions;
 
 	[TestClass]
 	public class TokenizerTests {
@@ -16,14 +17,34 @@ namespace YaJS.Compiler.Tests {
 
 		private static void RunTokenizer(string source, TokenType expectedType) {
 			var token = RunTokenizer(source);
-			Assert.IsTrue(token.Type == expectedType, source);
+			Assert.AreEqual(token.Type, expectedType, source);
 			Assert.IsTrue(string.CompareOrdinal(token.Value, source) == 0, source);
 		}
 
+		[AssertionMethod]
 		private static void RunTokenizer(string source, TokenType expectedType, string expectedValue) {
 			var token = RunTokenizer(source);
-			Assert.IsTrue(token.Type == expectedType, source);
+			Assert.AreEqual(token.Type, expectedType, source);
 			Assert.IsTrue(string.CompareOrdinal(token.Value, expectedValue) == 0, source);
+		}
+
+		[TestMethod]
+		public void Empty() {
+			var token = RunTokenizer("");
+			Assert.AreEqual(token.Type, TokenType.Unknown);
+		}
+
+		[TestMethod]
+		public void OnlyWhiteSpaces() {
+			var token = RunTokenizer(" ");
+			Assert.AreEqual(token.Type, TokenType.Unknown);
+		}
+
+		[TestMethod]
+		public void WhiteSpacesBeforeIdent() {
+			var token = RunTokenizer(" \n a");
+			Assert.AreEqual(token.Type, TokenType.Ident);
+			Assert.IsTrue(token.IsAfterLineTerminator);
 		}
 
 		[TestMethod]
@@ -34,7 +55,7 @@ namespace YaJS.Compiler.Tests {
 
 		[TestMethod]
 		public void MultiLineComment_Simple() {
-			var token = RunTokenizer("/* comment */");
+			var token = RunTokenizer("/* comment * comment */");
 			Assert.IsTrue(token.Type == TokenType.Unknown);
 		}
 
@@ -115,7 +136,7 @@ namespace YaJS.Compiler.Tests {
 			}
 		}
 
-		private Dictionary<string, TokenType> GetPunctuators() {
+		private static Dictionary<string, TokenType> GetPunctuators() {
 			return (new Dictionary<string, TokenType>() {
 				{ "{", TokenType.LCurlyBrace },
 				{ "}", TokenType.RCurlyBrace },
@@ -123,6 +144,7 @@ namespace YaJS.Compiler.Tests {
 				{ ")", TokenType.RParenthesis },
 				{ "[", TokenType.LBracket },
 				{ "]", TokenType.RBracket },
+				{ ",", TokenType.Comma },
 				{ ".", TokenType.Dot },
 				{ ";", TokenType.Semicolon },
 				{ "<", TokenType.Lt },
@@ -172,6 +194,11 @@ namespace YaJS.Compiler.Tests {
 			foreach (var punctuator in GetPunctuators()) {
 				Assert.IsTrue(RunTokenizer(punctuator.Key).Type == punctuator.Value, punctuator.Key);
 			}
+		}
+
+		[TestMethod]
+		public void Integer_Zero() {
+			RunTokenizer("0", TokenType.Integer);
 		}
 
 		[TestMethod]
@@ -276,8 +303,13 @@ namespace YaJS.Compiler.Tests {
 		}
 
 		[TestMethod]
-		public void String_HexEscapeSequence() {
+		public void String_HexEscapeSequence_Lower() {
 			RunTokenizer("'\\x0a'", TokenType.String, "\n");
+		}
+
+		[TestMethod]
+		public void String_HexEscapeSequence_Upper() {
+			RunTokenizer("'\\x0F'", TokenType.String, "\x0F");
 		}
 
 		[TestMethod]
@@ -301,6 +333,12 @@ namespace YaJS.Compiler.Tests {
 		[ExpectedException(typeof(UnexpectedEndOfFileException))]
 		public void String_Unterminated() {
 			RunTokenizer("'abc");
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(UnexpectedCharException))]
+		public void InvalidChar() {
+			RunTokenizer("#");
 		}
 	}
 }

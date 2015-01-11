@@ -8,8 +8,8 @@ namespace YaJS.Runtime.Constructors {
 	/// Native-конструктор JSArray
 	/// </summary>
 	internal sealed class JSArrayConstructor : JSNativeFunction {
-		public JSArrayConstructor(JSObject inherited)
-			: base(inherited) {
+		public JSArrayConstructor(VirtualMachine vm, JSObject inherited)
+			: base(vm, inherited) {
 		}
 
 		public static void InitPrototype(JSObject proto, JSObject functionPrototype) {
@@ -18,14 +18,16 @@ namespace YaJS.Runtime.Constructors {
 			// TODO
 		}
 
-		public override JSObject GetPrototype(VirtualMachine vm) {
-			return (vm.Array);
+		public override JSObject GetPrototype() {
+			return (VM.Array);
 		}
 
-		public override JSValue Invoke(
-			VirtualMachine vm, JSObject context, LocalScope outerScope, List<JSValue> args
-		) {
-			return (vm.NewArray(args));
+		public override JSValue Construct(LocalScope outerScope, List<JSValue> args) {
+			return (VM.NewArray(args));
+		}
+
+		public override JSValue Invoke(JSObject context, LocalScope outerScope, List<JSValue> args) {
+			return (Construct(outerScope, args));
 		}
 	}
 }

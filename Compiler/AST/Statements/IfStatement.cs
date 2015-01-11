@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics.Contracts;
 
 namespace YaJS.Compiler.AST.Statements {
 	/// <summary>
@@ -14,8 +9,8 @@ namespace YaJS.Compiler.AST.Statements {
 		private Statement _thenStatement;
 		private Statement _elseStatement;
 
-		public IfStatement(Statement parent)
-			: base(parent, StatementType.If) {
+		public IfStatement(Statement parent, int lineNo)
+			: base(parent, StatementType.If, lineNo) {
 		}
 
 		public Expression Condition {

@@ -7,8 +7,8 @@ namespace YaJS.Compiler.AST.Statements {
 	internal sealed class ThrowStatement : Statement {
 		private Expression _expression;
 
-		public ThrowStatement(Statement parent, Expression expression)
-			: base(parent, StatementType.Throw) {
+		public ThrowStatement(Statement parent, int lineNo, Expression expression)
+			: base(parent, StatementType.Throw, lineNo) {
 			Contract.Requires(expression != null);
 			_expression = expression;
 		}

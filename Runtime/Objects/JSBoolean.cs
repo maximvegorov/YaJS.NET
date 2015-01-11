@@ -4,16 +4,17 @@ namespace YaJS.Runtime.Objects {
 	/// <summary>
 	/// Объект-wrapper для логических значений
 	/// </summary>
-	public sealed class JSBoolean : JSObject {
-		internal JSBoolean(bool value, JSObject inherited)
-			: base(inherited) {
+	internal sealed class JSBoolean : JSObject {
+		private readonly bool _value;
+
+		public JSBoolean(VirtualMachine vm, bool value, JSObject inherited)
+			: base(vm, inherited) {
 				Contract.Requires(inherited != null);
+			_value = value;
 		}
 
 		public override string ToString() {
-			return (Value.ToString());
+			return (_value.ToString());
 		}
-
-		public bool Value { get; private set; }
 	}
 }

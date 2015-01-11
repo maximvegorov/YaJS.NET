@@ -5,18 +5,24 @@ using System.Diagnostics.Contracts;
 namespace YaJS.Runtime {
 	using Runtime.Exceptions;
 	using Runtime.Objects;
-	using Runtime.Objects.Errors;
+	using Runtime.Values;
 
 	/// <summary>
 	/// Поток исполнения в рамках которого исполняется JS-функция
 	/// </summary>
 	public sealed class ExecutionThread {
-		internal ExecutionThread(VirtualMachine vm, CompiledFunction mainFunction) {
+		internal ExecutionThread(VirtualMachine vm, CompiledFunction globalFunction) {
 			Contract.Requires(vm != null);
-			Contract.Requires(mainFunction != null);
+			Contract.Requires(globalFunction != null);
 			VM = vm;
-			MainFunction = new JSManagedFunction(mainFunction, null, VM.Function);
-			CurrentFrame = new CallStackFrame(VM, MainFunction, vm.Global, new List<JSValue>(), null, false);
+			GlobalFunction = new JSManagedFunction(VM, null, globalFunction, VM.Function);
+			CurrentFrame = new CallStackFrame(VM, GlobalFunction, vm.Global, new List<JSValue>());
+		}
+
+		private void Switch(int tableIndex, JSValue selector) {
+			var table = CurrentFrame.Function.CompiledFunction.SwitchJumpTables[tableIndex];
+			var offset = table.Jump(selector);
+			CurrentFrame.CodeReader.Seek(offset);
 		}
 
 		private void Unwind() {
@@ -32,21 +38,41 @@ namespace YaJS.Runtime {
 			throw new UnhandledExceptionException(CurrentException.ThrownValue.CastToString());
 		}
 
+		private void EnterCatch() {
+			if (CurrentException == null)
+				throw new IllegalOpCodeException(OpCode.EnterCatch.ToString());
+			CurrentFrame.BeginScope();
+			CurrentFrame.LocalScope.Variables.Add(
+				CurrentFrame.CodeReader.ReadString(), CurrentException.ThrownValue
+			);
+		}
+
+		private void LeaveCatch() {
+			if (CurrentException == null)
+				throw new IllegalOpCodeException(OpCode.LeaveCatch.ToString());
+			CurrentFrame.EndScope();
+			CurrentException = null;
+		}
+
 		private void Throw(JSValue thrownValue) {
-			if (CurrentException == null || !Object.ReferenceEquals(CurrentException.ThrownValue, thrownValue)) {
+			if (CurrentException == null || !ReferenceEquals(CurrentException.ThrownValue, thrownValue)) {
 				CurrentException = new ExceptionObject(thrownValue, CurrentException);
 			}
 			Unwind();
 		}
 
+		private void Rethrow() {
+			if (CurrentException == null)
+				throw new IllegalOpCodeException(OpCode.Rethrow.ToString());
+			Unwind();
+		}
+
 		private void NewObject(JSFunction constructor, List<JSValue> args) {
 			if (constructor.IsNative) {
-				CurrentFrame.Push(constructor.Invoke(
-					VM, null, CurrentFrame.LocalScope, args
-				));
+				CurrentFrame.Push(constructor.Construct(CurrentFrame.LocalScope, args));
 			}
 			else {
-				var newObject = new JSObject(constructor.GetPrototype(VM));
+				var newObject = new JSObject(VM, constructor.GetPrototype());
 				CurrentFrame = new CallStackFrame(
 					VM, constructor as JSManagedFunction, newObject, args, CurrentFrame, true
 				);
@@ -56,20 +82,21 @@ namespace YaJS.Runtime {
 
 		private void MakeObject(int memberCount) {
 			var newObject = VM.NewObject();
+			var members = newObject.OwnMembers;
 			for (var i = memberCount - 1; i >= 0; i--) {
 				var memberName = CurrentFrame.Pop().CastToString();
 				var memberValue = CurrentFrame.Pop();
-				newObject.OwnMembers.Add(memberName, memberValue);
+				members.Add(memberName, memberValue);
 			}
 			CurrentFrame.Push(newObject);
 		}
 
 		private void MakeArray(int memberCount) {
-			var newArray = VM.NewArray(new List<JSValue>(memberCount));
+			var items = new List<JSValue>(memberCount);
 			for (var i = memberCount - 1; i >= 0; i--) {
-				newArray.Items[i] = CurrentFrame.Pop();
+				items[i] = CurrentFrame.Pop();
 			}
-			CurrentFrame.Push(newArray);
+			CurrentFrame.Push(VM.NewArray(items));
 		}
 
 		private void CallFunction(
@@ -77,7 +104,7 @@ namespace YaJS.Runtime {
 		) {
 			if (function.IsNative) {
 				CurrentFrame.Push(function.Invoke(
-					VM, context, CurrentFrame.LocalScope, args
+					context, CurrentFrame.LocalScope, args
 				));
 			}
 			else {
@@ -95,7 +122,7 @@ namespace YaJS.Runtime {
 		/// <returns>False - если выполненная инструкция является последней, иначе true</returns>
 		public bool ExecuteStep() {
 			if (IsTerminated)
-				throw new InvalidThreadStateException();
+				throw new IllegalThreadStateException();
 
 			var currentFrame = CurrentFrame;
 
@@ -112,64 +139,65 @@ namespace YaJS.Runtime {
 							currentFrame.Push(JSValue.Null);
 							break;
 						case OpCode.LdBoolean:
-							currentFrame.Push(JSValue.Create(currentFrame.CodeReader.ReadBoolean()));
+							currentFrame.Push(currentFrame.CodeReader.ReadBoolean());
 							break;
 						case OpCode.LdInteger:
-							currentFrame.Push(JSValue.Create(currentFrame.CodeReader.ReadInteger()));
+							currentFrame.Push((JSNumberValue)currentFrame.CodeReader.ReadInteger());
 							break;
 						case OpCode.LdFloat:
-							currentFrame.Push(JSValue.Create(currentFrame.CodeReader.ReadFloat()));
+							currentFrame.Push((JSNumberValue)currentFrame.CodeReader.ReadFloat());
 							break;
 						case OpCode.LdString:
-							currentFrame.Push(JSValue.Create(currentFrame.CodeReader.ReadString()));
+							currentFrame.Push(currentFrame.CodeReader.ReadString());
 							break;
 
 						case OpCode.LdThis:
 							currentFrame.Push(CurrentFrame.Context);
 							break;
 
-						case OpCode.DeclLocal:
-							currentFrame.LocalScope.DeclareLocal(currentFrame.CodeReader.ReadString());
-							break;
-
 						case OpCode.LdLocal:
 							currentFrame.Push(
-								currentFrame.LocalScope.GetLocalVariable(this, currentFrame.CodeReader.ReadString())
+								currentFrame.LocalScope.GetVariable(currentFrame.CodeReader.ReadString())
 							);
 							break;
 						case OpCode.LdLocalFunc:
 							currentFrame.Push(
-								currentFrame.GetLocalFunction(VM, currentFrame.CodeReader.ReadInteger())
+								currentFrame.GetFunction(VM, currentFrame.CodeReader.ReadInteger())
 							);
 							break;
 						case OpCode.StLocal:
-							currentFrame.LocalScope.SetLocalVariable(
-								this, currentFrame.CodeReader.ReadString(), currentFrame.Pop()
+							currentFrame.LocalScope.SetVariable(
+								currentFrame.CodeReader.ReadString(), currentFrame.Pop()
+							);
+							break;
+						case OpCode.DelLocal:
+							currentFrame.Push(
+								currentFrame.LocalScope.DeleteVariable(currentFrame.CodeReader.ReadString())
 							);
 							break;
 
 						case OpCode.IsMember: {
-								var obj = currentFrame.Pop().GetAsObject();
-								var memberName = currentFrame.PopPrimitiveValue();
-								currentFrame.Push(JSValue.Create(obj.ContainsMember(memberName)));
+								var obj = currentFrame.Pop().ToObject(VM);
+								var member = currentFrame.PopPrimitiveValue();
+								currentFrame.Push(obj.ContainsMember(member));
 								break;
 							}
 						case OpCode.LdMember: {
-								var obj = currentFrame.Pop().GetAsObject();
-								var memberName = currentFrame.PopPrimitiveValue();
-								currentFrame.Push(obj.GetMember(VM, memberName));
+								var obj = currentFrame.Pop().ToObject(VM);
+								var member = currentFrame.PopPrimitiveValue();
+								currentFrame.Push(obj.GetMember(member));
 								break;
 							}
 						case OpCode.StMember: {
-								var obj = currentFrame.Pop().GetAsObject();
-								var memberName = currentFrame.PopPrimitiveValue();
-								obj.SetMember(VM, memberName, currentFrame.Pop());
+								var obj = currentFrame.Pop().RequireObject();
+								var member = currentFrame.PopPrimitiveValue();
+								obj.SetMember(member, currentFrame.Pop());
 								break;
 							}
 						case OpCode.DelMember: {
-								var obj = currentFrame.Pop().GetAsObject();
-								var memberName = currentFrame.PopPrimitiveValue();
-								currentFrame.Push(JSValue.Create(obj.DeleteMember(memberName)));
+								var obj = currentFrame.Pop().RequireObject();
+								var member = currentFrame.PopPrimitiveValue();
+								currentFrame.Push(obj.DeleteMember(member));
 								break;
 							}
 
@@ -195,6 +223,12 @@ namespace YaJS.Runtime {
 									currentFrame.CodeReader.Seek(offset);
 								break;
 							}
+						
+						case OpCode.Switch:
+							Switch(
+								currentFrame.CodeReader.ReadInteger(), currentFrame.PopPrimitiveValue()
+							);
+							break;
 
 						case OpCode.BeginScope:
 							currentFrame.BeginScope();
@@ -204,39 +238,40 @@ namespace YaJS.Runtime {
 							break;
 
 						case OpCode.EnterTry:
-							currentFrame.BeginTry();
+							currentFrame.EnterTry();
 							break;
 						case OpCode.LeaveTry:
-							currentFrame.EndTry();
+							currentFrame.LeaveTry();
 							break;
 
-						case OpCode.EndCatch:
-							CurrentException = null;
+						case OpCode.EnterCatch:
+							EnterCatch();
 							break;
-
-						case OpCode.EndFinally:
-							if (CurrentException != null)
-								Unwind();
+						case OpCode.LeaveCatch:
+							LeaveCatch();
 							break;
 
 						case OpCode.Throw:
 							Throw(currentFrame.Pop());
 							break;
+						case OpCode.Rethrow:
+							Rethrow();
+							break;
 
 						case OpCode.NewObj:
-							var constructor = currentFrame.Pop().GetAsFunction();
+							var constructor = currentFrame.Pop().RequireFunction();
 							NewObject(constructor, currentFrame.PopArguments());
 							break;
 
 						case OpCode.MakeObject:
-							MakeObject(currentFrame.Pop().GetAsInteger());
+							MakeObject(currentFrame.Pop().RequireInteger());
 							break;
 						case OpCode.MakeArray:
-							MakeArray(currentFrame.Pop().GetAsInteger());
+							MakeArray(currentFrame.Pop().RequireInteger());
 							break;
 
 						case OpCode.Call: {
-								var function = currentFrame.Pop().GetAsFunction();
+								var function = currentFrame.Pop().RequireFunction();
 								CallFunction(
 									function, VM.Global, currentFrame.PopArguments(), currentFrame.CodeReader.ReadBoolean()
 								);
@@ -244,9 +279,9 @@ namespace YaJS.Runtime {
 							}
 
 						case OpCode.CallMember: {
-								var function = currentFrame.Pop().GetAsFunction();
+								var function = currentFrame.Pop().RequireFunction();
 								CallFunction(
-									function, currentFrame.Pop().GetAsObject(), currentFrame.PopArguments(), currentFrame.CodeReader.ReadBoolean()
+									function, currentFrame.Pop().RequireObject(), currentFrame.PopArguments(), currentFrame.CodeReader.ReadBoolean()
 								);
 								break;
 							}
@@ -259,6 +294,23 @@ namespace YaJS.Runtime {
 							CurrentFrame = currentFrame.Caller;
 							break;
 
+						case OpCode.GetEnumerator:
+							currentFrame.Push(currentFrame.Pop().GetEnumerator());
+							break;
+						case OpCode.EnumMoveNext: {
+							var enumerator = currentFrame.PopEnumerator();
+							var hasMoreValue = enumerator.MoveNext();
+							currentFrame.LocalScope.SetVariable(
+								currentFrame.CodeReader.ReadString(),
+								hasMoreValue ? enumerator.Current : JSValue.Undefined
+							);
+							currentFrame.Push(hasMoreValue);
+							break;
+						}
+
+						case OpCode.Pos:
+							currentFrame.Push(currentFrame.PopPrimitiveValue().ToNumber());
+							break;
 						case OpCode.Neg:
 							currentFrame.Push(currentFrame.PopPrimitiveValue().Neg());
 							break;
@@ -336,7 +388,7 @@ namespace YaJS.Runtime {
 							}
 
 						case OpCode.Not:
-							currentFrame.Push(JSValue.Create(!currentFrame.Pop().CastToBoolean()));
+							currentFrame.Push(currentFrame.Pop().Not());
 							break;
 						case OpCode.And: {
 								var op1 = currentFrame.Pop();
@@ -354,68 +406,61 @@ namespace YaJS.Runtime {
 						case OpCode.Eq: {
 								var op1 = currentFrame.Pop();
 								var op2 = currentFrame.Pop();
-								currentFrame.Push(JSValue.Create(op1.EqualsTo(op2)));
+								currentFrame.Push(op1.EqualsTo(op2));
 								break;
 							}
 						case OpCode.StrictEq: {
 								var op1 = currentFrame.Pop();
 								var op2 = currentFrame.Pop();
-								currentFrame.Push(JSValue.Create(op1.Type == op2.Type && op1.StrictEqualsTo(op2)));
+								currentFrame.Push(op1.Type == op2.Type && op1.StrictEqualsTo(op2));
 								break;
 							}
 						case OpCode.Neq: {
 								var op1 = currentFrame.Pop();
 								var op2 = currentFrame.Pop();
-								currentFrame.Push(JSValue.Create(!op1.EqualsTo(op2)));
+								currentFrame.Push(!op1.EqualsTo(op2));
 								break;
 							}
 						case OpCode.StrictNeq: {
 								var op1 = currentFrame.Pop();
 								var op2 = currentFrame.Pop();
-								currentFrame.Push(JSValue.Create(op1.Type != op2.Type || !op1.StrictEqualsTo(op2)));
+								currentFrame.Push(op1.Type != op2.Type || !op1.StrictEqualsTo(op2));
 								break;
 							}
 
-						case OpCode.Cmp: {
-								var op1 = currentFrame.PopPrimitiveValue();
-								var op2 = currentFrame.PopPrimitiveValue();
-								currentFrame.Push(JSValue.Create(op1.CompareTo(op2)));
-								break;
-							}
-
-						case OpCode.Gt: {
-								var op1 = currentFrame.PopPrimitiveValue();
-								var op2 = currentFrame.PopPrimitiveValue();
-								currentFrame.Push(JSValue.Create(op1.CompareTo(op2) > 0));
-								break;
-							}
-						case OpCode.Gte: {
-								var op1 = currentFrame.PopPrimitiveValue();
-								var op2 = currentFrame.PopPrimitiveValue();
-								currentFrame.Push(JSValue.Create(op1.CompareTo(op2) >= 0));
-								break;
-							}
 						case OpCode.Lt: {
 								var op1 = currentFrame.PopPrimitiveValue();
 								var op2 = currentFrame.PopPrimitiveValue();
-								currentFrame.Push(JSValue.Create(op1.CompareTo(op2) < 0));
+								currentFrame.Push(op1.Lt(op2));
 								break;
 							}
 						case OpCode.Lte: {
 								var op1 = currentFrame.PopPrimitiveValue();
 								var op2 = currentFrame.PopPrimitiveValue();
-								currentFrame.Push(JSValue.Create(op1.CompareTo(op2) <= 0));
+								currentFrame.Push(op1.Lte(op2));
+								break;
+							}
+						case OpCode.Gt: {
+								var op1 = currentFrame.PopPrimitiveValue();
+								var op2 = currentFrame.PopPrimitiveValue();
+								currentFrame.Push(op2.Lt(op1));
+								break;
+							}
+						case OpCode.Gte: {
+								var op1 = currentFrame.PopPrimitiveValue();
+								var op2 = currentFrame.PopPrimitiveValue();
+								currentFrame.Push(op2.Lte(op1));
 								break;
 							}
 
 						case OpCode.InstanceOf: {
-								var op1 = currentFrame.Pop().GetAsObject();
-								var op2 = currentFrame.Pop().GetAsFunction();
-								currentFrame.Push(JSValue.Create(op1.IsInstanceOf(op2)));
+								var op1 = currentFrame.Pop();
+								var op2 = currentFrame.Pop().RequireFunction();
+								currentFrame.Push(op1.IsInstanceOf(op2));
 								break;
 							}
 						case OpCode.TypeOf:
-							currentFrame.Push(JSValue.Create(currentFrame.Pop().TypeOf()));
+							currentFrame.Push(currentFrame.Pop().TypeOf());
 							break;
 
 						default:
@@ -453,7 +498,7 @@ namespace YaJS.Runtime {
 		/// <summary>
 		/// Исполняемая функция
 		/// </summary>
-		public JSManagedFunction MainFunction { get; private set; }
+		public JSManagedFunction GlobalFunction { get; private set; }
 		/// <summary>
 		/// Текуший кадр вызова
 		/// </summary>

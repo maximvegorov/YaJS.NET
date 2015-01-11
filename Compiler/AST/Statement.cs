@@ -5,7 +5,7 @@ namespace YaJS.Compiler.AST {
 	/// Тип оператора
 	/// </summary>
 	public enum StatementType {
-		Root,
+		FunctionBody,
 		Block,
 		Break,
 		Continue,
@@ -28,9 +28,11 @@ namespace YaJS.Compiler.AST {
 	public abstract class Statement {
 		internal static readonly ILabelSet EmptyLabelSet = new EmptyLabelSet();
 
-		public Statement(Statement parent, StatementType type) {
+		protected Statement(Statement parent, StatementType type, int lineNo) {
+			Contract.Requires(lineNo >= 1);
 			Parent = parent;
 			Type = type;
+			LineNo = lineNo;
 		}
 
 		public virtual bool IsBreakTarget(string targetLabel) {
@@ -41,15 +43,14 @@ namespace YaJS.Compiler.AST {
 			Contract.Requires(targetLabel != null);
 			return (false);
 		}
-		public virtual bool CanContainReturn() {
-			return (Parent != null ? Parent.CanContainReturn() : true);
-		}
 
-		public virtual bool IsTarget(Statement target) {
+		protected virtual bool IsTarget(Statement target) {
+			Contract.Requires(target != null);
 			return (false);
 		}
 
 		protected virtual void RegisterAsExitPoint(Statement exitPoint) {
+			Contract.Requires(exitPoint != null);
 		}
 
 		/// <summary>
@@ -69,5 +70,9 @@ namespace YaJS.Compiler.AST {
 		/// Тип оператора
 		/// </summary>
 		public StatementType Type { get; private set; }
+		/// <summary>
+		/// Строка на которой начинается оператор
+		/// </summary>
+		public int LineNo { get; private set; }
 	}
 }

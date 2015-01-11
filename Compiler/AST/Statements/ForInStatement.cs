@@ -10,10 +10,11 @@ namespace YaJS.Compiler.AST.Statements {
 
 		public ForInStatement(
 			Statement parent,
+			int lineNo,
 			string variableName,
 			Expression enumerable,
 			ILabelSet labelSet
-		) : base(parent, StatementType.ForIn, labelSet) {
+		) : base(parent, StatementType.ForIn, lineNo, labelSet) {
 			Contract.Requires(!string.IsNullOrEmpty(variableName));
 			Contract.Requires(enumerable != null);
 			_variableName = variableName;

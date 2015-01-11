@@ -95,7 +95,7 @@
     <Compile Include="AST\CompoundStatement.cs" />
     <Compile Include="AST\Statements\BreakStatement.cs" />
     <Compile Include="AST\Statements\EmptyStatement.cs" />
-    <Compile Include="AST\Statements\RootStatement.cs" />
+    <Compile Include="AST\FunctionBody.cs" />
     <Compile Include="Exceptions\ExpectedCaseClauseException.cs" />
     <Compile Include="Exceptions\ExpectedStatementException.cs" />
     <Compile Include="Exceptions\FunctionAlreadyDeclaredException.cs" />

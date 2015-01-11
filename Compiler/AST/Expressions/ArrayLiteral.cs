@@ -4,15 +4,18 @@ using System.Text;
 
 namespace YaJS.Compiler.AST.Expressions {
 	internal sealed class ArrayLiteral : Expression {
+		private readonly List<Expression> _items;
+
 		public ArrayLiteral(List<Expression> items) {
 			Contract.Requires(items != null);
+			_items = items;
 		}
 
 		public override string ToString() {
 			var result = new StringBuilder();
 			result.Append('[');
-			if (Items.Count > 0) {
-				foreach (var item in Items) {
+			if (_items.Count > 0) {
+				foreach (var item in _items) {
 					result.Append(item.ToString())
 						.Append(',');
 				}
@@ -24,7 +27,5 @@ namespace YaJS.Compiler.AST.Expressions {
 
 		public override bool CanHaveMembers { get { return (true); } }
 		public override bool CanHaveMutableMembers { get { return (true); } }
-
-		public List<Expression> Items { get; private set; }
 	}
 }

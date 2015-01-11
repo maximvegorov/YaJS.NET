@@ -5,16 +5,16 @@ namespace YaJS.Compiler.AST.Statements {
 	/// Оператор break (См. http://www.ecma-international.org/ecma-262/5.1/#sec-12.8)
 	/// </summary>
 	internal sealed class BreakStatement : Statement {
-		private Statement _target;
+		private readonly Statement _target;
 
-		public BreakStatement(Statement parent, Statement target)
-			: base(parent, StatementType.Break) {
+		public BreakStatement(Statement parent, int lineNo, Statement target)
+			: base(parent, StatementType.Break, lineNo) {
 			Contract.Requires(target != null);
 			_target = target;
 		}
 
-		public override bool IsTarget(Statement target) {
-			return (object.ReferenceEquals(_target, target));
+		protected override bool IsTarget(Statement target) {
+			return (ReferenceEquals(_target, target));
 		}
 	}
 }

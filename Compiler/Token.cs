@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics.Contracts;
+﻿using System.Diagnostics.Contracts;
 
 namespace YaJS.Compiler {
 	public enum TokenType {
@@ -119,8 +118,8 @@ namespace YaJS.Compiler {
 	}
 
 	public struct TokenPosition {
-		private int _lineNo;
-		private int _columnNo;
+		private readonly int _lineNo;
+		private readonly int _columnNo;
 
 		public TokenPosition(int lineNo, int columnNo) {
 			Contract.Requires(lineNo > 0);

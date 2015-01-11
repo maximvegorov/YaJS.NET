@@ -5,10 +5,10 @@ namespace YaJS.Compiler.AST {
 	/// Базовый класс для всех операторов, которые могут иметь набор меток do/while, for, while, switch
 	/// </summary>
 	internal class LabellableStatement : Statement {
-		private ILabelSet _labelSet;
+		private readonly ILabelSet _labelSet;
 
-		public LabellableStatement(Statement parent, StatementType type, ILabelSet labelSet)
-			: base(parent, type) {
+		protected LabellableStatement(Statement parent, StatementType type, int lineNo, ILabelSet labelSet)
+			: base(parent, type, lineNo) {
 			Contract.Requires(labelSet != null);
 			_labelSet = labelSet.UnionWith(string.Empty);
 		}

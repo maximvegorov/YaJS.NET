@@ -1,7 +1,7 @@
 ﻿namespace YaJS.Runtime.Objects.Errors {
-	public sealed class JSTypeError : JSError {
-		internal JSTypeError(string message, JSObject inherited)
-			: base(message, inherited) {
+	internal sealed class JSTypeError : JSError {
+		public JSTypeError(VirtualMachine vm, string message, JSObject inherited)
+			: base(vm, message, inherited) {
 		}
 	}
 }

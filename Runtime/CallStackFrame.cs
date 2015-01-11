@@ -6,26 +6,36 @@ using System.Linq;
 namespace YaJS.Runtime {
 	using Runtime.Exceptions;
 	using Runtime.Objects;
+	using Runtime.Values;
 
 	/// <summary>
 	/// Кадр вызова функции
 	/// </summary>
 	public sealed class CallStackFrame {
+		/// <summary>
+		/// Стек вычислений
+		/// </summary>
+		private readonly Stack<JSValue> _evalStack;
+		/// <summary>
+		/// Текущий блок try
+		/// </summary>
+		private TryBlockInfo _currentTryBlock;
+
 		internal CallStackFrame(
 			VirtualMachine vm,
 			JSManagedFunction function,
 			JSObject context,
-			List<JSValue> argumentValues,
+			List<JSValue> parameterValues,
 			CallStackFrame caller = null,
 			bool copyResult = false
 		) {
 			Contract.Requires(vm != null);
 			Contract.Requires(function != null);
 			Contract.Requires(context != null);
-			Contract.Requires(argumentValues != null);
+			Contract.Requires(parameterValues != null);
 			Contract.Ensures(
 				LocalScope != null &&
-				LocalScope.Variables.Count == Math.Max(function.CompiledFunction.Arguments.Length, LocalScope.Variables.Count) + 1
+				LocalScope.Variables.Count == Math.Max(function.CompiledFunction.ParameterNames.Length, LocalScope.Variables.Count) + 1
 			);
 
 			Caller = caller;
@@ -33,50 +43,74 @@ namespace YaJS.Runtime {
 			Function = function;
 			Context = context;
 
-			LocalScope = new LocalScope(function.OuterScope);
+			LocalScope = function.OuterScope != null ? new LocalScope(function.OuterScope) : new LocalScope(vm.Global.OwnMembers);
 
-			EvalStack = new Stack<JSValue>(4);
+			_evalStack = new Stack<JSValue>(4);
 
-			// Поместить параметры в область хранения локальных переменных
-			var argumentNames = function.CompiledFunction.Arguments;
-			LocalScope.Variables.Add("arguments", vm.NewArray(argumentValues));
-			var n = Math.Min(argumentNames.Length, argumentValues.Count);
+			// Создать привязки для параметров
+			var parameterNames = function.CompiledFunction.ParameterNames;
+			var n = Math.Min(parameterNames.Length, parameterValues.Count);
 			for (var i = 0; i < n; i++) {
-				LocalScope.Variables.Add(argumentNames[i], argumentValues[i]);
+				LocalScope.Variables.Add(parameterNames[i], parameterValues[i]);
 			}
-			for (var i = n; i < argumentNames.Length; i++) {
-				LocalScope.Variables.Add(argumentNames[i], JSValue.Undefined);
+			for (var i = n; i < parameterNames.Length; i++) {
+				LocalScope.Variables.Add(parameterNames[i], JSValue.Undefined);
+			}
+
+			// Создать привязку для arguments
+			LocalScope.Variables.Add("arguments", vm.NewArray(parameterValues));
+
+			// Создать привязки для объявленных функций
+			for (var i = 0; i < Function.CompiledFunction.DeclaredFunctionCount; i++) {
+				var declaredFunction = Function.CompiledFunction.NestedFunctions[i];
+				if (!LocalScope.Variables.ContainsKey(declaredFunction.Name)) {
+					LocalScope.Variables.Add(
+						declaredFunction.Name, vm.NewFunction(LocalScope, declaredFunction)
+					);
+				}
+			}
+
+			// Создать привязки для объявленных переменных
+			for (var i = 0; i < Function.CompiledFunction.DeclaredVariables.Length; i++) {
+				var variableName = Function.CompiledFunction.DeclaredVariables[i];
+				if (!LocalScope.Variables.ContainsKey(variableName)) {
+					LocalScope.Variables.Add(variableName, JSValue.Undefined);
+				}
 			}
 
 			CodeReader = new ByteCodeReader(Function.CompiledFunction.CompiledCode);
 		}
 
 		internal void Push(JSValue value) {
-			EvalStack.Push(value);
+			_evalStack.Push(value);
 		}
 
 		internal JSValue Peek() {
-			return (EvalStack.Peek());
+			return (_evalStack.Peek());
 		}
 
 		internal JSValue Pop() {
-			return (EvalStack.Pop());
+			return (_evalStack.Pop());
 		}
 
 		internal JSValue PopPrimitiveValue() {
-			return (JSValue.ToPrimitiveValue(EvalStack.Pop()));
+			return (_evalStack.Pop().ToPrimitiveValue());
+		}
+
+		internal JSEnumerator PopEnumerator() {
+			return (_evalStack.Pop().RequireEnumerator());
 		}
 
 		internal List<JSValue> PopArguments() {
-			var result = new List<JSValue>(EvalStack.Pop().GetAsInteger());
+			var result = new List<JSValue>(_evalStack.Pop().RequireInteger());
 			for (var i = result.Count - 1; i >= 0; i--)
-				result[i] = EvalStack.Pop();
+				result[i] = _evalStack.Pop();
 			return (result);
 		}
 
-		internal JSFunction GetLocalFunction(VirtualMachine vm, int index) {
+		internal JSFunction GetFunction(VirtualMachine vm, int index) {
 			return (vm.NewFunction(
-				Function.CompiledFunction.NestedFunctions[index], LocalScope
+				LocalScope, Function.CompiledFunction.NestedFunctions[index]
 			));
 		}
 
@@ -89,25 +123,25 @@ namespace YaJS.Runtime {
 			LocalScope = LocalScope.OuterScope;
 		}
 
-		internal void BeginTry() {
-			CurrentTryBlock = new TryBlockInfo(CodeReader.ReadInteger(), LocalScope, CurrentTryBlock);
+		internal void EnterTry() {
+			_currentTryBlock = new TryBlockInfo(CodeReader.ReadInteger(), LocalScope, _currentTryBlock);
 		}
 
-		internal void EndTry() {
-			if (CurrentTryBlock == null)
-				throw new UnexpectedEndTryException();
-			CurrentTryBlock = CurrentTryBlock.OuterBlock;
+		internal void LeaveTry() {
+			if (_currentTryBlock == null)
+				throw new IllegalOpCodeException(OpCode.LeaveTry.ToString());
+			_currentTryBlock = _currentTryBlock.OuterBlock;
 			CodeReader.Seek(CodeReader.ReadInteger());
 		}
 
 		internal bool TryHandle(ExceptionObject exception) {
-			if (CurrentTryBlock == null)
+			if (_currentTryBlock == null)
 				return (false);
-			LocalScope = CurrentTryBlock.Scope;
-			CodeReader.Seek(CurrentTryBlock.HandlerOffset);
-			CurrentTryBlock = CurrentTryBlock.OuterBlock;
-			EvalStack.Push(exception.ThrownValue);
-			EvalStack.Push(JSValue.Create(1));
+			LocalScope = _currentTryBlock.Scope;
+			CodeReader.Seek(_currentTryBlock.HandlerOffset);
+			_currentTryBlock = _currentTryBlock.OuterBlock;
+			_evalStack.Push(exception.ThrownValue);
+			_evalStack.Push((JSNumberValue)1);
 			return (true);
 		}
 
@@ -145,14 +179,6 @@ namespace YaJS.Runtime {
 		/// Область хранения локальных переменных
 		/// </summary>
 		public LocalScope LocalScope { get; private set; }
-		/// <summary>
-		/// Стек вычислений
-		/// </summary>
-		internal Stack<JSValue> EvalStack { get; private set; }
-		/// <summary>
-		/// Текущий блок try
-		/// </summary>
-		internal TryBlockInfo CurrentTryBlock { get; private set; }
 		/// <summary>
 		/// Byte-код reader
 		/// </summary>

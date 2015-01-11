@@ -7,8 +7,8 @@ namespace YaJS.Compiler.AST.Statements {
 	internal sealed class ReturnStatement : Statement {
 		private Expression _expression;
 
-		public ReturnStatement(Statement parent, Expression expression)
-			: base(parent, StatementType.Return) {
+		public ReturnStatement(Statement parent, int lineNo, Expression expression)
+			: base(parent, StatementType.Return, lineNo) {
 			Contract.Requires(expression != null);
 			_expression = expression;
 		}

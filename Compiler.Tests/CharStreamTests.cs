@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace YaJS.Compiler.Tests {
-	using YaJS.Compiler;
+	using Compiler;
 
 	[TestClass]
 	public class CharStreamTests {

@@ -2,16 +2,20 @@
 using System.Diagnostics.Contracts;
 
 namespace YaJS.Compiler.AST {
+	using Statements;
+
 	/// <summary>
 	/// Представляет в AST дереве функцию
 	/// </summary>
 	public sealed class Function {
 		public Function(
 			string name,
+			int lineNo,
 			List<string> parameterNames,
 			List<string> declaredVariables,
 			List<Function> nestedFunctions,
 			Statement functionBody,
+			IEnumerable<TryStatement> tryBlocks,
 			bool isDeclaration
 		) {
 			Contract.Requires(!(isDeclaration && string.IsNullOrEmpty(name)));
@@ -19,12 +23,15 @@ namespace YaJS.Compiler.AST {
 			Contract.Requires(declaredVariables != null);
 			Contract.Requires(nestedFunctions != null);
 			Contract.Requires(functionBody != null);
+			Contract.Requires(tryBlocks != null);
 
 			Name = name;
+			LineNo = lineNo;
 			ParameterNames = parameterNames;
 			DeclaredVariables = declaredVariables;
 			NestedFunctions = nestedFunctions;
 			FunctionBody = functionBody;
+			TryBlocks = tryBlocks;
 			IsDeclaration = isDeclaration;
 
 			// Переупорядочить NestedFunctions переместив FunctionDeclaration в начало
@@ -50,6 +57,10 @@ namespace YaJS.Compiler.AST {
 		/// </summary>
 		public string Name { get; private set; }
 		/// <summary>
+		/// Номер строки на которой начинается функция
+		/// </summary>
+		public int LineNo { get; private set; }
+		/// <summary>
 		/// Список имен параметров функции
 		/// </summary>
 		public List<string> ParameterNames { get; private set; }
@@ -66,9 +77,13 @@ namespace YaJS.Compiler.AST {
 		/// </summary>
 		public Statement FunctionBody { get; private set; }
 		/// <summary>
+		/// Блоки try содержащиеся в функции
+		/// </summary>
+		public IEnumerable<TryStatement> TryBlocks { get; private set; }
+		/// <summary>
 		/// Является ли функция FunctionDeclaration
 		/// </summary>
-		public bool IsDeclaration { get; set; }
+		public bool IsDeclaration { get; private set; }
 		/// <summary>
 		/// Кол-во FunctionDeclaration в списке NestedFunctions
 		/// </summary>
@@ -76,6 +91,6 @@ namespace YaJS.Compiler.AST {
 		/// <summary>
 		/// Индекс функции в списке вложенных функций внешней функции (используется для кодогенерации)
 		/// </summary>
-		public int Index { get; internal set; }
+		public int Index { get; private set; }
 	}
 }

@@ -9,6 +9,8 @@ namespace YaJS.Compiler.AST.Statements {
 		public CaseClause(Expression selector, IEnumerable<Statement> statements) {
 			Contract.Requires(selector != null);
 			Contract.Requires(statements != null);
+			Selector = selector;
+			Statements = statements;
 		}
 
 		public Expression Selector { get; private set; }
@@ -24,8 +26,8 @@ namespace YaJS.Compiler.AST.Statements {
 		private IEnumerable<Statement> _defaultClause;
 		private IEnumerable<CaseClause> _afterDefaultClauses;
 
-		public SwitchStatement(Statement parent, ILabelSet labelSet)
-			: base(parent, StatementType.Switch, labelSet) {
+		public SwitchStatement(Statement parent, int lineNo, ILabelSet labelSet)
+			: base(parent, StatementType.Switch, lineNo, labelSet) {
 		}
 
 		public Expression Expression {

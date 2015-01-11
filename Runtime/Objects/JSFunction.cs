@@ -7,39 +7,50 @@ namespace YaJS.Runtime.Objects {
 	/// Базовый класс для всех функций
 	/// </summary>
 	public abstract class JSFunction : JSObject {
-		public const string PrototypeMemberName = "prototype";
+		private const string PrototypeMemberName = "prototype";
 
-		protected JSFunction(JSObject inherited)
-			: base(inherited) {
+		protected JSFunction(VirtualMachine vm, JSObject inherited)
+			: base(vm, inherited) {
 			Contract.Requires(inherited != null);
 		}
 
-		public virtual JSObject GetPrototype(VirtualMachine vm) {
-			Contract.Requires(vm != null);
+		public virtual JSObject GetPrototype() {
 			JSValue result;
 			if (!OwnMembers.TryGetValue(PrototypeMemberName, out result)) {
-				result = new JSObject(vm.Object);
+				result = VM.NewObject();
 				OwnMembers.Add(PrototypeMemberName, result);
 			}
-			return (result.GetAsObject());
+			return (result.RequireObject());
 		}
 
 		/// <summary>
 		/// Вызвать Native-функцию
 		/// </summary>
-		/// <param name="vm">Виртуальная машина</param>
-		/// <param name="context">Контекст. В случае если функция вызывается как конструктор, то null</param>
-		/// <param name="outerScope">Внешнняя область локальных переменных</param>
+		/// <param name="outerScope">Внешняя область локальных переменных</param>
 		/// <param name="args">Список параметров</param>
 		/// <returns></returns>
-		public virtual JSValue Invoke(
-			VirtualMachine vm, JSObject context, LocalScope outerScope, List<JSValue> args
-		) {
-			Contract.Requires(vm != null);
+		public virtual JSValue Construct(LocalScope outerScope, List<JSValue> args) {
+			Contract.Requires(outerScope != null);
+			Contract.Requires(args != null);
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// Вызвать Native-функцию
+		/// </summary>
+		/// <param name="context">Контекст</param>
+		/// <param name="outerScope">Внешняя область локальных переменных</param>
+		/// <param name="args">Список параметров</param>
+		/// <returns></returns>
+		public virtual JSValue Invoke(JSObject context, LocalScope outerScope, List<JSValue> args) {
 			Contract.Requires(context != null);
 			Contract.Requires(outerScope != null);
 			Contract.Requires(args != null);
 			throw new NotSupportedException();
+		}
+
+		public override string TypeOf() {
+			return ("function");
 		}
 
 		/// <summary>

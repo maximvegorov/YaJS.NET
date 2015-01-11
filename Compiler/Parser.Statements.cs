@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 
 namespace YaJS.Compiler {
-	using System.Linq;
-	using YaJS.Compiler.AST;
-	using YaJS.Compiler.AST.Statements;
+	using AST;
+	using AST.Statements;
 
 	public partial class Parser {
 		private void ParseFunctionDeclaration() {
@@ -29,7 +28,7 @@ namespace YaJS.Compiler {
 		}
 
 		private BlockStatement ParseBlockStatement(Statement parent) {
-			var result = new BlockStatement(parent);
+			var result = new BlockStatement(parent, _lookahead.StartPosition.LineNo);
 			Match(TokenType.LCurlyBrace);
 			foreach (var statement in ParseStatementList(result)) {
 				result.AddStatement(statement);
@@ -39,7 +38,7 @@ namespace YaJS.Compiler {
 		}
 
 		private Statement ParseBreakStatement(Statement parent) {
-			var breakPosition = _lookahead.StartPosition;
+			var startPosition = _lookahead.StartPosition;
 			Match(TokenType.Break);
 			string targetLabel;
 			if (_lookahead.IsAfterLineTerminator)
@@ -58,14 +57,14 @@ namespace YaJS.Compiler {
 				target = target.Parent;
 			}
 			if (target == null)
-				ThrowUnreachableLabel(breakPosition, targetLabel);
-			var result = new BreakStatement(parent, target);
+				ThrowUnreachableLabel(startPosition, targetLabel);
+			var result = new BreakStatement(parent, startPosition.LineNo, target);
 			result.RegisterAsExitPoint();
 			return (result);
 		}
 
 		private Statement ParseContinueStatement(Statement parent) {
-			var continuePosition = _lookahead.StartPosition;
+			var startPosition = _lookahead.StartPosition;
 			Match(TokenType.Continue);
 			string targetLabel;
 			if (_lookahead.IsAfterLineTerminator)
@@ -84,14 +83,14 @@ namespace YaJS.Compiler {
 				target = target.Parent;
 			}
 			if (target == null)
-				ThrowUnreachableLabel(continuePosition, targetLabel);
-			var result = new ContinueStatement(parent, target);
+				ThrowUnreachableLabel(startPosition, targetLabel);
+			var result = new ContinueStatement(parent, startPosition.LineNo, target);
 			result.RegisterAsExitPoint();
 			return (result);
 		}
 
 		private Statement ParseDoWhileStatement(Statement parent, ILabelSet labelSet) {
-			var result = new DoWhileStatement(parent, labelSet);
+			var result = new DoWhileStatement(parent, _lookahead.StartPosition.LineNo, labelSet);
 			Match(TokenType.Do);
 			result.Statement = ParseStatement(result, true);
 			Match(TokenType.While);
@@ -102,12 +101,13 @@ namespace YaJS.Compiler {
 		}
 
 		private Statement ParseEmptyStatement(Statement parent) {
+			var result = new EmptyStatement(parent, _lookahead.StartPosition.LineNo);
 			ReadNextToken();
-			return (new EmptyStatement(parent));
+			return (result);
 		}
 
 		private Statement ParseIfStatement(Statement parent) {
-			var result = new IfStatement(parent);
+			var result = new IfStatement(parent, _lookahead.StartPosition.LineNo);
 			Match(TokenType.If);
 			Match(TokenType.LParenthesis);
 			result.Condition = ParseExpression();
@@ -154,6 +154,7 @@ namespace YaJS.Compiler {
 		}
 
 		private Statement ParseForStatement(Statement parent, ILabelSet labelSet) {
+			var startPosition = _lookahead.StartPosition;
 			IterationStatement result = null;
 			Match(TokenType.For);
 			Match(TokenType.LParenthesis);
@@ -170,7 +171,9 @@ namespace YaJS.Compiler {
 						if (!_currentFunction.DeclaredVariables.Contains(variableName))
 							_currentFunction.DeclaredVariables.Add(variableName);
 					}
-					result = new ForInStatement(parent, variableName, ParseExpression(), labelSet);
+					result = new ForInStatement(
+						parent, startPosition.LineNo, variableName, ParseExpression(), labelSet
+					);
 				}
 			}
 			if (result == null) {
@@ -193,7 +196,9 @@ namespace YaJS.Compiler {
 				if (_lookahead.Type != TokenType.RParenthesis) {
 					increment = ParseExpression();
 				}
-				result = new ForStatement(parent, initialization, condition, increment, labelSet);
+				result = new ForStatement(
+					parent, startPosition.LineNo, initialization, condition, increment, labelSet
+				);
 			}
 			Match(TokenType.RParenthesis);
 			result.Statement = ParseStatement(result, true);
@@ -201,28 +206,24 @@ namespace YaJS.Compiler {
 		}
 
 		private Statement ParseReturnStatement(Statement parent) {
-			if (!parent.CanContainReturn())
-				ThrowInvalidStatement(_lookahead.StartPosition);
+			var startPosition = _lookahead.StartPosition;
 			Match(TokenType.Return);
-			Expression expression;
-			if (_lookahead.IsAfterLineTerminator)
-				expression = Expression.Undefined();
-			else
-				expression = ParseExpression();
-			var result = new ReturnStatement(parent, expression);
+			var expression = _lookahead.IsAfterLineTerminator ? Expression.Undefined() : ParseExpression();
+			var result = new ReturnStatement(parent, startPosition.LineNo, expression);
 			result.RegisterAsExitPoint();
 			return (result);
 		}
 
 		private Statement ParseThrowStatement(Statement parent) {
+			var startPosition = _lookahead.StartPosition;
 			Match(TokenType.Throw);
 			if (_lookahead.IsAfterLineTerminator)
 				ThrowUnexpectedLineTerminator(_lookahead.StartPosition);
-			return (new ThrowStatement(parent, ParseExpression()));
+			return (new ThrowStatement(parent, startPosition.LineNo, ParseExpression()));
 		}
 
 		private Statement ParseTryStatement(Statement parent) {
-			var result = new TryStatement(parent);
+			var result = new TryStatement(parent, _lookahead.StartPosition.LineNo);
 			Match(TokenType.Try);
 			result.TryBlock = ParseBlockStatement(result);
 			var hasCatch = _lookahead.Type == TokenType.Catch;
@@ -268,7 +269,7 @@ namespace YaJS.Compiler {
 		}
 
 		private Statement ParseSwitchStatement(Statement parent, ILabelSet labelSet) {
-			var result = new SwitchStatement(parent, labelSet);
+			var result = new SwitchStatement(parent, _lookahead.StartPosition.LineNo, labelSet);
 
 			Match(TokenType.Switch);
 
@@ -278,14 +279,11 @@ namespace YaJS.Compiler {
 
 			Match(TokenType.LCurlyBrace);
 
-			List<CaseClause> beforeDefaultClauses = new List<CaseClause>();
+			var beforeDefaultClauses = new List<CaseClause>();
 			while (_lookahead.Type == TokenType.Case) {
 				beforeDefaultClauses.Add(ParseCaseClause(result));
 			}
-			if (beforeDefaultClauses.Count == 0)
-				result.BeforeDefaultClauses = Enumerable.Empty<CaseClause>();
-			else
-				result.BeforeDefaultClauses = beforeDefaultClauses;
+			result.BeforeDefaultClauses = beforeDefaultClauses.Count == 0 ? Enumerable.Empty<CaseClause>() : beforeDefaultClauses;
 
 			var hasDefaultClause = _lookahead.Type == TokenType.Default;
 			if (hasDefaultClause) {
@@ -293,14 +291,11 @@ namespace YaJS.Compiler {
 				Match(TokenType.Colon);
 				result.DefaultClause = ParseCaseClauseStatementList(result);
 
-				List<CaseClause> afterDefaultClauses = new List<CaseClause>();
+				var afterDefaultClauses = new List<CaseClause>();
 				while (_lookahead.Type == TokenType.Case) {
 					afterDefaultClauses.Add(ParseCaseClause(result));
 				}
-				if (afterDefaultClauses.Count == 0)
-					result.AfterDefaultClauses = Enumerable.Empty<CaseClause>();
-				else
-					result.AfterDefaultClauses = afterDefaultClauses;
+				result.AfterDefaultClauses = afterDefaultClauses.Count == 0 ? Enumerable.Empty<CaseClause>() : afterDefaultClauses;
 			}
 
 			if (beforeDefaultClauses.Count == 0 && !hasDefaultClause)
@@ -312,12 +307,13 @@ namespace YaJS.Compiler {
 		}
 
 		private Statement ParseVariableDeclarationStatement(Statement parent) {
+			var startPosition = _lookahead.StartPosition;
 			Match(TokenType.Var);
-			return (new ExpressionStatement(parent, ParseVariableDeclarationList()));
+			return (new ExpressionStatement(parent, startPosition.LineNo, ParseVariableDeclarationList()));
 		}
 
 		private Statement ParseWhileStatement(Statement parent, ILabelSet labelSet) {
-			var result = new WhileStatement(parent, labelSet);
+			var result = new WhileStatement(parent, _lookahead.StartPosition.LineNo, labelSet);
 			Match(TokenType.While);
 			Match(TokenType.LParenthesis);
 			result.Condition = ParseExpression();
@@ -327,13 +323,15 @@ namespace YaJS.Compiler {
 		}
 
 		private Statement ParseExpressionStatement(Statement parent) {
-			return (new ExpressionStatement(parent, ParseExpression()));
+			return (new ExpressionStatement(
+				parent, _lookahead.StartPosition.LineNo, ParseExpression()
+			));
 		}
 
 		private Statement ParseStatement(Statement parent, bool isRequired) {
 			Contract.Requires(parent != null);
 
-			ILabelSet labelSet = Statement.EmptyLabelSet;
+			var labelSet = Statement.EmptyLabelSet;
 
 			// Вычислить набор меток текущего оператора
 			while (_lookahead.Type == TokenType.Ident) {
@@ -386,18 +384,18 @@ namespace YaJS.Compiler {
 			}
 		}
 
-		private void ParseSourceElements(RootStatement root) {
-			Contract.Requires(root != null);
+		private void ParseFunctionBody(FunctionBody functionBody) {
+			Contract.Requires(functionBody != null);
 			for (; ; ) {
 				if (_lookahead.Type == TokenType.Function) {
 					// ReadNextToken вызовет ParseFunctionDeclaration
 					ParseFunctionDeclaration();
 				}
 				else {
-					var statement = ParseStatement(root, false);
+					var statement = ParseStatement(functionBody, false);
 					if (statement == null)
 						break;
-					root.AddStatement(statement);
+					functionBody.AddStatement(statement);
 					if (_lookahead.Type == TokenType.Unknown)
 						break;
 					else if (_lookahead.Type == TokenType.Semicolon)

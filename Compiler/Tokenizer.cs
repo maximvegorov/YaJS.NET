@@ -5,7 +5,7 @@ using System.IO;
 using System.Text;
 
 namespace YaJS.Compiler {
-	using YaJS.Compiler.Exceptions;
+	using Exceptions;
 
 	/// <summary>
 	/// Сканер
@@ -66,7 +66,7 @@ namespace YaJS.Compiler {
 			Keywords.Add("arguments", TokenType.Arguments);
 		}
 
-		public CharStream _input;
+		private readonly CharStream _input;
 
 		public Tokenizer(TextReader reader) {
 			Contract.Requires<ArgumentNullException>(reader != null, "reader");

@@ -8,8 +8,8 @@ namespace YaJS.Runtime.Constructors {
 	/// Native-конструктор JSObject
 	/// </summary>
 	internal sealed class JSObjectConstructor : JSNativeFunction {
-		public JSObjectConstructor(JSObject inherited)
-			: base(inherited) {
+		public JSObjectConstructor(VirtualMachine vm, JSObject inherited)
+			: base(vm, inherited) {
 		}
 
 		public static void InitPrototype(JSObject proto, JSObject functionPrototype) {
@@ -18,17 +18,16 @@ namespace YaJS.Runtime.Constructors {
 			// TODO
 		}
 
-		public override JSObject GetPrototype(VirtualMachine vm) {
-			return (vm.Object);
+		public override JSObject GetPrototype() {
+			return (VM.Object);
 		}
 
-		public override JSValue Invoke(
-			VirtualMachine vm, JSObject context, LocalScope outerScope, List<JSValue> args
-		) {
-			if (args.Count == 0)
-				return (vm.NewObject());
-			else
-				return (args[0].ToObject(vm));
+		public override JSValue Construct(LocalScope outerScope, List<JSValue> args) {
+			return (args.Count == 0 ? VM.NewObject() : args[0].ToObject(VM));
+		}
+
+		public override JSValue Invoke(JSObject context, LocalScope outerScope, List<JSValue> args) {
+			return (Construct(outerScope, args));
 		}
 	}
 }

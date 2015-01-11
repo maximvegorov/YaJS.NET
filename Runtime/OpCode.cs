@@ -14,8 +14,6 @@
 
 		LdThis,			// Загрузить в стек this
 
-		DeclLocal,		// Объявить локальную переменную
-		DeclLocalFunc,	// Объявить локальную функцию
 		LdLocal,		// Загрузить в стек значение локальной переменной
 		LdLocalFunc,	// Загрузить в стек ссылку на локальную функцию
 		StLocal,		// Извлечь из стека значение и сохранить в локальной переменной
@@ -32,6 +30,8 @@
 		Goto,			// Безусловный переход
 		GotoIfTrue,		// Перейти если S[top] истинно
 		GotoIfFalse,	// Перейти если S[top] ложно
+
+		Switch,			// Перейти по таблице переходов с учетом значения S[top]
 
 		BeginScope,		// Создать новую область локальных переменных
 		EndScope,		// Вернуться к предыдущей области локальных переменных
@@ -54,6 +54,10 @@
 
 		Return,			// Вернуться из функции
 
+		GetEnumerator,	// Вернуть перечислитель
+		EnumMoveNext,	// Перейти к следующему элементу перечислителя
+
+		Pos,			// Number(S[top])
 		Neg,			// -S[top]
 
 		Plus,			// S[top] + S[top - 1]
@@ -80,12 +84,10 @@
 		Neq,			// S[top] != S[top - 1]
 		StrictNeq,		// S[top] !== S[top - 1]
 
-		Cmp,			// Сравнить S[top] с S[top - 1], -1 если S[top] < S[top - 1], 0 если S[top] = S[top - 1], иначе 1
-
-		Gt,				// S[top] > S[top - 1]
-		Gte,			// S[top] >= S[top - 1]
 		Lt,				// S[top] < S[top - 1]
 		Lte,			// S[top] <= S[top - 1]
+		Gt,				// S[top] > S[top - 1]
+		Gte,			// S[top] >= S[top - 1]
 
 		InstanceOf,		// S[top] instanceof S[top - 1]
 		TypeOf			// typeof S[top]

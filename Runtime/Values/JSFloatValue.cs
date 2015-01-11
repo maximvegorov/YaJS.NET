@@ -6,16 +6,25 @@ namespace YaJS.Runtime.Values {
 	/// Вещественное значение
 	/// </summary>
 	[Serializable]
-	public sealed class JSFloatValue : JSNumberValue {
-		internal JSFloatValue(double value)
+	internal sealed class JSFloatValue : JSNumberValue {
+		private readonly double _value;
+
+		public JSFloatValue(double value)
 			: base(JSValueType.Float) {
-			Value = value;
+			_value = value;
+		}
+
+		public override bool Equals(object other) {
+			var otherValue = other as JSFloatValue;
+			return (otherValue != null && _value.Equals(otherValue._value));
+		}
+
+		public override int GetHashCode() {
+			return (_value.GetHashCode());
 		}
 
 		public override string ToString() {
-			return (Value.ToString(CultureInfo.InvariantCulture));
+			return (_value.ToString(CultureInfo.InvariantCulture));
 		}
-
-		public double Value { get; private set; }
 	}
 }

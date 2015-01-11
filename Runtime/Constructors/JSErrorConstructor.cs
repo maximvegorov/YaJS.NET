@@ -8,8 +8,8 @@ namespace YaJS.Runtime.Constructors {
 	/// Native-конструктор JSError
 	/// </summary>
 	internal sealed class JSErrorConstructor : JSNativeFunction {
-		public JSErrorConstructor(JSObject inherited)
-			: base(inherited) {
+		public JSErrorConstructor(VirtualMachine vm, JSObject inherited)
+			: base(vm, inherited) {
 		}
 
 		public static void InitPrototype(JSObject proto, JSObject functionPrototype) {
@@ -18,14 +18,16 @@ namespace YaJS.Runtime.Constructors {
 			// TODO
 		}
 
-		public override JSObject GetPrototype(VirtualMachine vm) {
-			return (vm.Error);
+		public override JSObject GetPrototype() {
+			return (VM.Error);
 		}
 
-		public override JSValue Invoke(
-			VirtualMachine vm, JSObject context, LocalScope outerScope, List<JSValue> args
-		) {
-			return (vm.NewError(args.Count > 0 ? args[0].CastToString() : string.Empty));
+		public override JSValue Construct(LocalScope outerScope, List<JSValue> args) {
+			return (VM.NewError(args.Count > 0 ? args[0].CastToString() : string.Empty));
+		}
+
+		public override JSValue Invoke(JSObject context, LocalScope outerScope, List<JSValue> args) {
+			return (Construct(outerScope, args));
 		}
 	}
 }

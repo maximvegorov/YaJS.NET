@@ -2,11 +2,11 @@
 using System.Diagnostics.Contracts;
 
 namespace YaJS.Compiler {
-	using YaJS.Compiler.AST;
+	using AST;
 
 	public sealed class FunctionCollection {
-		private List<Function> _list;
-		private Dictionary<string, Function> _map;
+		private readonly List<Function> _list;
+		private readonly Dictionary<string, Function> _map;
 
 		public FunctionCollection() {
 			_list = new List<Function>();

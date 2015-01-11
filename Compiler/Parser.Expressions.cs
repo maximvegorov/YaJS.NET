@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace YaJS.Compiler {
-	using YaJS.Compiler.AST;
+	using AST;
 
 	/// <summary>
 	/// Синтаксис выражений:
@@ -47,13 +46,13 @@ namespace YaJS.Compiler {
 	/// ExpressionNoIn ::= AssignmentExpressionNoIn (, AssignmentExpressionNoIn)*
 	/// </summary>
 	public partial class Parser {
-		private static readonly List<Expression> _emptyArgumentList = new List<Expression>();
+		private static readonly List<Expression> EmptyArgumentList = new List<Expression>();
 
 		private List<Expression> ParseArguments() {
 			Match(TokenType.LParenthesis);
 			if (_lookahead.Type == TokenType.RParenthesis) {
 				ReadNextToken();
-				return (_emptyArgumentList);
+				return (EmptyArgumentList);
 			}
 			else {
 				var result = new List<Expression>() { ParseExpression() };
@@ -278,7 +277,7 @@ namespace YaJS.Compiler {
 			while (newOperatorStack.Count >= 0) {
 				if (!result.CanBeConstructor)
 					ThrowExpectedConstructor(newOperatorStack.Pop());
-				result = Expression.New(result, _emptyArgumentList);
+				result = Expression.New(result, EmptyArgumentList);
 				newOperatorStack.Pop();
 			}
 
@@ -291,10 +290,7 @@ namespace YaJS.Compiler {
 			if (_lookahead.Type == TokenType.Inc || _lookahead.Type == TokenType.Dec) {
 				if (!result.IsReference)
 					ThrowExpectedReference(startPos);
-				if (_lookahead.Type == TokenType.Inc)
-					result = Expression.PostfixInc(result);
-				else
-					result = Expression.PostfixDec(result);
+				result = _lookahead.Type == TokenType.Inc ? Expression.PostfixInc(result) : Expression.PostfixDec(result);
 			}
 			return (result);
 		}

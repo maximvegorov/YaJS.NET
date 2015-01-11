@@ -7,19 +7,16 @@ namespace YaJS.Runtime.Constructors.Errors {
 	/// Native-конструктор JSSyntaxError
 	/// </summary>
 	internal sealed class JSSyntaxErrorConstructor : JSNativeFunction {
-		public JSSyntaxErrorConstructor(JSObject inherited)
-			: base(inherited) {
+		public JSSyntaxErrorConstructor(VirtualMachine vm, JSObject inherited)
+			: base(vm, inherited) {
 		}
 
-		public override JSObject GetPrototype(VirtualMachine vm) {
-			return (vm.SyntaxError);
+		public override JSObject GetPrototype() {
+			return (VM.SyntaxError);
 		}
 
-		public override JSValue Invoke(
-			VirtualMachine vm, JSObject context, LocalScope outerScope, List<JSValue> args
-		) {
-			return (vm.NewSyntaxError(args.Count > 0 ? args[0].CastToString() : string.Empty));
+		public override JSValue Invoke(JSObject context, LocalScope outerScope, List<JSValue> args) {
+			return (VM.NewSyntaxError(args.Count > 0 ? args[0].CastToString() : string.Empty));
 		}
 	}
 }
-

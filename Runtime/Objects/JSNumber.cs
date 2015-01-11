@@ -1,20 +1,23 @@
 ﻿using System.Diagnostics.Contracts;
-using System.Globalization;
 
 namespace YaJS.Runtime.Objects {
+	using Runtime.Values;
+
 	/// <summary>
 	/// Объект-wrapper для числовых значений
 	/// </summary>
-	public sealed class JSNumber : JSObject {
-		internal JSNumber(double value, JSObject inherited)
-			: base(inherited) {
+	internal sealed class JSNumber : JSObject {
+		private readonly JSNumberValue _value;
+
+		public JSNumber(VirtualMachine vm, JSNumberValue value, JSObject inherited)
+			: base(vm, inherited) {
+			Contract.Requires(value != null);
 			Contract.Requires(inherited != null);
+			_value = value;
 		}
 
 		public override string ToString() {
-			return (Value.ToString(CultureInfo.InvariantCulture));
+			return (_value.ToString());
 		}
-
-		public double Value { get; private set; }
 	}
 }

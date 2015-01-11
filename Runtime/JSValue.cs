@@ -8,34 +8,22 @@ namespace YaJS.Runtime {
 	/// <summary>
 	/// Типы примитивных значений
 	/// </summary>
-	public enum JSValueType { Undefined, Null, Boolean, Integer, Float, String, Object }
+	public enum JSValueType { Undefined, Null, Boolean, Integer, Float, String, Object, Enumerator }
 
 	/// <summary>
 	/// Примитивное значение
 	/// </summary>
 	[Serializable]
-	public abstract class JSValue : IComparable<JSValue> {
-		public static readonly JSUndefinedValue Undefined = new JSUndefinedValue();
-		public static readonly JSNullValue Null = new JSNullValue();
+	public abstract class JSValue {
+		public static readonly JSValue Undefined = new JSUndefinedValue();
+		public static readonly JSValue Null = new JSNullValue();
 
-		public JSValue(JSValueType type) {
+		protected JSValue(JSValueType type) {
 			Type = type;
 		}
 
-		public virtual bool ContainsMember(JSValue name) {
-			throw new TypeErrorException();
-		}
-
-		public virtual JSValue GetMember(VirtualMachine runtime, JSValue name) {
-			throw new TypeErrorException();
-		}
-
-		public virtual void SetMember(VirtualMachine runtime, JSValue name, JSValue value) {
-			throw new TypeErrorException();
-		}
-
-		public virtual bool DeleteMember(JSValue name) {
-			throw new TypeErrorException();
+		public virtual JSEnumerator GetEnumerator() {
+			return (JSEnumerator.Empty);
 		}
 
 		public virtual JSValue Neg() {
@@ -91,7 +79,7 @@ namespace YaJS.Runtime {
 		}
 
 		public JSValue Not() {
-			return (JSValue.Create(!CastToBoolean()));
+			return (!CastToBoolean());
 		}
 
 		public JSValue And(JSValue value) {
@@ -110,22 +98,24 @@ namespace YaJS.Runtime {
 			return (false);
 		}
 
-		public virtual int CompareTo(JSValue value) {
+		public virtual bool Lt(JSValue value) {
+			throw new TypeErrorException();
+		}
+
+		public virtual bool Lte(JSValue value) {
 			throw new TypeErrorException();
 		}
 
 		public virtual bool IsInstanceOf(JSFunction constructor) {
-			throw new TypeErrorException();
+			return (false);
 		}
 
-		public virtual string TypeOf() {
-			throw new TypeErrorException();
-		}
+		public abstract string TypeOf();
 
 		public virtual bool CastToBoolean() {
 			throw new TypeErrorException();
 		}
-		public virtual double CastToInteger() {
+		public virtual int CastToInteger() {
 			throw new TypeErrorException();
 		}
 		public virtual double CastToFloat() {
@@ -135,51 +125,36 @@ namespace YaJS.Runtime {
 			throw new TypeErrorException();
 		}
 
-		public virtual bool GetAsBoolean() {
+		public virtual int RequireInteger() {
 			throw new TypeErrorException();
 		}
-		public virtual int GetAsInteger() {
+		public virtual JSObject RequireObject() {
 			throw new TypeErrorException();
 		}
-		public virtual double GetAsFloat() {
+		public virtual JSFunction RequireFunction() {
 			throw new TypeErrorException();
 		}
-		public virtual string GetAsString() {
+		public virtual JSEnumerator RequireEnumerator() {
 			throw new TypeErrorException();
 		}
-		public virtual JSObject GetAsObject() {
-			throw new TypeErrorException();
+
+		public virtual JSValue ToPrimitiveValue() {
+			return (this);
 		}
-		public virtual JSFunction GetAsFunction() {
+
+		public virtual JSNumberValue ToNumber() {
 			throw new TypeErrorException();
 		}
 
 		public virtual JSObject ToObject(VirtualMachine vm) {
-			throw new NotImplementedException();
-		}
-		public virtual JSValue ValueOf() {
-			return (this);
+			throw new TypeErrorException();
 		}
 
-		public static JSValue ToPrimitiveValue(JSValue value) {
-			if (value.Type == JSValueType.Object)
-				value = value.ValueOf();
-			return (value);
-		}
-
-		public static JSValue Create(bool value) {
+		public static implicit operator JSValue(bool value) {
 			return (new JSBooleanValue(value));
 		}
 
-		public static JSValue Create(int value) {
-			return (new JSIntegerValue(value));
-		}
-
-		public static JSValue Create(double value) {
-			return (new JSFloatValue(value));
-		}
-
-		public static JSValue Create(string value) {
+		public static implicit operator JSValue(string value) {
 			return (new JSStringValue(value));
 		}
 

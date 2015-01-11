@@ -29,7 +29,7 @@ namespace YaJS.Compiler.AST {
 	/// Пустой набор меток
 	/// </summary>
 	internal sealed class EmptyLabelSet : ILabelSet {
-		private static readonly ILabelSet _oneEmptyStringLabelSet = new SingletonLabelSet(string.Empty);
+		private static readonly ILabelSet OneEmptyStringLabelSet = new SingletonLabelSet(string.Empty);
 
 		public bool Contains(string label) {
 			return (false);
@@ -37,7 +37,7 @@ namespace YaJS.Compiler.AST {
 
 		public ILabelSet UnionWith(string label) {
 			if (string.IsNullOrEmpty(label))
-				return (_oneEmptyStringLabelSet);
+				return (OneEmptyStringLabelSet);
 			else
 				return (new SingletonLabelSet(label));
 		}
@@ -47,11 +47,11 @@ namespace YaJS.Compiler.AST {
 	/// Набор меток содержащий одну метку
 	/// </summary>
 	internal sealed class SingletonLabelSet : ILabelSet {
-		private string _label;
+		private readonly string _label;
 
 		public SingletonLabelSet(string label) {
 			Contract.Requires(label != null);
-			this._label = label;
+			_label = label;
 		}
 
 		[Pure]
@@ -68,8 +68,8 @@ namespace YaJS.Compiler.AST {
 	/// Набор меток содержащий две метки
 	/// </summary>
 	internal sealed class TwoLabelSet : ILabelSet {
-		private string _label1;
-		private string _label2;
+		private readonly string _label1;
+		private readonly string _label2;
 
 		public TwoLabelSet(string label1, string label2) {
 			Contract.Requires(label1 != null);
@@ -92,7 +92,7 @@ namespace YaJS.Compiler.AST {
 	/// Набор содержащий произвольное кол-во меток
 	/// </summary>
 	internal sealed class HashLabelSet : ILabelSet {
-		private HashSet<string> _set;
+		private readonly HashSet<string> _set;
 
 		public HashLabelSet(string label1, string label2, string label3) {
 			Contract.Requires(label1 != null);

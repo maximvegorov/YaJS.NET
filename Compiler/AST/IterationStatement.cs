@@ -7,8 +7,8 @@ namespace YaJS.Compiler.AST {
 	internal abstract class IterationStatement : LabellableStatement {
 		private Statement _statement;
 
-		public IterationStatement(Statement parent, StatementType type, ILabelSet labelSet)
-			: base(parent, type, labelSet) {
+		protected IterationStatement(Statement parent, StatementType type, int lineNo, ILabelSet labelSet)
+			: base(parent, type, lineNo, labelSet) {
 		}
 
 		public Statement Statement {

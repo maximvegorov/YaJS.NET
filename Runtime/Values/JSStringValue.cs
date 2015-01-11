@@ -5,16 +5,29 @@ namespace YaJS.Runtime.Values {
 	/// Строковое значение
 	/// </summary>
 	[Serializable]
-	public sealed class JSStringValue : JSValue {
-		internal JSStringValue(string value)
+	internal sealed class JSStringValue : JSValue {
+		private readonly string _value;
+
+		public JSStringValue(string value)
 			: base(JSValueType.String) {
-			Value = value ?? string.Empty;
+			_value = value ?? string.Empty;
+		}
+
+		public override bool Equals(object other) {
+			var otherValue = other as JSStringValue;
+			return (otherValue != null && _value.Equals(otherValue._value));
+		}
+
+		public override int GetHashCode() {
+			return (_value.GetHashCode());
 		}
 
 		public override string ToString() {
-			return (Value);
+			return (_value);
 		}
 
-		public string Value { get; private set; }
+		public override string TypeOf() {
+			return ("string");
+		}
 	}
 }

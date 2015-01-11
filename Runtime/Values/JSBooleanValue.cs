@@ -5,16 +5,29 @@ namespace YaJS.Runtime.Values {
 	/// Логическое значение
 	/// </summary>
 	[Serializable]
-	public sealed class JSBooleanValue : JSValue {
-		internal JSBooleanValue(bool value)
+	internal sealed class JSBooleanValue : JSValue {
+		private readonly bool _value;
+
+		public JSBooleanValue(bool value)
 			: base(JSValueType.Boolean) {
-			Value = value;
+			_value = value;
+		}
+
+		public override bool Equals(object other) {
+			var otherValue = other as JSBooleanValue;
+			return (otherValue != null && _value.Equals(otherValue._value));
+		}
+
+		public override int GetHashCode() {
+			return (_value.GetHashCode());
 		}
 
 		public override string ToString() {
-			return (Value.ToString());
+			return (_value.ToString());
 		}
 
-		public bool Value { get; private set; }
+		public override string TypeOf() {
+			return ("boolean");
+		}
 	}
 }

@@ -5,11 +5,17 @@ namespace YaJS.Runtime.Values {
 	/// Undefined
 	/// </summary>
 	[Serializable]
-	public sealed class JSUndefinedValue : JSValue {
-		internal JSUndefinedValue() : base(JSValueType.Undefined) { }
+	internal sealed class JSUndefinedValue : JSValue {
+		private const string UndefinedString = "undefined";
+
+		public JSUndefinedValue() : base(JSValueType.Undefined) { }
 
 		public override string ToString() {
-			return ("undefined");
+			return (UndefinedString);
+		}
+
+		public override string TypeOf() {
+			return (UndefinedString);
 		}
 	}
 }

@@ -5,11 +5,17 @@ namespace YaJS.Runtime.Values {
 	/// Null
 	/// </summary>
 	[Serializable]
-	public sealed class JSNullValue : JSValue {
-		internal JSNullValue() : base(JSValueType.Null) { }
+	internal sealed class JSNullValue : JSValue {
+		private const string NullString = "null";
+
+		public JSNullValue() : base(JSValueType.Null) { }
 
 		public override string ToString() {
-			return ("null");
+			return (NullString);
+		}
+
+		public override string TypeOf() {
+			return (NullString);
 		}
 	}
 }

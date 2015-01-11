@@ -6,13 +6,13 @@ namespace YaJS.Runtime.Objects {
 	/// <summary>
 	/// Массив
 	/// </summary>
-	public sealed class JSArray : JSObject {
-		internal JSArray(JSObject inherited)
-			: this(new List<JSValue>(), inherited) {
+	internal sealed class JSArray : JSObject {
+		public JSArray(VirtualMachine vm, JSObject inherited)
+			: this(vm, new List<JSValue>(), inherited) {
 		}
 
-		internal JSArray(List<JSValue> items, JSObject inherited)
-			: base(inherited) {
+		public JSArray(VirtualMachine vm, List<JSValue> items, JSObject inherited)
+			: base(vm, inherited) {
 			Contract.Requires(items != null);
 			Contract.Requires(inherited != null);
 			Items = items;
@@ -22,7 +22,7 @@ namespace YaJS.Runtime.Objects {
 			var result = new StringBuilder();
 			result.Append('[');
 			for (var i = 0; i < Items.Count; i++) {
-				result.Append(Items[i].ToString())
+				result.Append(Items[i])
 					.Append(", ");
 			}
 			if (result.Length > 1)

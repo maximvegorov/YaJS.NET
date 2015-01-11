@@ -1,49 +1,43 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 
 namespace YaJS.Compiler {
-	using YaJS.Compiler.AST;
-	using YaJS.Compiler.AST.Statements;
+	using AST;
+	using AST.Statements;
 
 	/// <summary>
 	/// Контекст parsing-га функции
 	/// </summary>
 	internal sealed class FunctionContext {
-		private List<TryStatement> _tryBlocks;
-
-		public FunctionContext(RootStatement rootStatement) {
-			Initialize("global", VariableCollection.Empty, rootStatement);
-		}
-
-		public FunctionContext(
-			string name,
-			IVariableCollection parameterNames,
-			RootStatement rootStatement
-		) {
-			Initialize(name, parameterNames, rootStatement);
-		}
+		private readonly string _name;
+		private readonly int _lineNo;
+		private readonly IVariableCollection _parameterNames;
+		private readonly List<TryStatement> _tryBlocks;
+		private readonly bool _isDeclaration;
 
 		public FunctionContext(
 			FunctionContext outer,
 			string name,
+			int lineNo,
 			IVariableCollection parameterNames,
-			RootStatement rootStatement,
+			FunctionBody functionBody,
 			bool isDeclaration
 		) {
 			Contract.Requires(outer != null);
-			Outer = outer;
-			Initialize(name, parameterNames, rootStatement);
-			IsDeclaration = isDeclaration;
-		}
-
-		private void Initialize(string name, IVariableCollection parameterNames, RootStatement rootStatement) {
-			Contract.Requires(!string.IsNullOrEmpty(Name));
+			Contract.Requires(!(isDeclaration && string.IsNullOrEmpty(name)));
 			Contract.Requires(parameterNames != null);
-			Contract.Requires(rootStatement != null);
-			Name = name;
+			Contract.Requires(functionBody != null);
+
+			Outer = outer;
+			_name = name;
+			_lineNo = lineNo;
+			_parameterNames = parameterNames;
 			DeclaredVariables = new VariableCollection();
 			NestedFunctions = new FunctionCollection();
-			RootStatement = rootStatement;
+			FunctionBody = functionBody;
+			_tryBlocks = new List<TryStatement>();
+			_isDeclaration = isDeclaration;
 		}
 
 		public void RegisterTryBlock(TryStatement tryBlock) {
@@ -53,21 +47,20 @@ namespace YaJS.Compiler {
 
 		public Function ToFunction() {
 			return (new Function(
-				Name,
-				ParameterNames.ToList(),
+				_name,
+				_lineNo,
+				_parameterNames.ToList(),
 				DeclaredVariables.ToList(),
 				NestedFunctions.ToList(),
-				RootStatement,
-				IsDeclaration
+				FunctionBody,
+				_tryBlocks.Count == 0 ? Enumerable.Empty<TryStatement>() : _tryBlocks,
+				_isDeclaration
 			));
 		}
 
 		public FunctionContext Outer { get; private set; }
-		public string Name { get; private set; }
-		public IVariableCollection ParameterNames { get; private set; }
 		public IVariableCollection DeclaredVariables { get; private set; }
 		public FunctionCollection NestedFunctions { get; private set; }
-		public RootStatement RootStatement { get; private set; }
-		public bool IsDeclaration { get; private set; }
+		public FunctionBody FunctionBody { get; private set; }
 	}
 }

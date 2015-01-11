@@ -5,6 +5,8 @@ namespace YaJS.Runtime {
 	/// Сервис компилятора. Используется для компиляции JS кода в byte-код на лету
 	/// </summary>
 	public interface ICompilerServices {
-		CompiledFunction Compile(IEnumerable<string> argumentNames, string functionBody);
+		CompiledFunction Compile(
+			string functionName, IEnumerable<string> parameterNames, string functionBody
+		);
 	}
 }

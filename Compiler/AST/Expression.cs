@@ -3,7 +3,7 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 
 namespace YaJS.Compiler.AST {
-	using YaJS.Compiler.AST.Expressions;
+	using Expressions;
 
 	/// <summary>
 	/// Представляет в AST дереве выражение. Является базовым классом для всех выражений

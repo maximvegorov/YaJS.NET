@@ -6,16 +6,25 @@ namespace YaJS.Runtime.Values {
 	/// Целочисленное значение
 	/// </summary>
 	[Serializable]
-	public sealed class JSIntegerValue : JSNumberValue {
-		internal JSIntegerValue(int value)
+	internal sealed class JSIntegerValue : JSNumberValue {
+		private readonly int _value;
+
+		public JSIntegerValue(int value)
 			: base(JSValueType.Integer) {
-			Value = value;
+			_value = value;
+		}
+
+		public override bool Equals(object other) {
+			var otherValue = other as JSIntegerValue;
+			return (otherValue != null && _value.Equals(otherValue._value));
+		}
+
+		public override int GetHashCode() {
+			return (_value.GetHashCode());
 		}
 
 		public override string ToString() {
-			return (Value.ToString(CultureInfo.InvariantCulture));
+			return (_value.ToString(CultureInfo.InvariantCulture));
 		}
-
-		public int Value { get; private set; }
 	}
 }

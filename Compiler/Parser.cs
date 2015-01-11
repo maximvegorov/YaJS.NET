@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Globalization;
 
 namespace YaJS.Compiler {
-	using YaJS.Compiler.AST;
-	using YaJS.Compiler.AST.Statements;
-	using YaJS.Compiler.Exceptions;
+	using AST;
+	using Exceptions;
 
 	/// <summary>
 	/// Синтаксический анализатор
 	/// </summary>
 	public partial class Parser {
-		private Tokenizer _tokenizer;
-		private LinkedList<Token> _peekTokens;
+		private readonly Tokenizer _tokenizer;
+		private readonly LinkedList<Token> _peekTokens;
 		private Token _lookahead;
 		private FunctionContext _currentFunction;
 
@@ -58,19 +56,12 @@ namespace YaJS.Compiler {
 
 			Match(TokenType.Function);
 
-			string name;
+			string name = null;
 			if (_lookahead.Type == TokenType.Ident) {
 				name = _lookahead.Value;
 				if (_currentFunction.Outer.NestedFunctions.Contains(name))
 					ThrowFunctionAlreadyDeclared(startPosition, name);
 				ReadNextToken();
-			}
-			else {
-				name = string.Format(
-					"anonymous at {0},{1}",
-					startPosition.LineNo.ToString(CultureInfo.InvariantCulture),
-					startPosition.ColumnNo.ToString(CultureInfo.InvariantCulture)
-				);
 			}
 
 			var parameterNames = new VariableCollection();
@@ -94,23 +85,16 @@ namespace YaJS.Compiler {
 			Match(TokenType.RParenthesis);
 
 			_currentFunction = new FunctionContext(
-				_currentFunction, name, parameterNames, new RootStatement(true), isDeclaration
+				_currentFunction, name, startPosition.LineNo, parameterNames, new FunctionBody(), isDeclaration
 			);
 			Match(TokenType.LCurlyBrace);
-			ParseSourceElements(_currentFunction.RootStatement);
+			ParseFunctionBody(_currentFunction.FunctionBody);
 			Match(TokenType.RCurlyBrace);
 
 			var result = _currentFunction.ToFunction();
 			_currentFunction = _currentFunction.Outer;
 			_currentFunction.NestedFunctions.Add(result);
 			return (result);
-		}
-
-		public Function ParseGlobal() {
-			_currentFunction = new FunctionContext(new RootStatement(false));
-			ParseSourceElements(_currentFunction.RootStatement);
-			Contract.Assert(_lookahead.Type == TokenType.Unknown);
-			return (_currentFunction.ToFunction());
 		}
 
 		private static IVariableCollection ToVariableCollection(IEnumerable<string> parameterNames) {
@@ -127,9 +111,9 @@ namespace YaJS.Compiler {
 			Contract.Requires<ArgumentNullException>(!string.IsNullOrEmpty(functionName), "functionName");
 			Contract.Requires<ArgumentNullException>(parameterNames != null, "parameterNames");
 			_currentFunction = new FunctionContext(
-				functionName, ToVariableCollection(parameterNames), new RootStatement(true)
+				null, functionName, 1, ToVariableCollection(parameterNames), new FunctionBody(), false
 			);
-			ParseSourceElements(_currentFunction.RootStatement);
+			ParseFunctionBody(_currentFunction.FunctionBody);
 			Contract.Assert(_lookahead.Type == TokenType.Unknown);
 			return (_currentFunction.ToFunction());
 		}

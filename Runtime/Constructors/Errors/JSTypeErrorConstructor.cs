@@ -7,18 +7,16 @@ namespace YaJS.Runtime.Constructors.Errors {
 	/// Native-конструктор JSTypeError
 	/// </summary>
 	internal sealed class JSTypeErrorConstructor : JSNativeFunction {
-		public JSTypeErrorConstructor(JSObject inherited)
-			: base(inherited) {
+		public JSTypeErrorConstructor(VirtualMachine vm, JSObject inherited)
+			: base(vm, inherited) {
 		}
 
-		public override JSObject GetPrototype(VirtualMachine vm) {
-			return (vm.TypeError);
+		public override JSObject GetPrototype() {
+			return (VM.TypeError);
 		}
 
-		public override JSValue Invoke(
-			VirtualMachine vm, JSObject context, LocalScope outerScope, List<JSValue> args
-		) {
-			return (vm.NewTypeError(args.Count > 0 ? args[0].CastToString() : string.Empty));
+		public override JSValue Invoke(JSObject context, LocalScope outerScope, List<JSValue> args) {
+			return (VM.NewTypeError(args.Count > 0 ? args[0].CastToString() : string.Empty));
 		}
 	}
 }
