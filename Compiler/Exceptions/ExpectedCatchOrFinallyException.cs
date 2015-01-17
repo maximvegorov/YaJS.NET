@@ -6,8 +6,7 @@ namespace YaJS.Compiler.Exceptions {
 	/// </summary>
 	[Serializable]
 	public sealed class ExpectedCatchOrFinallyException : ParserException {
-		public ExpectedCatchOrFinallyException()
-			: base() {
+		public ExpectedCatchOrFinallyException() {
 		}
 
 		public ExpectedCatchOrFinallyException(string message)

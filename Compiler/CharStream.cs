@@ -26,8 +26,7 @@ namespace YaJS.Compiler {
 #if DEBUG
 				Offset++;
 #endif
-				switch (CurChar)
-				{
+				switch (CurChar) {
 					case -1:
 						IsEOF = true;
 						break;

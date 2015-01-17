@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.Contracts;
+﻿using System;
+using System.Diagnostics.Contracts;
 
 namespace YaJS.Runtime.Objects {
 	/// <summary>
@@ -9,12 +10,16 @@ namespace YaJS.Runtime.Objects {
 
 		public JSString(VirtualMachine vm, string value, JSObject inherited)
 			: base(vm, inherited) {
-			Contract.Requires(inherited != null);
+			Contract.Requires(inherited == vm.String);
 			_value = value ?? string.Empty;
 		}
 
 		public override string ToString() {
 			return (_value);
+		}
+
+		public override void CastToPrimitiveValue(ExecutionThread thread, Action<JSValue> onCompleteCallback) {
+			onCompleteCallback(_value);
 		}
 	}
 }

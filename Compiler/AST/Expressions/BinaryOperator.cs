@@ -5,7 +5,8 @@ namespace YaJS.Compiler.AST.Expressions {
 	/// Базовый класс для всех бинарных операторов
 	/// </summary>
 	internal abstract class BinaryOperator : Expression {
-		protected BinaryOperator(Expression leftOperand, Expression rightOperand) {
+		protected BinaryOperator(ExpressionType type, Expression leftOperand, Expression rightOperand)
+			: base(type) {
 			Contract.Requires(leftOperand != null);
 			Contract.Requires(rightOperand != null);
 			LeftOperand = leftOperand;
@@ -13,7 +14,6 @@ namespace YaJS.Compiler.AST.Expressions {
 		}
 
 		public override bool IsConstant { get { return (LeftOperand.IsConstant && RightOperand.IsConstant); } }
-
 		protected Expression LeftOperand { get; private set; }
 		protected Expression RightOperand { get; private set; }
 	}

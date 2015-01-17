@@ -21,10 +21,10 @@ namespace YaJS.Compiler.AST.Statements {
 	/// Оператор switch (См. http://www.ecma-international.org/ecma-262/5.1/#sec-12.11)
 	/// </summary>
 	internal sealed class SwitchStatement : LabellableStatement {
-		private Expression _expression;
+		private IEnumerable<CaseClause> _afterDefaultClauses;
 		private IEnumerable<CaseClause> _beforeDefaultClauses;
 		private IEnumerable<Statement> _defaultClause;
-		private IEnumerable<CaseClause> _afterDefaultClauses;
+		private Expression _expression;
 
 		public SwitchStatement(Statement parent, int lineNo, ILabelSet labelSet)
 			: base(parent, StatementType.Switch, lineNo, labelSet) {
@@ -37,6 +37,7 @@ namespace YaJS.Compiler.AST.Statements {
 				_expression = value;
 			}
 		}
+
 		public IEnumerable<CaseClause> BeforeDefaultClauses {
 			set {
 				Contract.Requires(value != null);
@@ -44,6 +45,7 @@ namespace YaJS.Compiler.AST.Statements {
 				_beforeDefaultClauses = value;
 			}
 		}
+
 		public IEnumerable<Statement> DefaultClause {
 			set {
 				Contract.Requires(value != null);
@@ -51,6 +53,7 @@ namespace YaJS.Compiler.AST.Statements {
 				_defaultClause = value;
 			}
 		}
+
 		public IEnumerable<CaseClause> AfterDefaultClauses {
 			set {
 				Contract.Requires(value != null);

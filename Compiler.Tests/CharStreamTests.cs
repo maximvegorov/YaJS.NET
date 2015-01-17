@@ -2,8 +2,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace YaJS.Compiler.Tests {
-	using Compiler;
-
 	[TestClass]
 	public class CharStreamTests {
 		private static CharStream Create(string source) {

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using YaJS.Runtime.Constructors;
+using YaJS.Runtime.Constructors.Errors;
+using YaJS.Runtime.Objects;
+using YaJS.Runtime.Objects.Errors;
 using YaJS.Runtime.Values;
 
 namespace YaJS.Runtime {
-	using Runtime.Constructors;
-	using Runtime.Objects;
-	using Runtime.Objects.Errors;
-
 	/// <summary>
 	/// Виртуальная машина
 	/// </summary>
@@ -36,6 +36,7 @@ namespace YaJS.Runtime {
 			ReferenceError = new JSObject(this, Error);
 			SyntaxError = new JSObject(this, Error);
 			TypeError = new JSObject(this, Error);
+			RangeError = new JSObject(this, Error);
 
 			// Инициализировать прототипы встроенных объектов (все конструкторы являются функциями в JS)
 			JSObjectConstructor.InitPrototype(Object, Function);
@@ -55,6 +56,11 @@ namespace YaJS.Runtime {
 			Global.OwnMembers.Add("Function", new JSFunctionConstructor(this, Function));
 
 			Global.OwnMembers.Add("Error", new JSErrorConstructor(this, Function));
+			Global.OwnMembers.Add("InternalError", new JSInternalErrorConstructor(this, Function));
+			Global.OwnMembers.Add("ReferenceError", new JSReferenceErrorConstructor(this, Function));
+			Global.OwnMembers.Add("SyntaxError", new JSSyntaxErrorConstructor(this, Function));
+			Global.OwnMembers.Add("TypeError", new JSTypeErrorConstructor(this, Function));
+			Global.OwnMembers.Add("RangeError", new JSRangeErrorConstructor(this, Function));
 		}
 
 		public ExecutionThread NewThread(CompiledFunction globalFunction) {
@@ -116,6 +122,10 @@ namespace YaJS.Runtime {
 			return (new JSTypeError(this, message, TypeError));
 		}
 
+		public JSError NewRangeError(string message) {
+			return (new JSRangeError(this, message, RangeError));
+		}
+
 		/// <summary>
 		/// Компилятор
 		/// </summary>
@@ -130,16 +140,17 @@ namespace YaJS.Runtime {
 		/// Прототипы встроенных объектов
 		/// </summary>
 		public JSObject Object { get; private set; }
+
 		public JSObject Boolean { get; private set; }
 		public JSObject Number { get; private set; }
 		public JSObject String { get; private set; }
 		public JSObject Array { get; private set; }
 		public JSObject Function { get; private set; }
-
-		public JSObject Error { get; private set; }
-		public JSObject InternalError { get; private set; }
-		public JSObject ReferenceError { get; private set; }
-		public JSObject SyntaxError { get; private set; }
-		public JSObject TypeError { get; private set; }
+		internal JSObject Error { get; private set; }
+		internal JSObject InternalError { get; private set; }
+		internal JSObject ReferenceError { get; private set; }
+		internal JSObject SyntaxError { get; private set; }
+		internal JSObject TypeError { get; private set; }
+		internal JSObject RangeError { get; private set; }
 	}
 }

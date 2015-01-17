@@ -6,8 +6,7 @@ namespace YaJS.Runtime.Exceptions {
 	/// </summary>
 	[Serializable]
 	public sealed class InvalidVariableNameException : InternalErrorException {
-		public InvalidVariableNameException()
-			: base() {
+		public InvalidVariableNameException() {
 		}
 
 		public InvalidVariableNameException(string message)

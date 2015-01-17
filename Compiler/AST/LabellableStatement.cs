@@ -16,6 +16,7 @@ namespace YaJS.Compiler.AST {
 		public override bool IsBreakTarget(string targetLabel) {
 			return (_labelSet.Contains(targetLabel));
 		}
+
 		public override bool IsContinueTarget(string targetLabel) {
 			return (_labelSet.Contains(targetLabel));
 		}

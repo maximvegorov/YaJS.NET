@@ -6,8 +6,7 @@ namespace YaJS.Runtime.Exceptions {
 	/// </summary>
 	[Serializable]
 	public class IllegalOpCodeException : InternalErrorException {
-		public IllegalOpCodeException()
-			: base() {
+		public IllegalOpCodeException() {
 		}
 
 		public IllegalOpCodeException(string message)

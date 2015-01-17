@@ -6,8 +6,7 @@ namespace YaJS.Compiler.Exceptions {
 	/// </summary>
 	[Serializable]
 	public sealed class InvalidTokenException : ParserException {
-		public InvalidTokenException()
-			: base() {
+		public InvalidTokenException() {
 		}
 
 		public InvalidTokenException(string message)

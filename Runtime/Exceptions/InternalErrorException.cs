@@ -6,8 +6,7 @@ namespace YaJS.Runtime.Exceptions {
 	/// </summary>
 	[Serializable]
 	public abstract class InternalErrorException : RuntimeException {
-		public InternalErrorException()
-			: base() {
+		public InternalErrorException() {
 		}
 
 		public InternalErrorException(string message)

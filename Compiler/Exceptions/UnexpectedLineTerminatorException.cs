@@ -6,8 +6,7 @@ namespace YaJS.Compiler.Exceptions {
 	/// </summary>
 	[Serializable]
 	public sealed class UnexpectedLineTerminatorException : ParserException {
-		public UnexpectedLineTerminatorException()
-			: base() {
+		public UnexpectedLineTerminatorException() {
 		}
 
 		public UnexpectedLineTerminatorException(string message)

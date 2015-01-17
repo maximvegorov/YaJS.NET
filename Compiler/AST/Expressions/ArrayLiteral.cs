@@ -6,7 +6,8 @@ namespace YaJS.Compiler.AST.Expressions {
 	internal sealed class ArrayLiteral : Expression {
 		private readonly List<Expression> _items;
 
-		public ArrayLiteral(List<Expression> items) {
+		public ArrayLiteral(List<Expression> items)
+			: base(ExpressionType.ArrayLiteral) {
 			Contract.Requires(items != null);
 			_items = items;
 		}
@@ -16,7 +17,7 @@ namespace YaJS.Compiler.AST.Expressions {
 			result.Append('[');
 			if (_items.Count > 0) {
 				foreach (var item in _items) {
-					result.Append(item.ToString())
+					result.Append(item)
 						.Append(',');
 				}
 				result.Length -= 1;
@@ -27,5 +28,6 @@ namespace YaJS.Compiler.AST.Expressions {
 
 		public override bool CanHaveMembers { get { return (true); } }
 		public override bool CanHaveMutableMembers { get { return (true); } }
+		public override bool CanBeObject { get { return (true); } }
 	}
 }

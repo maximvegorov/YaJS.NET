@@ -6,8 +6,7 @@ namespace YaJS.Compiler.Exceptions {
 	/// </summary>
 	[Serializable]
 	public sealed class UnreachableLabelException : ParserException {
-		public UnreachableLabelException()
-			: base() {
+		public UnreachableLabelException() {
 		}
 
 		public UnreachableLabelException(string message)

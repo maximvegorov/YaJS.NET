@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using YaJS.Compiler.AST;
 
 namespace YaJS.Compiler {
-	using AST;
-
 	public sealed class FunctionCollection {
 		private readonly List<Function> _list;
 		private readonly Dictionary<string, Function> _map;
@@ -22,9 +21,8 @@ namespace YaJS.Compiler {
 		public void Add(Function function) {
 			Contract.Requires(function != null && !(function.IsDeclaration && Contains(function.Name)));
 			_list.Add(function);
-			if (function.IsDeclaration) {
+			if (function.IsDeclaration)
 				_map.Add(function.Name, function);
-			}
 		}
 
 		public List<Function> ToList() {

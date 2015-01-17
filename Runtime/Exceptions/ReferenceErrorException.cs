@@ -6,8 +6,7 @@ namespace YaJS.Runtime.Exceptions {
 	/// </summary>
 	[Serializable]
 	public class ReferenceErrorException : RuntimeErrorException {
-		public ReferenceErrorException()
-			: base() {
+		public ReferenceErrorException() {
 		}
 
 		public ReferenceErrorException(string message)

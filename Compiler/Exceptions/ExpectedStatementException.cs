@@ -6,8 +6,7 @@ namespace YaJS.Compiler.Exceptions {
 	/// </summary>
 	[Serializable]
 	public sealed class ExpectedStatementException : ParserException {
-		public ExpectedStatementException()
-			: base() {
+		public ExpectedStatementException() {
 		}
 
 		public ExpectedStatementException(string message)

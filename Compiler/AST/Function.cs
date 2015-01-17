@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using YaJS.Compiler.AST.Statements;
 
 namespace YaJS.Compiler.AST {
-	using Statements;
-
 	/// <summary>
 	/// Представляет в AST дереве функцию
 	/// </summary>
@@ -17,7 +16,7 @@ namespace YaJS.Compiler.AST {
 			Statement functionBody,
 			IEnumerable<TryStatement> tryBlocks,
 			bool isDeclaration
-		) {
+			) {
 			Contract.Requires(!(isDeclaration && string.IsNullOrEmpty(name)));
 			Contract.Requires(parameterNames != null);
 			Contract.Requires(declaredVariables != null);
@@ -56,38 +55,47 @@ namespace YaJS.Compiler.AST {
 		/// Имя функции. Обязательно для FunctionDeclaration
 		/// </summary>
 		public string Name { get; private set; }
+
 		/// <summary>
 		/// Номер строки на которой начинается функция
 		/// </summary>
 		public int LineNo { get; private set; }
+
 		/// <summary>
 		/// Список имен параметров функции
 		/// </summary>
 		public List<string> ParameterNames { get; private set; }
+
 		/// <summary>
 		/// Список объявленных переменных
 		/// </summary>
 		public List<string> DeclaredVariables { get; private set; }
+
 		/// <summary>
 		/// Список вложенных функций
 		/// </summary>
 		public List<Function> NestedFunctions { get; private set; }
+
 		/// <summary>
 		/// Тело функции
 		/// </summary>
 		public Statement FunctionBody { get; private set; }
+
 		/// <summary>
 		/// Блоки try содержащиеся в функции
 		/// </summary>
 		public IEnumerable<TryStatement> TryBlocks { get; private set; }
+
 		/// <summary>
 		/// Является ли функция FunctionDeclaration
 		/// </summary>
 		public bool IsDeclaration { get; private set; }
+
 		/// <summary>
 		/// Кол-во FunctionDeclaration в списке NestedFunctions
 		/// </summary>
 		public int FunctionDeclarationCount { get; private set; }
+
 		/// <summary>
 		/// Индекс функции в списке вложенных функций внешней функции (используется для кодогенерации)
 		/// </summary>

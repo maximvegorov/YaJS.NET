@@ -6,8 +6,8 @@ namespace YaJS.Compiler.AST.Statements {
 	/// </summary>
 	internal sealed class IfStatement : Statement {
 		private Expression _condition;
-		private Statement _thenStatement;
 		private Statement _elseStatement;
+		private Statement _thenStatement;
 
 		public IfStatement(Statement parent, int lineNo)
 			: base(parent, StatementType.If, lineNo) {
@@ -21,6 +21,7 @@ namespace YaJS.Compiler.AST.Statements {
 				_condition = value;
 			}
 		}
+
 		public Statement ThenStatement {
 			get { return (_thenStatement); }
 			set {
@@ -29,6 +30,7 @@ namespace YaJS.Compiler.AST.Statements {
 				_thenStatement = value;
 			}
 		}
+
 		public Statement ElseStatement {
 			get { return (_elseStatement); }
 			set {

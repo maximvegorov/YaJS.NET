@@ -2,7 +2,8 @@
 	internal sealed class BooleanLiteral : Expression {
 		private readonly bool _value;
 
-		public BooleanLiteral(bool value) {
+		public BooleanLiteral(bool value)
+			: base(ExpressionType.BooleanLiteral) {
 			_value = value;
 		}
 

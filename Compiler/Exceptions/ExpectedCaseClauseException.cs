@@ -6,8 +6,7 @@ namespace YaJS.Compiler.Exceptions {
 	/// </summary>
 	[Serializable]
 	public sealed class ExpectedCaseClauseException : ParserException {
-		public ExpectedCaseClauseException()
-			: base() {
+		public ExpectedCaseClauseException() {
 		}
 
 		public ExpectedCaseClauseException(string message)

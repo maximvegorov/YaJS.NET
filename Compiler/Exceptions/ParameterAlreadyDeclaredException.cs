@@ -6,8 +6,7 @@ namespace YaJS.Compiler.Exceptions {
 	/// </summary>
 	[Serializable]
 	public sealed class ParameterAlreadyDeclaredException : ParserException {
-		public ParameterAlreadyDeclaredException()
-			: base() {
+		public ParameterAlreadyDeclaredException() {
 		}
 
 		public ParameterAlreadyDeclaredException(string message)

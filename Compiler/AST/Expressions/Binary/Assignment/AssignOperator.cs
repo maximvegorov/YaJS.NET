@@ -2,8 +2,8 @@
 
 namespace YaJS.Compiler.AST.Expressions {
 	internal abstract class AssignOperator : BinaryOperator {
-		protected AssignOperator(Expression leftOperand, Expression rightOperand)
-			: base(leftOperand, rightOperand) {
+		protected AssignOperator(ExpressionType type, Expression leftOperand, Expression rightOperand)
+			: base(type, leftOperand, rightOperand) {
 			Contract.Requires(leftOperand.IsReference);
 		}
 

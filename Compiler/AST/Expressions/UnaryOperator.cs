@@ -5,13 +5,12 @@ namespace YaJS.Compiler.AST.Expressions {
 	/// Базовый класс для всех унарных операторов
 	/// </summary>
 	internal abstract class UnaryOperator : Expression {
-		public UnaryOperator(Expression operand) {
+		protected UnaryOperator(ExpressionType type, Expression operand) : base(type) {
 			Contract.Requires(operand != null);
 			Operand = operand;
 		}
 
 		public override bool IsConstant { get { return (Operand.IsConstant); } }
-
-		public Expression Operand { get; private set; }
+		protected Expression Operand { get; private set; }
 	}
 }

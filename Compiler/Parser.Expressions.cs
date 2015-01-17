@@ -1,24 +1,23 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using YaJS.Compiler.AST;
 
 namespace YaJS.Compiler {
-	using AST;
-
 	/// <summary>
 	/// Синтаксис выражений:
 	/// Arguments ::= ([Expression(, Expression)*])
 	/// PrimaryExpression ::= undefined | null | false | true | Number | String |
-	///		Identifier | ObjectLiteral | ArrayLiteral | FunctionLiteral | this |
-	///		arguments | eval | (Expression)
+	/// Identifier | ObjectLiteral | ArrayLiteral | FunctionLiteral | this |
+	/// arguments | eval | (Expression)
 	/// MemberExpression ::= PrimaryExpression ([Expression] | .Identifier)* |
-	///		new MemberExpression Arguments ([Expression] | .Identifier)*
+	/// new MemberExpression Arguments ([Expression] | .Identifier)*
 	/// LeftHandSideExpression ::= new+ MemberExpression | MemberExpression (Arguments | [Expression] | .Identifier)*
 	/// PostfixExpression ::= LeftHandSideExpression | LeftHandSideExpression++ | LeftHandSideExpression--
 	/// UnaryExpression ::= PostfixExpression | delete UnaryExpression |
-	///		void UnaryExpression | typeof UnaryExpression |
-	///		++UnaryExpression | --UnaryExpression |
-	///		+UnaryExpression | -UnaryExpression |
-	///		~UnaryExpression | !UnaryExpression
+	/// void UnaryExpression | typeof UnaryExpression |
+	/// ++UnaryExpression | --UnaryExpression |
+	/// +UnaryExpression | -UnaryExpression |
+	/// ~UnaryExpression | !UnaryExpression
 	/// MultiplicativeExpression ::= UnaryExpression ((* | / | %) UnaryExpression)*
 	/// AdditiveExpression ::= MultiplicativeExpression (( + | - ) MultiplicativeExpression)*
 	/// ShiftExpression ::= AdditiveExpression (( &lt;&lt; | &gt;&gt; | &gt;&gt;&gt; ) AdditiveExpression)*
@@ -39,9 +38,11 @@ namespace YaJS.Compiler {
 	/// ConditionalExpression ::= LogicalOrExpression [? AssignmentExpression : AssignmentExpression]
 	/// ConditionalExpressionNoIn ::= LogicalOrExpressionNoIn [? AssignmentExpression : AssignmentExpressionNoIn]
 	/// AssignmentExpression ::= ConditionalExpression |
-	///		LeftHandSideExpression (= | */ | /= | %= | += | -= | &lt;&lt;= | &gt;&gt;= | &gt;&gt;&gt;= | &= | ^= | |=) AssignmentExpression
+	/// LeftHandSideExpression (= | */ | /= | %= | += | -= | &lt;&lt;= | &gt;&gt;= | &gt;&gt;&gt;= | &= | ^= | |=)
+	/// AssignmentExpression
 	/// AssignmentExpressionNoIn ::= ConditionalExpressionNoIn |
-	///		LeftHandSideExpression (= | */ | /= | %= | += | -= | &lt;&lt;= | &gt;&gt;= | &gt;&gt;&gt;= | &= | ^= | |=) AssignmentExpressionNoIn
+	/// LeftHandSideExpression (= | */ | /= | %= | += | -= | &lt;&lt;= | &gt;&gt;= | &gt;&gt;&gt;= | &= | ^= | |=)
+	/// AssignmentExpressionNoIn
 	/// Expression ::= AssignmentExpression (, AssignmentExpression)*
 	/// ExpressionNoIn ::= AssignmentExpressionNoIn (, AssignmentExpressionNoIn)*
 	/// </summary>
@@ -50,29 +51,27 @@ namespace YaJS.Compiler {
 
 		private List<Expression> ParseArguments() {
 			Match(TokenType.LParenthesis);
-			if (_lookahead.Type == TokenType.RParenthesis) {
+			if (Lookahead.Type == TokenType.RParenthesis) {
 				ReadNextToken();
 				return (EmptyArgumentList);
 			}
-			else {
-				var result = new List<Expression>() { ParseExpression() };
-				while (_lookahead.Type == TokenType.Comma) {
-					ReadNextToken();
-					result.Add(ParseExpression());
-				}
-				Match(TokenType.RParenthesis);
-				return (result);
+			var result = new List<Expression> {ParseExpression()};
+			while (Lookahead.Type == TokenType.Comma) {
+				ReadNextToken();
+				result.Add(ParseExpression());
 			}
+			Match(TokenType.RParenthesis);
+			return (result);
 		}
 
 		private IEnumerable<KeyValuePair<string, Expression>> ParseObjectProperties() {
 			do {
 				ReadNextToken();
-				switch (_lookahead.Type) {
+				switch (Lookahead.Type) {
 					case TokenType.Ident:
 					case TokenType.Integer:
 					case TokenType.String:
-						var name = _lookahead.Value;
+						var name = Lookahead.Value;
 						ReadNextToken();
 						var value = ParseAssignmentExpression();
 						yield return new KeyValuePair<string, Expression>(name, value);
@@ -82,7 +81,7 @@ namespace YaJS.Compiler {
 					default:
 						throw InvalidToken();
 				}
-			} while (_lookahead.Type == TokenType.Comma);
+			} while (Lookahead.Type == TokenType.Comma);
 		}
 
 		private Expression ParseObject() {
@@ -94,14 +93,14 @@ namespace YaJS.Compiler {
 		private IEnumerable<Expression> ParseArrayItems() {
 			do {
 				ReadNextToken();
-				if (_lookahead.Type == TokenType.RBracket)
+				if (Lookahead.Type == TokenType.RBracket)
 					yield break;
-				while (_lookahead.Type == TokenType.Comma) {
+				while (Lookahead.Type == TokenType.Comma) {
 					ReadNextToken();
 					yield return Expression.Undefined();
 				}
 				yield return ParseAssignmentExpression();
-			} while (_lookahead.Type == TokenType.Comma);
+			} while (Lookahead.Type == TokenType.Comma);
 		}
 
 		private Expression ParseArray() {
@@ -118,37 +117,43 @@ namespace YaJS.Compiler {
 			Match(TokenType.LParenthesis);
 			var result = Expression.Grouping(
 				ParseExpression()
-			);
+				);
 			Match(TokenType.RParenthesis);
 			return (result);
 		}
 
 		private Expression ParsePrimaryExpression() {
-			switch (_lookahead.Type) {
+			switch (Lookahead.Type) {
 				case TokenType.Undefined:
 					ReadNextToken();
 					return (Expression.Undefined());
 				case TokenType.Null:
 					ReadNextToken();
 					return (Expression.Null());
+				case TokenType.False:
+					ReadNextToken();
+					return (Expression.False());
+				case TokenType.True:
+					ReadNextToken();
+					return (Expression.True());
 				case TokenType.Integer:
-					var integerValue = _lookahead.Value;
+					var integerValue = Lookahead.Value;
 					ReadNextToken();
 					return (Expression.Integer(integerValue));
 				case TokenType.HexInteger:
-					var hexIntegerValue = _lookahead.Value;
+					var hexIntegerValue = Lookahead.Value;
 					ReadNextToken();
 					return (Expression.HexInteger(hexIntegerValue));
 				case TokenType.Float:
-					var floatValue = _lookahead.Value;
+					var floatValue = Lookahead.Value;
 					ReadNextToken();
 					return (Expression.Float(floatValue));
 				case TokenType.String:
-					var stringValue = _lookahead.Value;
+					var stringValue = Lookahead.Value;
 					ReadNextToken();
 					return (Expression.String(stringValue));
 				case TokenType.Ident:
-					var identValue = _lookahead.Value;
+					var identValue = Lookahead.Value;
 					ReadNextToken();
 					return (Expression.Ident(identValue));
 				case TokenType.LCurlyBrace:
@@ -179,19 +184,19 @@ namespace YaJS.Compiler {
 
 		private Expression EatMemberOperators(Expression baseValue) {
 			var result = baseValue;
-			while (_lookahead.Type == TokenType.LBracket || _lookahead.Type == TokenType.Dot) {
+			while (Lookahead.Type == TokenType.LBracket || Lookahead.Type == TokenType.Dot) {
 				if (!result.CanHaveMembers)
-					ThrowExpectedObject(_lookahead.StartPosition);
-				var isLBracket = _lookahead.Type == TokenType.LBracket;
+					ThrowExpectedObject(Lookahead.StartPosition);
+				var isLBracket = Lookahead.Type == TokenType.LBracket;
 				ReadNextToken();
 				if (isLBracket) {
 					result = Expression.Member(result, ParseExpression());
 					Match(TokenType.RBracket);
 				}
 				else {
-					if (_lookahead.Type != TokenType.Ident)
-						ThrowUnmatchedToken(TokenType.Ident, _lookahead);
-					result = Expression.Member(result, Expression.Ident(_lookahead.Value));
+					if (Lookahead.Type != TokenType.Ident)
+						ThrowUnmatchedToken(TokenType.Ident, Lookahead);
+					result = Expression.Member(result, Expression.Ident(Lookahead.Value));
 					ReadNextToken();
 				}
 			}
@@ -200,12 +205,11 @@ namespace YaJS.Compiler {
 
 		private Expression ParseMemberExpression() {
 			Expression baseValue;
-			if (_lookahead.Type != TokenType.New) {
+			if (Lookahead.Type != TokenType.New)
 				baseValue = ParsePrimaryExpression();
-			}
 			else {
 				ReadNextToken();
-				var startPos = _lookahead.StartPosition;
+				var startPos = Lookahead.StartPosition;
 				var constructor = ParseMemberExpression();
 				if (!constructor.CanBeConstructor)
 					ThrowExpectedFunction(startPos);
@@ -217,26 +221,27 @@ namespace YaJS.Compiler {
 
 		private Expression EatCallOrMemberOperators(Expression functionOrBaseValue) {
 			var result = functionOrBaseValue;
-			while (_lookahead.Type == TokenType.LParenthesis || _lookahead.Type == TokenType.LBracket || _lookahead.Type == TokenType.Dot) {
-				if (_lookahead.Type == TokenType.LParenthesis) {
+			while (Lookahead.Type == TokenType.LParenthesis || Lookahead.Type == TokenType.LBracket ||
+				Lookahead.Type == TokenType.Dot) {
+				if (Lookahead.Type == TokenType.LParenthesis) {
 					if (!result.CanBeFunction)
-						ThrowExpectedFunction(_lookahead.StartPosition);
+						ThrowExpectedFunction(Lookahead.StartPosition);
 					var arguments = ParseArguments();
 					result = Expression.Call(result, arguments);
 				}
 				else {
 					if (!result.CanHaveMembers)
-						ThrowExpectedObject(_lookahead.StartPosition);
-					var isLBracket = _lookahead.Type == TokenType.LBracket;
+						ThrowExpectedObject(Lookahead.StartPosition);
+					var isLBracket = Lookahead.Type == TokenType.LBracket;
 					ReadNextToken();
 					if (isLBracket) {
 						result = Expression.Member(result, ParseExpression());
 						Match(TokenType.RBracket);
 					}
 					else {
-						if (_lookahead.Type != TokenType.Ident)
-							ThrowUnmatchedToken(TokenType.Ident, _lookahead);
-						result = Expression.Member(result, Expression.Ident(_lookahead.Value));
+						if (Lookahead.Type != TokenType.Ident)
+							ThrowUnmatchedToken(TokenType.Ident, Lookahead);
+						result = Expression.Member(result, Expression.Ident(Lookahead.Value));
 						ReadNextToken();
 					}
 				}
@@ -245,9 +250,8 @@ namespace YaJS.Compiler {
 		}
 
 		private Expression ParseLeftHandSideExpression() {
-			if (_lookahead.Type != TokenType.New) {
+			if (Lookahead.Type != TokenType.New)
 				return (EatCallOrMemberOperators(ParseMemberExpression()));
-			}
 
 			// Теперь необходимо выбрать между NewExpression и MemberExpression
 			// (Cм. http://www.ecma-international.org/ecma-262/5.1/#sec-11.2)
@@ -258,14 +262,13 @@ namespace YaJS.Compiler {
 			var newOperatorStack = new Stack<TokenPosition>();
 			do {
 				ReadNextToken();
-				newOperatorStack.Push(_lookahead.StartPosition);
-			}
-			while (_lookahead.Type == TokenType.New);
+				newOperatorStack.Push(Lookahead.StartPosition);
+			} while (Lookahead.Type == TokenType.New);
 
 			var result = ParseMemberExpression();
 
 			// Обработать все MemberExpression
-			while (_lookahead.Type == TokenType.LParenthesis && newOperatorStack.Count >= 0) {
+			while (Lookahead.Type == TokenType.LParenthesis && newOperatorStack.Count >= 0) {
 				if (!result.CanBeConstructor)
 					ThrowExpectedConstructor(newOperatorStack.Pop());
 				var arguments = ParseArguments();
@@ -285,28 +288,28 @@ namespace YaJS.Compiler {
 		}
 
 		private Expression ParsePostfixExpression() {
-			var startPos = _lookahead.StartPosition;
+			var startPos = Lookahead.StartPosition;
 			var result = ParseLeftHandSideExpression();
-			if (_lookahead.Type == TokenType.Inc || _lookahead.Type == TokenType.Dec) {
+			if (Lookahead.Type == TokenType.Inc || Lookahead.Type == TokenType.Dec) {
 				if (!result.IsReference)
 					ThrowExpectedReference(startPos);
-				result = _lookahead.Type == TokenType.Inc ? Expression.PostfixInc(result) : Expression.PostfixDec(result);
+				result = Lookahead.Type == TokenType.Inc ? Expression.PostfixInc(result) : Expression.PostfixDec(result);
 			}
 			return (result);
 		}
 
 		private Expression ParseUnaryExpression() {
 			Expression result;
-			switch (_lookahead.Type) {
+			switch (Lookahead.Type) {
 				case TokenType.Delete: {
-						ReadNextToken();
-						var startPos = _lookahead.StartPosition;
-						var operand = ParsePostfixExpression();
-						if (!operand.CanBeDeleted)
-							ThrowExpectedReference(startPos);
-						result = Expression.Delete(operand);
-						break;
-					}
+					ReadNextToken();
+					var startPos = Lookahead.StartPosition;
+					var operand = ParsePostfixExpression();
+					if (!operand.CanBeDeleted)
+						ThrowExpectedReference(startPos);
+					result = Expression.Delete(operand);
+					break;
+				}
 				case TokenType.Void:
 					ReadNextToken();
 					result = Expression.Void(ParsePostfixExpression());
@@ -316,23 +319,23 @@ namespace YaJS.Compiler {
 					result = Expression.TypeOf(ParsePostfixExpression());
 					break;
 				case TokenType.Inc: {
-						ReadNextToken();
-						var startPos = _lookahead.StartPosition;
-						var operand = ParsePostfixExpression();
-						if (!operand.IsReference)
-							ThrowExpectedReference(startPos);
-						result = Expression.Inc(operand);
-						break;
-					}
+					ReadNextToken();
+					var startPos = Lookahead.StartPosition;
+					var operand = ParsePostfixExpression();
+					if (!operand.IsReference)
+						ThrowExpectedReference(startPos);
+					result = Expression.Inc(operand);
+					break;
+				}
 				case TokenType.Dec: {
-						ReadNextToken();
-						var startPos = _lookahead.StartPosition;
-						var operand = ParsePostfixExpression();
-						if (!operand.IsReference)
-							ThrowExpectedReference(startPos);
-						result = Expression.Dec(operand);
-						break;
-					}
+					ReadNextToken();
+					var startPos = Lookahead.StartPosition;
+					var operand = ParsePostfixExpression();
+					if (!operand.IsReference)
+						ThrowExpectedReference(startPos);
+					result = Expression.Dec(operand);
+					break;
+				}
 				case TokenType.Plus:
 					ReadNextToken();
 					result = Expression.Pos(ParsePostfixExpression());
@@ -359,7 +362,7 @@ namespace YaJS.Compiler {
 		private Expression ParseMultiplicativeExpression() {
 			var result = ParseUnaryExpression();
 			while (true) {
-				switch (_lookahead.Type) {
+				switch (Lookahead.Type) {
 					case TokenType.Star:
 						ReadNextToken();
 						result = Expression.Mul(result, ParseUnaryExpression());
@@ -381,7 +384,7 @@ namespace YaJS.Compiler {
 		private Expression ParseAdditiveExpression() {
 			var result = ParseMultiplicativeExpression();
 			while (true) {
-				switch (_lookahead.Type) {
+				switch (Lookahead.Type) {
 					case TokenType.Plus:
 						ReadNextToken();
 						result = Expression.Plus(result, ParseMultiplicativeExpression());
@@ -399,7 +402,7 @@ namespace YaJS.Compiler {
 		private Expression ParseShiftExpression() {
 			var result = ParseAdditiveExpression();
 			while (true) {
-				switch (_lookahead.Type) {
+				switch (Lookahead.Type) {
 					case TokenType.Shl:
 						ReadNextToken();
 						result = Expression.Shl(result, ParseAdditiveExpression());
@@ -421,7 +424,7 @@ namespace YaJS.Compiler {
 		private Expression ParseRelationalExpression() {
 			var result = ParseShiftExpression();
 			while (true) {
-				switch (_lookahead.Type) {
+				switch (Lookahead.Type) {
 					case TokenType.Lt:
 						ReadNextToken();
 						result = Expression.Lt(result, ParseShiftExpression());
@@ -432,30 +435,30 @@ namespace YaJS.Compiler {
 						break;
 					case TokenType.Gt:
 						ReadNextToken();
-						result = Expression.Lt(result, ParseShiftExpression());
+						result = Expression.Gt(result, ParseShiftExpression());
 						break;
 					case TokenType.Gte:
 						ReadNextToken();
-						result = Expression.Lte(result, ParseShiftExpression());
+						result = Expression.Gte(result, ParseShiftExpression());
 						break;
 					case TokenType.InstanceOf: {
-							ReadNextToken();
-							var startPos = _lookahead.StartPosition;
-							var rightOperand = ParseShiftExpression();
-							if (!rightOperand.CanBeConstructor)
-								ThrowExpectedConstructor(startPos);
-							result = Expression.InstanceOf(result, rightOperand);
-							break;
-						}
+						ReadNextToken();
+						var startPos = Lookahead.StartPosition;
+						var rightOperand = ParseShiftExpression();
+						if (!rightOperand.CanBeConstructor)
+							ThrowExpectedConstructor(startPos);
+						result = Expression.InstanceOf(result, rightOperand);
+						break;
+					}
 					case TokenType.In: {
-							ReadNextToken();
-							var startPos = _lookahead.StartPosition;
-							var rightOperand = ParseShiftExpression();
-							if (!rightOperand.CanHaveMembers)
-								ThrowExpectedObject(startPos);
-							result = Expression.In(result, rightOperand);
-							break;
-						}
+						ReadNextToken();
+						var startPos = Lookahead.StartPosition;
+						var rightOperand = ParseShiftExpression();
+						if (!rightOperand.CanHaveMembers)
+							ThrowExpectedObject(startPos);
+						result = Expression.In(result, rightOperand);
+						break;
+					}
 					default:
 						return (result);
 				}
@@ -465,7 +468,7 @@ namespace YaJS.Compiler {
 		private Expression ParseEqualityExpression() {
 			var result = ParseRelationalExpression();
 			while (true) {
-				switch (_lookahead.Type) {
+				switch (Lookahead.Type) {
 					case TokenType.Eq:
 						ReadNextToken();
 						result = Expression.Eq(result, ParseRelationalExpression());
@@ -490,7 +493,7 @@ namespace YaJS.Compiler {
 
 		private Expression ParseBitwiseAndExpression() {
 			var result = ParseEqualityExpression();
-			while (_lookahead.Type == TokenType.BitAnd) {
+			while (Lookahead.Type == TokenType.BitAnd) {
 				ReadNextToken();
 				result = Expression.BitAnd(result, ParseEqualityExpression());
 			}
@@ -499,7 +502,7 @@ namespace YaJS.Compiler {
 
 		private Expression ParseBitwiseXorExpression() {
 			var result = ParseBitwiseAndExpression();
-			while (_lookahead.Type == TokenType.BitXor) {
+			while (Lookahead.Type == TokenType.BitXor) {
 				ReadNextToken();
 				result = Expression.BitXor(result, ParseBitwiseAndExpression());
 			}
@@ -508,7 +511,7 @@ namespace YaJS.Compiler {
 
 		private Expression ParseBitwiseOrExpression() {
 			var result = ParseBitwiseXorExpression();
-			while (_lookahead.Type == TokenType.BitOr) {
+			while (Lookahead.Type == TokenType.BitOr) {
 				ReadNextToken();
 				result = Expression.BitOr(result, ParseBitwiseXorExpression());
 			}
@@ -517,7 +520,7 @@ namespace YaJS.Compiler {
 
 		private Expression ParseLogicalAndExpression() {
 			var result = ParseBitwiseOrExpression();
-			while (_lookahead.Type == TokenType.And) {
+			while (Lookahead.Type == TokenType.And) {
 				ReadNextToken();
 				result = Expression.And(result, ParseBitwiseOrExpression());
 			}
@@ -526,7 +529,7 @@ namespace YaJS.Compiler {
 
 		private Expression ParseLogicalOrExpression() {
 			var result = ParseLogicalAndExpression();
-			while (_lookahead.Type == TokenType.Or) {
+			while (Lookahead.Type == TokenType.Or) {
 				ReadNextToken();
 				result = Expression.Or(result, ParseLogicalAndExpression());
 			}
@@ -535,7 +538,7 @@ namespace YaJS.Compiler {
 
 		private Expression ParseConditionalExpression() {
 			var result = ParseLogicalOrExpression();
-			if (_lookahead.Type != TokenType.QuestionMark)
+			if (Lookahead.Type != TokenType.QuestionMark)
 				return (result);
 			var trueOperand = ParseAssignmentExpression();
 			Match(TokenType.Colon);
@@ -544,9 +547,9 @@ namespace YaJS.Compiler {
 		}
 
 		private Expression ParseAssignmentExpression() {
-			var startPos = _lookahead.StartPosition;
+			var startPos = Lookahead.StartPosition;
 			var result = ParseConditionalExpression();
-			switch (_lookahead.Type) {
+			switch (Lookahead.Type) {
 				case TokenType.Assign:
 					if (!result.IsReference)
 						ThrowExpectedReference(startPos);
@@ -625,13 +628,13 @@ namespace YaJS.Compiler {
 
 		public Expression ParseExpression() {
 			var assignment = ParseAssignmentExpression();
-			if (_lookahead.Type != TokenType.Comma)
+			if (Lookahead.Type != TokenType.Comma)
 				return (assignment);
-			var sequence = new List<Expression>() { assignment };
+			var sequence = new List<Expression> {assignment};
 			do {
 				ReadNextToken();
 				sequence.Add(ParseAssignmentExpression());
-			} while (_lookahead.Type == TokenType.Comma);
+			} while (Lookahead.Type == TokenType.Comma);
 			return (Expression.Sequence(sequence));
 		}
 	}

@@ -6,8 +6,7 @@ namespace YaJS.Runtime.Exceptions {
 	/// </summary>
 	[Serializable]
 	public class IllegalThreadStateException : InternalErrorException {
-		public IllegalThreadStateException()
-			: base() {
+		public IllegalThreadStateException() {
 		}
 
 		public IllegalThreadStateException(string message)

@@ -1,8 +1,8 @@
-﻿using System.Diagnostics.Contracts;
+﻿using System;
+using System.Diagnostics.Contracts;
+using YaJS.Runtime.Values;
 
 namespace YaJS.Runtime.Objects {
-	using Runtime.Values;
-
 	/// <summary>
 	/// Объект-wrapper для числовых значений
 	/// </summary>
@@ -12,12 +12,16 @@ namespace YaJS.Runtime.Objects {
 		public JSNumber(VirtualMachine vm, JSNumberValue value, JSObject inherited)
 			: base(vm, inherited) {
 			Contract.Requires(value != null);
-			Contract.Requires(inherited != null);
+			Contract.Requires(inherited == vm.Number);
 			_value = value;
 		}
 
 		public override string ToString() {
 			return (_value.ToString());
+		}
+
+		public override void CastToPrimitiveValue(ExecutionThread thread, Action<JSValue> onCompleteCallback) {
+			onCompleteCallback(_value);
 		}
 	}
 }

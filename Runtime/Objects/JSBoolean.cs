@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.Contracts;
+﻿using System;
+using System.Diagnostics.Contracts;
 
 namespace YaJS.Runtime.Objects {
 	/// <summary>
@@ -9,12 +10,16 @@ namespace YaJS.Runtime.Objects {
 
 		public JSBoolean(VirtualMachine vm, bool value, JSObject inherited)
 			: base(vm, inherited) {
-				Contract.Requires(inherited != null);
+			Contract.Requires(inherited == vm.Boolean);
 			_value = value;
 		}
 
 		public override string ToString() {
 			return (_value.ToString());
+		}
+
+		public override void CastToPrimitiveValue(ExecutionThread thread, Action<JSValue> onCompleteCallback) {
+			onCompleteCallback(_value);
 		}
 	}
 }

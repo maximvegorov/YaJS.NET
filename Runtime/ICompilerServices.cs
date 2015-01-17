@@ -6,7 +6,9 @@ namespace YaJS.Runtime {
 	/// </summary>
 	public interface ICompilerServices {
 		CompiledFunction Compile(
-			string functionName, IEnumerable<string> parameterNames, string functionBody
-		);
+			string functionName,
+			IEnumerable<string> parameterNames,
+			string functionBody
+			);
 	}
 }

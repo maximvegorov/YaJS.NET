@@ -4,21 +4,24 @@ using System.Text;
 
 namespace YaJS.Compiler.AST.Expressions {
 	internal sealed class NewOperator : Expression {
-		public NewOperator(Expression constructor, List<Expression> arguments) {
+		private readonly List<Expression> _arguments;
+		private readonly Expression _constructor;
+
+		public NewOperator(Expression constructor, List<Expression> arguments) : base(ExpressionType.New) {
 			Contract.Requires(constructor != null && constructor.CanBeConstructor);
 			Contract.Requires(arguments != null);
-			Constructor = constructor;
-			Arguments = arguments;
+			_constructor = constructor;
+			_arguments = arguments;
 		}
 
 		public override string ToString() {
 			var result = new StringBuilder();
 			result.Append("new ")
-				.Append(Constructor.ToString())
+				.Append(_constructor)
 				.Append('(');
-			if (Arguments.Count > 0) {
-				foreach (var argument in Arguments) {
-					result.Append(argument.ToString())
+			if (_arguments.Count > 0) {
+				foreach (var argument in _arguments) {
+					result.Append(argument)
 						.Append(',');
 				}
 				result.Length -= 1;
@@ -31,8 +34,6 @@ namespace YaJS.Compiler.AST.Expressions {
 		public override bool CanHaveMutableMembers { get { return (true); } }
 		public override bool CanBeConstructor { get { return (true); } }
 		public override bool CanBeFunction { get { return (true); } }
-
-		public Expression Constructor { get; private set; }
-		public new List<Expression> Arguments { get; private set; }
+		public override bool CanBeObject { get { return (true); } }
 	}
 }

@@ -8,8 +8,8 @@ namespace YaJS.Runtime {
 	/// </summary>
 	[Serializable]
 	public sealed class SwitchJumpTable {
-		private readonly Dictionary<JSValue, int> _jumps;
 		private readonly int _defaultJump;
+		private readonly Dictionary<JSValue, int> _jumps;
 
 		public SwitchJumpTable(Dictionary<JSValue, int> jumps, int defaultJump) {
 			Contract.Requires(jumps != null);

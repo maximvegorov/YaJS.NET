@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using YaJS.Compiler.AST;
+using YaJS.Compiler.AST.Statements;
 
 namespace YaJS.Compiler {
-	using AST;
-	using AST.Statements;
-
 	public partial class Parser {
 		private void ParseFunctionDeclaration() {
 			ParseFunction(true);
@@ -16,46 +15,44 @@ namespace YaJS.Compiler {
 				var statement = ParseStatement(parent, false);
 				statement != null;
 				statement = ParseStatement(parent, false)
-			) {
+				) {
 				yield return statement;
-				if (_lookahead.Type == TokenType.RCurlyBrace)
+				if (Lookahead.Type == TokenType.RCurlyBrace)
 					break;
-				else if (_lookahead.Type == TokenType.Semicolon)
+				if (Lookahead.Type == TokenType.Semicolon)
 					ReadNextToken();
-				else if (!_lookahead.IsAfterLineTerminator)
-					ThrowUnmatchedToken(TokenType.Semicolon, _lookahead);
+				else if (!Lookahead.IsAfterLineTerminator)
+					ThrowUnmatchedToken(TokenType.Semicolon, Lookahead);
 			}
 		}
 
 		private BlockStatement ParseBlockStatement(Statement parent) {
-			var result = new BlockStatement(parent, _lookahead.StartPosition.LineNo);
+			var result = new BlockStatement(parent, Lookahead.StartPosition.LineNo);
 			Match(TokenType.LCurlyBrace);
-			foreach (var statement in ParseStatementList(result)) {
+			foreach (var statement in ParseStatementList(result))
 				result.AddStatement(statement);
-			}
 			Match(TokenType.RCurlyBrace);
 			return (result);
 		}
 
 		private Statement ParseBreakStatement(Statement parent) {
-			var startPosition = _lookahead.StartPosition;
+			var startPosition = Lookahead.StartPosition;
 			Match(TokenType.Break);
 			string targetLabel;
-			if (_lookahead.IsAfterLineTerminator)
+			if (Lookahead.IsAfterLineTerminator)
 				targetLabel = string.Empty;
-			else if (_lookahead.Type == TokenType.Ident) {
-				targetLabel = _lookahead.Value;
+			else if (Lookahead.Type == TokenType.Ident) {
+				targetLabel = Lookahead.Value;
 				ReadNextToken();
 			}
 			else {
-				ThrowUnmatchedToken(TokenType.Ident, _lookahead);
+				ThrowUnmatchedToken(TokenType.Ident, Lookahead);
 				// Для того чтобы не ругался компилятор
 				targetLabel = null;
 			}
 			var target = parent;
-			while (target != null && !target.IsBreakTarget(targetLabel)) {
+			while (target != null && !target.IsBreakTarget(targetLabel))
 				target = target.Parent;
-			}
 			if (target == null)
 				ThrowUnreachableLabel(startPosition, targetLabel);
 			var result = new BreakStatement(parent, startPosition.LineNo, target);
@@ -64,24 +61,23 @@ namespace YaJS.Compiler {
 		}
 
 		private Statement ParseContinueStatement(Statement parent) {
-			var startPosition = _lookahead.StartPosition;
+			var startPosition = Lookahead.StartPosition;
 			Match(TokenType.Continue);
 			string targetLabel;
-			if (_lookahead.IsAfterLineTerminator)
+			if (Lookahead.IsAfterLineTerminator)
 				targetLabel = string.Empty;
-			else if (_lookahead.Type == TokenType.Ident) {
-				targetLabel = _lookahead.Value;
+			else if (Lookahead.Type == TokenType.Ident) {
+				targetLabel = Lookahead.Value;
 				ReadNextToken();
 			}
 			else {
-				ThrowUnmatchedToken(TokenType.Ident, _lookahead);
+				ThrowUnmatchedToken(TokenType.Ident, Lookahead);
 				// Для того чтобы не ругался компилятор
 				targetLabel = null;
 			}
 			var target = parent;
-			while (target != null && !target.IsContinueTarget(targetLabel)) {
+			while (target != null && !target.IsContinueTarget(targetLabel))
 				target = target.Parent;
-			}
 			if (target == null)
 				ThrowUnreachableLabel(startPosition, targetLabel);
 			var result = new ContinueStatement(parent, startPosition.LineNo, target);
@@ -90,7 +86,7 @@ namespace YaJS.Compiler {
 		}
 
 		private Statement ParseDoWhileStatement(Statement parent, ILabelSet labelSet) {
-			var result = new DoWhileStatement(parent, _lookahead.StartPosition.LineNo, labelSet);
+			var result = new DoWhileStatement(parent, Lookahead.StartPosition.LineNo, labelSet);
 			Match(TokenType.Do);
 			result.Statement = ParseStatement(result, true);
 			Match(TokenType.While);
@@ -101,19 +97,19 @@ namespace YaJS.Compiler {
 		}
 
 		private Statement ParseEmptyStatement(Statement parent) {
-			var result = new EmptyStatement(parent, _lookahead.StartPosition.LineNo);
+			var result = new EmptyStatement(parent, Lookahead.StartPosition.LineNo);
 			ReadNextToken();
 			return (result);
 		}
 
 		private Statement ParseIfStatement(Statement parent) {
-			var result = new IfStatement(parent, _lookahead.StartPosition.LineNo);
+			var result = new IfStatement(parent, Lookahead.StartPosition.LineNo);
 			Match(TokenType.If);
 			Match(TokenType.LParenthesis);
 			result.Condition = ParseExpression();
 			Match(TokenType.RParenthesis);
 			result.ThenStatement = ParseStatement(result, true);
-			if (_lookahead.Type == TokenType.Else) {
+			if (Lookahead.Type == TokenType.Else) {
 				ReadNextToken();
 				result.ElseStatement = ParseStatement(result, true);
 			}
@@ -124,47 +120,48 @@ namespace YaJS.Compiler {
 			var assignments = new List<Expression>();
 			var hasMore = true;
 			do {
-				if (_lookahead.Type != TokenType.Ident)
-					ThrowUnmatchedToken(TokenType.Ident, _lookahead);
-				var variableName = _lookahead.Value;
+				if (Lookahead.Type != TokenType.Ident)
+					ThrowUnmatchedToken(TokenType.Ident, Lookahead);
+				var variableName = Lookahead.Value;
 				if (!_currentFunction.DeclaredVariables.Contains(variableName))
 					_currentFunction.DeclaredVariables.Add(variableName);
 				ReadNextToken();
-				if (_lookahead.Type != TokenType.Assign) {
+				if (Lookahead.Type != TokenType.Assign) {
 					assignments.Add(
 						Expression.SimpleAssign(
-							Expression.Ident(variableName), Expression.Undefined()
-						)
-					);
+							Expression.Ident(variableName),
+							Expression.Undefined()
+							)
+						);
 				}
 				else {
 					assignments.Add(
 						Expression.SimpleAssign(
-							Expression.Ident(variableName), ParseAssignmentExpression()
-						)
-					);
+							Expression.Ident(variableName),
+							ParseAssignmentExpression()
+							)
+						);
 				}
-				if (_lookahead.Type != TokenType.Comma)
+				if (Lookahead.Type != TokenType.Comma)
 					hasMore = false;
 				else
 					ReadNextToken();
-			}
-			while (hasMore);
+			} while (hasMore);
 			return (Expression.Sequence(assignments));
 		}
 
 		private Statement ParseForStatement(Statement parent, ILabelSet labelSet) {
-			var startPosition = _lookahead.StartPosition;
+			var startPosition = Lookahead.StartPosition;
 			IterationStatement result = null;
 			Match(TokenType.For);
 			Match(TokenType.LParenthesis);
 			var isVariableDeclaration = false;
-			if (_lookahead.Type == TokenType.Var) {
+			if (Lookahead.Type == TokenType.Var) {
 				ReadNextToken();
 				isVariableDeclaration = true;
 			}
-			if (_lookahead.Type == TokenType.Ident) {
-				var variableName = _lookahead.Value;
+			if (Lookahead.Type == TokenType.Ident) {
+				var variableName = Lookahead.Value;
 				if (PeekNextToken().Type == TokenType.In) {
 					MoveForwardLookahead();
 					if (isVariableDeclaration) {
@@ -172,33 +169,38 @@ namespace YaJS.Compiler {
 							_currentFunction.DeclaredVariables.Add(variableName);
 					}
 					result = new ForInStatement(
-						parent, startPosition.LineNo, variableName, ParseExpression(), labelSet
-					);
+						parent,
+						startPosition.LineNo,
+						variableName,
+						ParseExpression(),
+						labelSet
+						);
 				}
 			}
 			if (result == null) {
 				Expression initialization = null;
-				if (isVariableDeclaration) {
+				if (isVariableDeclaration)
 					initialization = ParseVariableDeclarationList();
-				}
 				else {
-					if (_lookahead.Type != TokenType.Semicolon) {
+					if (Lookahead.Type != TokenType.Semicolon)
 						initialization = ParseExpression();
-					}
 				}
 				Match(TokenType.Semicolon);
 				Expression condition = null;
-				if (_lookahead.Type != TokenType.Semicolon) {
+				if (Lookahead.Type != TokenType.Semicolon)
 					condition = ParseExpression();
-				}
 				Match(TokenType.Semicolon);
 				Expression increment = null;
-				if (_lookahead.Type != TokenType.RParenthesis) {
+				if (Lookahead.Type != TokenType.RParenthesis)
 					increment = ParseExpression();
-				}
 				result = new ForStatement(
-					parent, startPosition.LineNo, initialization, condition, increment, labelSet
-				);
+					parent,
+					startPosition.LineNo,
+					initialization,
+					condition,
+					increment,
+					labelSet
+					);
 			}
 			Match(TokenType.RParenthesis);
 			result.Statement = ParseStatement(result, true);
@@ -206,44 +208,44 @@ namespace YaJS.Compiler {
 		}
 
 		private Statement ParseReturnStatement(Statement parent) {
-			var startPosition = _lookahead.StartPosition;
+			var startPosition = Lookahead.StartPosition;
 			Match(TokenType.Return);
-			var expression = _lookahead.IsAfterLineTerminator ? Expression.Undefined() : ParseExpression();
+			var expression = Lookahead.IsAfterLineTerminator ? Expression.Undefined() : ParseExpression();
 			var result = new ReturnStatement(parent, startPosition.LineNo, expression);
 			result.RegisterAsExitPoint();
 			return (result);
 		}
 
 		private Statement ParseThrowStatement(Statement parent) {
-			var startPosition = _lookahead.StartPosition;
+			var startPosition = Lookahead.StartPosition;
 			Match(TokenType.Throw);
-			if (_lookahead.IsAfterLineTerminator)
-				ThrowUnexpectedLineTerminator(_lookahead.StartPosition);
+			if (Lookahead.IsAfterLineTerminator)
+				ThrowUnexpectedLineTerminator(Lookahead.StartPosition);
 			return (new ThrowStatement(parent, startPosition.LineNo, ParseExpression()));
 		}
 
 		private Statement ParseTryStatement(Statement parent) {
-			var result = new TryStatement(parent, _lookahead.StartPosition.LineNo);
+			var result = new TryStatement(parent, Lookahead.StartPosition.LineNo);
 			Match(TokenType.Try);
 			result.TryBlock = ParseBlockStatement(result);
-			var hasCatch = _lookahead.Type == TokenType.Catch;
+			var hasCatch = Lookahead.Type == TokenType.Catch;
 			if (hasCatch) {
 				ReadNextToken();
 				Match(TokenType.LParenthesis);
-				if (_lookahead.Type != TokenType.Ident)
-					ThrowUnmatchedToken(TokenType.Ident, _lookahead);
-				result.CatchBlockVariable = _lookahead.Value;
+				if (Lookahead.Type != TokenType.Ident)
+					ThrowUnmatchedToken(TokenType.Ident, Lookahead);
+				result.CatchBlockVariable = Lookahead.Value;
 				ReadNextToken();
 				Match(TokenType.LParenthesis);
 				result.CatchBlock = ParseBlockStatement(result);
 			}
-			var hasFinally = _lookahead.Type == TokenType.Finally;
+			var hasFinally = Lookahead.Type == TokenType.Finally;
 			if (hasFinally) {
 				ReadNextToken();
 				result.FinallyBlock = ParseBlockStatement(result);
 			}
 			if (!hasCatch && !hasFinally)
-				ThrowExpectedCatchOrFinally(_lookahead.StartPosition);
+				ThrowExpectedCatchOrFinally(Lookahead.StartPosition);
 			_currentFunction.RegisterTryBlock(result);
 			return (result);
 		}
@@ -252,24 +254,24 @@ namespace YaJS.Compiler {
 			var result = ParseStatementList(parent).ToList();
 			if (result.Count == 0)
 				return (Enumerable.Empty<Statement>());
-			else
-				return (result);
+			return (result);
 		}
 
 		private CaseClause ParseCaseClause(Statement parent) {
 			Match(TokenType.Case);
-			var startPosition = _lookahead.StartPosition;
+			var startPosition = Lookahead.StartPosition;
 			var expression = ParseExpression();
 			if (!expression.CanBeUsedInCaseClause)
 				ThrowUnsupportedCaseClauseExpression(startPosition);
 			Match(TokenType.Colon);
 			return (new CaseClause(
-				expression, ParseCaseClauseStatementList(parent)
-			));
+				expression,
+				ParseCaseClauseStatementList(parent)
+				));
 		}
 
 		private Statement ParseSwitchStatement(Statement parent, ILabelSet labelSet) {
-			var result = new SwitchStatement(parent, _lookahead.StartPosition.LineNo, labelSet);
+			var result = new SwitchStatement(parent, Lookahead.StartPosition.LineNo, labelSet);
 
 			Match(TokenType.Switch);
 
@@ -280,26 +282,24 @@ namespace YaJS.Compiler {
 			Match(TokenType.LCurlyBrace);
 
 			var beforeDefaultClauses = new List<CaseClause>();
-			while (_lookahead.Type == TokenType.Case) {
+			while (Lookahead.Type == TokenType.Case)
 				beforeDefaultClauses.Add(ParseCaseClause(result));
-			}
 			result.BeforeDefaultClauses = beforeDefaultClauses.Count == 0 ? Enumerable.Empty<CaseClause>() : beforeDefaultClauses;
 
-			var hasDefaultClause = _lookahead.Type == TokenType.Default;
+			var hasDefaultClause = Lookahead.Type == TokenType.Default;
 			if (hasDefaultClause) {
 				ReadNextToken();
 				Match(TokenType.Colon);
 				result.DefaultClause = ParseCaseClauseStatementList(result);
 
 				var afterDefaultClauses = new List<CaseClause>();
-				while (_lookahead.Type == TokenType.Case) {
+				while (Lookahead.Type == TokenType.Case)
 					afterDefaultClauses.Add(ParseCaseClause(result));
-				}
 				result.AfterDefaultClauses = afterDefaultClauses.Count == 0 ? Enumerable.Empty<CaseClause>() : afterDefaultClauses;
 			}
 
 			if (beforeDefaultClauses.Count == 0 && !hasDefaultClause)
-				ThrowExpectedCaseClause(_lookahead.StartPosition);
+				ThrowExpectedCaseClause(Lookahead.StartPosition);
 
 			Match(TokenType.RCurlyBrace);
 
@@ -307,13 +307,13 @@ namespace YaJS.Compiler {
 		}
 
 		private Statement ParseVariableDeclarationStatement(Statement parent) {
-			var startPosition = _lookahead.StartPosition;
+			var startPosition = Lookahead.StartPosition;
 			Match(TokenType.Var);
 			return (new ExpressionStatement(parent, startPosition.LineNo, ParseVariableDeclarationList()));
 		}
 
 		private Statement ParseWhileStatement(Statement parent, ILabelSet labelSet) {
-			var result = new WhileStatement(parent, _lookahead.StartPosition.LineNo, labelSet);
+			var result = new WhileStatement(parent, Lookahead.StartPosition.LineNo, labelSet);
 			Match(TokenType.While);
 			Match(TokenType.LParenthesis);
 			result.Condition = ParseExpression();
@@ -324,8 +324,10 @@ namespace YaJS.Compiler {
 
 		private Statement ParseExpressionStatement(Statement parent) {
 			return (new ExpressionStatement(
-				parent, _lookahead.StartPosition.LineNo, ParseExpression()
-			));
+				parent,
+				Lookahead.StartPosition.LineNo,
+				ParseExpression()
+				));
 		}
 
 		private Statement ParseStatement(Statement parent, bool isRequired) {
@@ -334,24 +336,24 @@ namespace YaJS.Compiler {
 			var labelSet = Statement.EmptyLabelSet;
 
 			// Вычислить набор меток текущего оператора
-			while (_lookahead.Type == TokenType.Ident) {
-				var possibleLabel = _lookahead.Value;
+			while (Lookahead.Type == TokenType.Ident) {
+				var possibleLabel = Lookahead.Value;
 				if (PeekNextToken().Type != TokenType.Colon)
 					break;
 				if (labelSet.Contains(possibleLabel))
-					ThrowDuplicatedLabel(_lookahead.StartPosition, possibleLabel);
+					ThrowDuplicatedLabel(Lookahead.StartPosition, possibleLabel);
 				labelSet = labelSet.UnionWith(possibleLabel);
 				MoveForwardLookahead();
 			}
 
 			// Разобрать оператор
-			switch (_lookahead.Type) {
+			switch (Lookahead.Type) {
 				case TokenType.Unknown:
 				case TokenType.Case:
 				case TokenType.Default:
 				case TokenType.RCurlyBrace:
 					if (isRequired)
-						ThrowExpectedStatement(_lookahead.StartPosition);
+						ThrowExpectedStatement(Lookahead.StartPosition);
 					return (null);
 				case TokenType.LCurlyBrace:
 					return (ParseBlockStatement(parent));
@@ -386,8 +388,8 @@ namespace YaJS.Compiler {
 
 		private void ParseFunctionBody(FunctionBody functionBody) {
 			Contract.Requires(functionBody != null);
-			for (; ; ) {
-				if (_lookahead.Type == TokenType.Function) {
+			for (;;) {
+				if (Lookahead.Type == TokenType.Function) {
 					// ReadNextToken вызовет ParseFunctionDeclaration
 					ParseFunctionDeclaration();
 				}
@@ -396,12 +398,12 @@ namespace YaJS.Compiler {
 					if (statement == null)
 						break;
 					functionBody.AddStatement(statement);
-					if (_lookahead.Type == TokenType.Unknown)
+					if (Lookahead.Type == TokenType.Unknown)
 						break;
-					else if (_lookahead.Type == TokenType.Semicolon)
+					if (Lookahead.Type == TokenType.Semicolon)
 						ReadNextToken();
-					else if (!_lookahead.IsAfterLineTerminator)
-						ThrowUnmatchedToken(TokenType.Semicolon, _lookahead);
+					else if (!Lookahead.IsAfterLineTerminator)
+						ThrowUnmatchedToken(TokenType.Semicolon, Lookahead);
 				}
 			}
 		}

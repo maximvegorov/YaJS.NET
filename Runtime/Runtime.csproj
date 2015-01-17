@@ -88,6 +88,8 @@
     <Compile Include="CallStackFrame.cs" />
     <Compile Include="CallStackFrameView.cs" />
     <Compile Include="CompiledFunction.cs" />
+    <Compile Include="Constructors\Errors\JSInternalErrorConstructor.cs" />
+    <Compile Include="Constructors\Errors\JSRangeErrorConstructor.cs" />
     <Compile Include="Constructors\Errors\JSReferenceErrorConstructor.cs" />
     <Compile Include="Constructors\Errors\JSSyntaxErrorException.cs" />
     <Compile Include="Constructors\Errors\JSTypeErrorConstructor.cs" />
@@ -98,11 +100,11 @@
     <Compile Include="Constructors\JSNumberConstructor.cs" />
     <Compile Include="Constructors\JSObjectConstructor.cs" />
     <Compile Include="Constructors\JSStringConstructor.cs" />
-    <Compile Include="Enumerators\JSEmptyEnumerator.cs" />
     <Compile Include="ExceptionObject.cs" />
     <Compile Include="Exceptions\IllegalOpCodeException.cs" />
     <Compile Include="Exceptions\InternalErrorException.cs" />
     <Compile Include="Exceptions\InvalidVariableNameException.cs" />
+    <Compile Include="Exceptions\RangeErrorException.cs" />
     <Compile Include="Exceptions\UnrecoverableErrorException.cs" />
     <Compile Include="Exceptions\InvalidEvalStackStateException.cs" />
     <Compile Include="Exceptions\IllegalThreadStateException.cs" />
@@ -121,6 +123,7 @@
     <Compile Include="JSValue.cs" />
     <Compile Include="LocalScope.cs" />
     <Compile Include="Objects\Errors\JSInternalError.cs" />
+    <Compile Include="Objects\Errors\JSRangeError.cs" />
     <Compile Include="Objects\Errors\JSReferenceError.cs" />
     <Compile Include="Objects\Errors\JSSyntaxError.cs" />
     <Compile Include="Objects\Errors\JSTypeError.cs" />

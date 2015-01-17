@@ -6,8 +6,7 @@ namespace YaJS.Compiler.Exceptions {
 	/// </summary>
 	[Serializable]
 	public abstract class ParserException : Exception {
-		protected ParserException()
-			: base() {
+		protected ParserException() {
 		}
 
 		protected ParserException(string message)

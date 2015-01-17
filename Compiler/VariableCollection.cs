@@ -3,24 +3,27 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
 namespace YaJS.Compiler {
-	[ContractClass(typeof(ContractClassForIVariableCollection))]
+	[ContractClass(typeof (ContractClassForIVariableCollection))]
 	internal interface IVariableCollection {
 		[Pure]
 		bool Contains(string variableName);
+
 		void Add(string variableName);
 		List<string> ToList();
 	}
 
-	[ContractClassFor(typeof(IVariableCollection))]
+	[ContractClassFor(typeof (IVariableCollection))]
 	internal abstract class ContractClassForIVariableCollection : IVariableCollection {
 		public bool Contains(string variableName) {
 			Contract.Requires(!string.IsNullOrEmpty(variableName));
 			throw new NotImplementedException();
 		}
+
 		public void Add(string variableName) {
 			Contract.Requires(!Contains(variableName));
 			throw new NotImplementedException();
 		}
+
 		public List<string> ToList() {
 			throw new NotImplementedException();
 		}
@@ -42,9 +45,8 @@ namespace YaJS.Compiler {
 
 	internal sealed class VariableCollection : IVariableCollection {
 		public static readonly IVariableCollection Empty = new EmptyVariableCollection();
-
-		private List<string> _list;
-		private HashSet<string> _set;
+		private readonly List<string> _list;
+		private readonly HashSet<string> _set;
 
 		public VariableCollection() {
 			_list = new List<string>();

@@ -2,13 +2,16 @@
 
 namespace YaJS.Compiler.AST.Expressions {
 	internal sealed class Identifier : Expression {
-		public Identifier(string value) {
+		private readonly string _value;
+
+		public Identifier(string value)
+			: base(ExpressionType.Ident) {
 			Contract.Requires(!string.IsNullOrEmpty(value));
-			Value = value;
+			_value = value;
 		}
 
 		public override string ToString() {
-			return (Value);
+			return (_value);
 		}
 
 		public override bool IsReference { get { return (true); } }
@@ -17,7 +20,6 @@ namespace YaJS.Compiler.AST.Expressions {
 		public override bool CanBeConstructor { get { return (true); } }
 		public override bool CanBeFunction { get { return (true); } }
 		public override bool CanBeDeleted { get { return (true); } }
-
-		public string Value { get; set; } 
+		public override bool CanBeObject { get { return (true); } }
 	}
 }

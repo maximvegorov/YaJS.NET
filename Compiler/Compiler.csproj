@@ -88,6 +88,7 @@
     <Compile Include="AST\Expressions\Binary\Assignment\SimpleAssignOperator.cs" />
     <Compile Include="AST\Expressions\GroupingOperator.cs" />
     <Compile Include="AST\Expressions\StringLiteral.cs" />
+    <Compile Include="AST\ExpressionType.cs" />
     <Compile Include="AST\Function.cs" />
     <Compile Include="AST\IterationStatement.cs" />
     <Compile Include="AST\LabellableStatement.cs" />
@@ -96,6 +97,10 @@
     <Compile Include="AST\Statements\BreakStatement.cs" />
     <Compile Include="AST\Statements\EmptyStatement.cs" />
     <Compile Include="AST\FunctionBody.cs" />
+    <Compile Include="Emitter\ByteCodeEmitter.cs" />
+    <Compile Include="Emitter\Label.cs" />
+    <Compile Include="CompilerServices.cs" />
+    <Compile Include="Emitter\UnresolvedOffsetSet.cs" />
     <Compile Include="Exceptions\ExpectedCaseClauseException.cs" />
     <Compile Include="Exceptions\ExpectedStatementException.cs" />
     <Compile Include="Exceptions\FunctionAlreadyDeclaredException.cs" />
@@ -189,13 +194,14 @@
     <Compile Include="AST\Statements\ThrowStatement.cs" />
     <Compile Include="AST\Statements\TryStatement.cs" />
     <Compile Include="AST\Statements\WhileStatement.cs" />
+    <Compile Include="FunctionCompiler.cs" />
     <Compile Include="VariableCollection.cs" />
     <Compile Include="Exceptions\UnexpectedCharException.cs" />
     <Compile Include="Exceptions\ParserException.cs" />
     <Compile Include="Exceptions\UnexpectedEndOfFileException.cs" />
     <Compile Include="Exceptions\InvalidTokenException.cs" />
     <Compile Include="Exceptions\UnmatchedTokenException.cs" />
-    <Compile Include="FunctionContext.cs" />
+    <Compile Include="FunctionBuilder.cs" />
     <Compile Include="Messages.cs" />
     <Compile Include="CharStream.cs" />
     <Compile Include="Parser.cs" />
@@ -205,7 +211,12 @@
     <Compile Include="Tokenizer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Runtime\Runtime.csproj">
+      <Project>{7fb8a4c3-3b73-45b9-b97e-b86a769c7d40}</Project>
+      <Name>Runtime</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

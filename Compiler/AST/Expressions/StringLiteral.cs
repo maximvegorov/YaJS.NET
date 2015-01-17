@@ -3,15 +3,17 @@ using System.Text;
 
 namespace YaJS.Compiler.AST.Expressions {
 	internal sealed class StringLiteral : Expression {
-		public StringLiteral(string value) {
-			Value = value ?? string.Empty;
+		private readonly string _value;
+
+		public StringLiteral(string value) : base(ExpressionType.String) {
+			_value = value ?? string.Empty;
 		}
 
 		public override string ToString() {
 			var result = new StringBuilder();
 			result.Append('"');
 			for (var i = 0; i < result.Length; i++) {
-				var c = Value[i];
+				var c = _value[i];
 				switch (c) {
 					case '"':
 						result.Append("\\\"");
@@ -54,7 +56,5 @@ namespace YaJS.Compiler.AST.Expressions {
 		public override bool CanHaveMembers { get { return (true); } }
 		public override bool IsConstant { get { return (true); } }
 		public override bool CanBeUsedInCaseClause { get { return (true); } }
-
-		public string Value { get; private set; }
 	}
 }

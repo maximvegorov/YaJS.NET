@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using YaJS.Runtime.Exceptions;
+using YaJS.Runtime.Objects;
+using YaJS.Runtime.Values;
 
 namespace YaJS.Runtime {
-	using Runtime.Exceptions;
-	using Runtime.Objects;
-	using Runtime.Values;
-
 	/// <summary>
 	/// Кадр вызова функции
 	/// </summary>
@@ -22,40 +21,45 @@ namespace YaJS.Runtime {
 		private TryBlockInfo _currentTryBlock;
 
 		internal CallStackFrame(
+			CallStackFrame caller,
 			VirtualMachine vm,
 			JSManagedFunction function,
 			JSObject context,
 			List<JSValue> parameterValues,
-			CallStackFrame caller = null,
-			bool copyResult = false
-		) {
+			bool copyResult = false,
+			Action onCompleteCallback = null
+			) {
 			Contract.Requires(vm != null);
 			Contract.Requires(function != null);
+			Contract.Requires(function.OuterScope != null);
 			Contract.Requires(context != null);
 			Contract.Requires(parameterValues != null);
 			Contract.Ensures(
 				LocalScope != null &&
-				LocalScope.Variables.Count == Math.Max(function.CompiledFunction.ParameterNames.Length, LocalScope.Variables.Count) + 1
-			);
+					LocalScope.Variables.Count ==
+						Math.Max(function.CompiledFunction.ParameterNames.Length, LocalScope.Variables.Count) + 1
+				);
 
 			Caller = caller;
 			CopyResult = copyResult;
 			Function = function;
 			Context = context;
 
-			LocalScope = function.OuterScope != null ? new LocalScope(function.OuterScope) : new LocalScope(vm.Global.OwnMembers);
+			LocalScope = new LocalScope(function.OuterScope);
 
 			_evalStack = new Stack<JSValue>(4);
+
+			CodeReader = new ByteCodeReader(Function.CompiledFunction.CompiledCode);
+
+			OnCompleteCallback = onCompleteCallback;
 
 			// Создать привязки для параметров
 			var parameterNames = function.CompiledFunction.ParameterNames;
 			var n = Math.Min(parameterNames.Length, parameterValues.Count);
-			for (var i = 0; i < n; i++) {
+			for (var i = 0; i < n; i++)
 				LocalScope.Variables.Add(parameterNames[i], parameterValues[i]);
-			}
-			for (var i = n; i < parameterNames.Length; i++) {
+			for (var i = n; i < parameterNames.Length; i++)
 				LocalScope.Variables.Add(parameterNames[i], JSValue.Undefined);
-			}
 
 			// Создать привязку для arguments
 			LocalScope.Variables.Add("arguments", vm.NewArray(parameterValues));
@@ -65,23 +69,25 @@ namespace YaJS.Runtime {
 				var declaredFunction = Function.CompiledFunction.NestedFunctions[i];
 				if (!LocalScope.Variables.ContainsKey(declaredFunction.Name)) {
 					LocalScope.Variables.Add(
-						declaredFunction.Name, vm.NewFunction(LocalScope, declaredFunction)
-					);
+						declaredFunction.Name,
+						vm.NewFunction(LocalScope, declaredFunction)
+						);
 				}
 			}
 
 			// Создать привязки для объявленных переменных
 			for (var i = 0; i < Function.CompiledFunction.DeclaredVariables.Length; i++) {
 				var variableName = Function.CompiledFunction.DeclaredVariables[i];
-				if (!LocalScope.Variables.ContainsKey(variableName)) {
+				if (!LocalScope.Variables.ContainsKey(variableName))
 					LocalScope.Variables.Add(variableName, JSValue.Undefined);
-				}
 			}
-
-			CodeReader = new ByteCodeReader(Function.CompiledFunction.CompiledCode);
 		}
 
 		internal void Push(JSValue value) {
+			_evalStack.Push(value);
+		}
+
+		internal void Push(JSNumberValue value) {
 			_evalStack.Push(value);
 		}
 
@@ -93,14 +99,6 @@ namespace YaJS.Runtime {
 			return (_evalStack.Pop());
 		}
 
-		internal JSValue PopPrimitiveValue() {
-			return (_evalStack.Pop().ToPrimitiveValue());
-		}
-
-		internal JSEnumerator PopEnumerator() {
-			return (_evalStack.Pop().RequireEnumerator());
-		}
-
 		internal List<JSValue> PopArguments() {
 			var result = new List<JSValue>(_evalStack.Pop().RequireInteger());
 			for (var i = result.Count - 1; i >= 0; i--)
@@ -110,8 +108,9 @@ namespace YaJS.Runtime {
 
 		internal JSFunction GetFunction(VirtualMachine vm, int index) {
 			return (vm.NewFunction(
-				LocalScope, Function.CompiledFunction.NestedFunctions[index]
-			));
+				LocalScope,
+				Function.CompiledFunction.NestedFunctions[index]
+				));
 		}
 
 		internal void BeginScope() {
@@ -146,9 +145,8 @@ namespace YaJS.Runtime {
 		}
 
 		private IEnumerable<CallStackFrame> GetFrames() {
-			for (var frame = this; frame != null; frame = frame.Caller) {
+			for (var frame = this; frame != null; frame = frame.Caller)
 				yield return frame;
-			}
 		}
 
 		public CallStackFrameView[] ToStackTrace() {
@@ -156,32 +154,42 @@ namespace YaJS.Runtime {
 				GetFrames().Select(f => new CallStackFrameView(f))
 					.Reverse()
 					.ToArray()
-			);
+				);
 		}
 
 		/// <summary>
 		/// Стек-фрейм вызывающей функции
 		/// </summary>
 		public CallStackFrame Caller { get; private set; }
+
 		/// <summary>
 		/// Копировать возвращаемое значение в стек вычислений вызывающей функции
 		/// </summary>
 		public bool CopyResult { get; private set; }
+
 		/// <summary>
 		/// Вызванная функция
 		/// </summary>
 		public JSManagedFunction Function { get; private set; }
+
 		/// <summary>
 		/// Контекст в котором вызывается функция
 		/// </summary>
 		public JSObject Context { get; private set; }
+
 		/// <summary>
 		/// Область хранения локальных переменных
 		/// </summary>
 		public LocalScope LocalScope { get; private set; }
+
 		/// <summary>
 		/// Byte-код reader
 		/// </summary>
 		internal ByteCodeReader CodeReader { get; private set; }
+
+		/// <summary>
+		/// Callback вызывающийся после завершения
+		/// </summary>
+		internal Action OnCompleteCallback { get; private set; }
 	}
 }

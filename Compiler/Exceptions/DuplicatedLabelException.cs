@@ -6,8 +6,7 @@ namespace YaJS.Compiler.Exceptions {
 	/// </summary>
 	[Serializable]
 	public sealed class DuplicatedLabelException : ParserException {
-		public DuplicatedLabelException()
-			: base() {
+		public DuplicatedLabelException() {
 		}
 
 		public DuplicatedLabelException(string message)

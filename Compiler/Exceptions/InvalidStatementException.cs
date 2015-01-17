@@ -6,8 +6,7 @@ namespace YaJS.Compiler.Exceptions {
 	/// </summary>
 	[Serializable]
 	public sealed class InvalidStatementException : ParserException {
-		public InvalidStatementException()
-			: base() {
+		public InvalidStatementException() {
 		}
 
 		public InvalidStatementException(string message)

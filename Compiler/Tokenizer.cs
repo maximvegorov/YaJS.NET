@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text;
+using YaJS.Compiler.Exceptions;
 
 namespace YaJS.Compiler {
-	using Exceptions;
-
 	/// <summary>
 	/// Сканер
 	/// </summary>
 	public sealed class Tokenizer {
 		private static readonly Dictionary<string, TokenType> Keywords = new Dictionary<string, TokenType>();
+		private readonly CharStream _input;
 
 		static Tokenizer() {
 			Keywords.Add("break", TokenType.Break);
@@ -66,8 +66,6 @@ namespace YaJS.Compiler {
 			Keywords.Add("arguments", TokenType.Arguments);
 		}
 
-		private readonly CharStream _input;
-
 		public Tokenizer(TextReader reader) {
 			Contract.Requires<ArgumentNullException>(reader != null, "reader");
 			_input = new CharStream(reader);
@@ -79,10 +77,11 @@ namespace YaJS.Compiler {
 		}
 
 		private void ReadIdentOrKeyword() {
-			StringBuilder builder = new StringBuilder();
+			var builder = new StringBuilder();
 			builder.Append((char)_input.CurChar);
 			_input.ReadChar();
-			while (char.IsLetterOrDigit((char)_input.CurChar) || _input.CurChar == '$' || _input.CurChar == '_' || _input.CurChar == '\u200C' || _input.CurChar == '\u200D') {
+			while (char.IsLetterOrDigit((char)_input.CurChar) || _input.CurChar == '$' || _input.CurChar == '_' ||
+				_input.CurChar == '\u200C' || _input.CurChar == '\u200D') {
 				builder.Append((char)_input.CurChar);
 				_input.ReadChar();
 			}
@@ -199,8 +198,7 @@ namespace YaJS.Compiler {
 		private void SkipSingleLineComment() {
 			do {
 				_input.ReadChar();
-			}
-			while (_input.CurChar != '\n' && _input.CurChar != -1);
+			} while (_input.CurChar != '\n' && _input.CurChar != -1);
 		}
 
 		private void ThrowUnexpectedEndOfFile() {
@@ -209,12 +207,12 @@ namespace YaJS.Compiler {
 					_input.LineNo,
 					_input.ColumnNo,
 					"Unexpected end of file."
-				)
-			);
+					)
+				);
 		}
 
 		private void SkipMultiLineComment() {
-			for(;;) {
+			for (;;) {
 				_input.ReadChar();
 				switch (_input.CurChar) {
 					case -1:
@@ -319,14 +317,14 @@ namespace YaJS.Compiler {
 				Messages.Error(
 					_input.LineNo,
 					_input.ColumnNo,
-					string.Format("Unexpected char \"{0}\".", _input.CurChar.ToString())
-				)
-			);
+					string.Format("Unexpected char \"{0}\".", _input.CurChar)
+					)
+				);
 		}
 
 		private void ReadIntegerOrFloatNumber() {
 			Lookahead.Type = TokenType.Integer;
-			StringBuilder builder = new StringBuilder();
+			var builder = new StringBuilder();
 			while (char.IsDigit((char)_input.CurChar)) {
 				builder.Append((char)_input.CurChar);
 				_input.ReadChar();
@@ -376,12 +374,11 @@ namespace YaJS.Compiler {
 			_input.ReadChar();
 			if (!IsHexDigit((char)_input.CurChar))
 				ThrowUnexpectedChar();
-			StringBuilder builder = new StringBuilder();
+			var builder = new StringBuilder();
 			do {
 				builder.Append((char)_input.CurChar);
 				_input.ReadChar();
-			}
-			while (IsHexDigit((char)_input.CurChar));
+			} while (IsHexDigit((char)_input.CurChar));
 			// Число и идентификатор должны быть разделены хотя бы одним символом
 			// см. http://ecma-international.org/ecma-262/5.1/#sec-7.8.3
 			if (IsIdentStartChar((char)_input.CurChar))
@@ -392,9 +389,9 @@ namespace YaJS.Compiler {
 
 		private char ReadEscapeSequence(int length) {
 			_input.ReadChar();
-			int result = 0;
-			for (int i = 0; i < length; i++) {
-				int hexDigit = 0;
+			var result = 0;
+			for (var i = 0; i < length; i++) {
+				var hexDigit = 0;
 				if ('0' <= _input.CurChar && _input.CurChar <= '9')
 					hexDigit = _input.CurChar - '0';
 				else if ('a' <= _input.CurChar && _input.CurChar <= 'f')
@@ -410,7 +407,7 @@ namespace YaJS.Compiler {
 		}
 
 		private void ReadString(char endQuoteChar) {
-			StringBuilder builder = new StringBuilder();
+			var builder = new StringBuilder();
 			_input.ReadChar();
 			while (_input.CurChar != endQuoteChar) {
 				if (_input.CurChar == -1)

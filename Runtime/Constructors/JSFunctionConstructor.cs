@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using YaJS.Runtime.Objects;
 
 namespace YaJS.Runtime.Constructors {
-	using Runtime.Objects;
-
 	/// <summary>
 	/// Native-конструктор JSFunction
 	/// </summary>
@@ -22,7 +21,7 @@ namespace YaJS.Runtime.Constructors {
 			return (VM.Function);
 		}
 
-		public override JSValue Construct(LocalScope outerScope, List<JSValue> args) {
+		public override JSValue Construct(ExecutionThread thread, LocalScope outerScope, List<JSValue> args) {
 			IEnumerable<string> parameterNames;
 			string functionBody;
 			if (args.Count == 0) {
@@ -34,12 +33,20 @@ namespace YaJS.Runtime.Constructors {
 				functionBody = args[args.Count - 1].CastToString();
 			}
 			return (VM.NewFunction(
-				outerScope, VM.Compiler.Compile("f", parameterNames, functionBody)
-			));
+				outerScope,
+				VM.Compiler.Compile("f", parameterNames, functionBody)
+				));
 		}
 
-		public override JSValue Invoke(JSObject context, LocalScope outerScope, List<JSValue> args) {
-			return (Construct(outerScope, args));
+		public override JSValue Invoke(
+			ExecutionThread thread,
+			JSObject context,
+			LocalScope outerScope,
+			List<JSValue> args
+			) {
+			return (Construct(thread, outerScope, args));
 		}
+
+		public override int ParameterCount { get { return (1); } }
 	}
 }

@@ -6,8 +6,7 @@ namespace YaJS.Runtime.Exceptions {
 	/// </summary>
 	[Serializable]
 	public class SyntaxErrorException : RuntimeErrorException {
-		public SyntaxErrorException()
-			: base() {
+		public SyntaxErrorException() {
 		}
 
 		public SyntaxErrorException(string message)

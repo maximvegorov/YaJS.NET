@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using YaJS.Runtime.Exceptions;
+using YaJS.Runtime.Values;
 
 namespace YaJS.Runtime.Objects {
 	/// <summary>
@@ -11,7 +13,7 @@ namespace YaJS.Runtime.Objects {
 
 		protected JSFunction(VirtualMachine vm, JSObject inherited)
 			: base(vm, inherited) {
-			Contract.Requires(inherited != null);
+			Contract.Requires(inherited == vm.Function);
 		}
 
 		public virtual JSObject GetPrototype() {
@@ -26,10 +28,12 @@ namespace YaJS.Runtime.Objects {
 		/// <summary>
 		/// Вызвать Native-функцию
 		/// </summary>
+		/// <param name="thread"></param>
 		/// <param name="outerScope">Внешняя область локальных переменных</param>
 		/// <param name="args">Список параметров</param>
 		/// <returns></returns>
-		public virtual JSValue Construct(LocalScope outerScope, List<JSValue> args) {
+		public virtual JSValue Construct(ExecutionThread thread, LocalScope outerScope, List<JSValue> args) {
+			Contract.Requires(thread != null);
 			Contract.Requires(outerScope != null);
 			Contract.Requires(args != null);
 			throw new NotSupportedException();
@@ -38,24 +42,81 @@ namespace YaJS.Runtime.Objects {
 		/// <summary>
 		/// Вызвать Native-функцию
 		/// </summary>
+		/// <param name="thread"></param>
 		/// <param name="context">Контекст</param>
 		/// <param name="outerScope">Внешняя область локальных переменных</param>
 		/// <param name="args">Список параметров</param>
 		/// <returns></returns>
-		public virtual JSValue Invoke(JSObject context, LocalScope outerScope, List<JSValue> args) {
+		public virtual JSValue Invoke(
+			ExecutionThread thread,
+			JSObject context,
+			LocalScope outerScope,
+			List<JSValue> args
+			) {
+			Contract.Requires(thread != null);
 			Contract.Requires(context != null);
 			Contract.Requires(outerScope != null);
 			Contract.Requires(args != null);
 			throw new NotSupportedException();
 		}
 
+		public override bool ContainsMember(JSValue member) {
+			var name = member.CastToString();
+			switch (name) {
+				case "prototype":
+				case "length":
+					return (true);
+				default:
+					return (base.ContainsMember(name));
+			}
+		}
+
+		public override JSValue GetMember(JSValue member) {
+			var name = member.CastToString();
+			switch (name) {
+				case "prototype":
+					return (GetPrototype());
+				case "length":
+					return ((JSNumberValue)ParameterCount);
+				default:
+					return (base.GetMember(name));
+			}
+		}
+
+		public override void SetMember(JSValue member, JSValue value) {
+			var name = member.CastToString();
+			if (name == "length")
+				throw new TypeErrorException();
+			base.SetMember(name, value);
+		}
+
+		public override bool DeleteMember(JSValue member) {
+			var name = member.CastToString();
+			switch (name) {
+				case "prototype":
+				case "length":
+					return (true);
+				default:
+					return (base.DeleteMember(name));
+			}
+		}
+
 		public override string TypeOf() {
 			return ("function");
+		}
+
+		public override JSFunction RequireFunction() {
+			return (this);
 		}
 
 		/// <summary>
 		/// Native-функция?
 		/// </summary>
 		public abstract bool IsNative { get; }
+
+		/// <summary>
+		/// Кол-во параметров ожидаемых функцией по умолчанию
+		/// </summary>
+		public abstract int ParameterCount { get; }
 	}
 }

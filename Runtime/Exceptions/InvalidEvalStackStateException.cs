@@ -6,8 +6,7 @@ namespace YaJS.Runtime.Exceptions {
 	/// </summary>
 	[Serializable]
 	public sealed class InvalidEvalStackStateException : InternalErrorException {
-		public InvalidEvalStackStateException()
-			: base() {
+		public InvalidEvalStackStateException() {
 		}
 
 		public InvalidEvalStackStateException(string message)

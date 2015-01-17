@@ -3,8 +3,7 @@
 namespace YaJS.Runtime.Exceptions {
 	[Serializable]
 	public sealed class InvalidGotoOffsetException : InternalErrorException {
-		public InvalidGotoOffsetException()
-			: base() {
+		public InvalidGotoOffsetException() {
 		}
 
 		public InvalidGotoOffsetException(string message)

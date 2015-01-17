@@ -1,4 +1,5 @@
 ﻿using System;
+using YaJS.Runtime.Objects;
 
 namespace YaJS.Runtime.Values {
 	/// <summary>
@@ -26,8 +27,42 @@ namespace YaJS.Runtime.Values {
 			return (_value);
 		}
 
+		public override bool ConvEqualsTo(JSValue value) {
+			if (value.Type == JSValueType.String)
+				return (_value == value.CastToString());
+			return (value.ToNumber().ConvEqualsTo(value));
+		}
+
+		public override bool StrictEqualsTo(JSValue value) {
+			return (value.Type == JSValueType.Integer && _value == value.CastToString());
+		}
+
 		public override string TypeOf() {
 			return ("string");
+		}
+
+		public override bool CastToBoolean() {
+			return (!string.IsNullOrEmpty(_value));
+		}
+
+		public override int CastToInteger() {
+			return (JSNumberValue.ParseInteger(_value));
+		}
+
+		public override double CastToFloat() {
+			return (JSNumberValue.ParseFloat(_value));
+		}
+
+		public override string CastToString() {
+			return (_value);
+		}
+
+		public override JSNumberValue ToNumber() {
+			return (JSNumberValue.ParseNumber(_value));
+		}
+
+		public override JSObject ToObject(VirtualMachine vm) {
+			return (vm.NewString(_value));
 		}
 	}
 }

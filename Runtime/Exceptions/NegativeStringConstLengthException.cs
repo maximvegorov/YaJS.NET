@@ -6,8 +6,7 @@ namespace YaJS.Runtime.Exceptions {
 	/// </summary>
 	[Serializable]
 	public sealed class NegativeStringConstLengthException : InternalErrorException {
-		public NegativeStringConstLengthException()
-			: base() {
+		public NegativeStringConstLengthException() {
 		}
 
 		public NegativeStringConstLengthException(string message)

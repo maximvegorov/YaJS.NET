@@ -1,14 +1,24 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.Contracts;
+using YaJS.Runtime.Exceptions;
+using YaJS.Runtime.Objects;
+using YaJS.Runtime.Values;
 
 namespace YaJS.Runtime {
-	using Runtime.Exceptions;
-	using Runtime.Objects;
-	using Runtime.Values;
-
 	/// <summary>
 	/// Типы примитивных значений
 	/// </summary>
-	public enum JSValueType { Undefined, Null, Boolean, Integer, Float, String, Object, Enumerator }
+	public enum JSValueType {
+		Undefined,
+		Null,
+		Boolean,
+		Integer,
+		Float,
+		String,
+		Object,
+		Enumerator
+	}
 
 	/// <summary>
 	/// Примитивное значение
@@ -22,60 +32,19 @@ namespace YaJS.Runtime {
 			Type = type;
 		}
 
-		public virtual JSEnumerator GetEnumerator() {
-			return (JSEnumerator.Empty);
-		}
-
-		public virtual JSValue Neg() {
+		public virtual IEnumerator<JSValue> GetEnumerator() {
 			throw new TypeErrorException();
 		}
 
-		public virtual JSValue Plus(JSValue value) {
-			throw new TypeErrorException();
+		internal JSEnumerator GetJSEnumerator() {
+			return (new JSEnumerator(GetEnumerator()));
 		}
 
-		public virtual JSValue Minus(JSValue value) {
-			throw new TypeErrorException();
-		}
-
-		public virtual JSValue Mul(JSValue value) {
-			throw new TypeErrorException();
-		}
-
-		public virtual JSValue Div(JSValue value) {
-			throw new TypeErrorException();
-		}
-
-		public virtual JSValue Mod(JSValue value) {
-			throw new TypeErrorException();
-		}
-
-		public virtual JSValue BitNot() {
-			throw new TypeErrorException();
-		}
-
-		public virtual JSValue BitAnd(JSValue value) {
-			throw new TypeErrorException();
-		}
-
-		public virtual JSValue BitOr(JSValue value) {
-			throw new TypeErrorException();
-		}
-
-		public virtual JSValue BitXor(JSValue value) {
-			throw new TypeErrorException();
-		}
-
-		public virtual JSValue BitShl(JSValue value) {
-			throw new TypeErrorException();
-		}
-
-		public virtual JSValue BitShrS(JSValue value) {
-			throw new TypeErrorException();
-		}
-
-		public virtual JSValue BitShrU(JSValue value) {
-			throw new TypeErrorException();
+		public JSValue Plus(JSValue value) {
+			Contract.Requires(value != null);
+			if (Type == JSValueType.String || value.Type == JSValueType.String)
+				return (CastToString() + CastToString());
+			return (ToNumber().Plus(value.ToNumber()));
 		}
 
 		public JSValue Not() {
@@ -83,44 +52,60 @@ namespace YaJS.Runtime {
 		}
 
 		public JSValue And(JSValue value) {
+			Contract.Requires(value != null);
 			return (!CastToBoolean() ? this : value);
 		}
 
 		public JSValue Or(JSValue value) {
+			Contract.Requires(value != null);
 			return (CastToBoolean() ? this : value);
 		}
 
-		public virtual bool EqualsTo(JSValue value) {
-			return (false);
+		public virtual bool ConvEqualsTo(JSValue value) {
+			Contract.Requires(value != null);
+			throw new TypeErrorException();
 		}
 
 		public virtual bool StrictEqualsTo(JSValue value) {
-			return (false);
-		}
-
-		public virtual bool Lt(JSValue value) {
+			Contract.Requires(value != null);
 			throw new TypeErrorException();
 		}
 
-		public virtual bool Lte(JSValue value) {
-			throw new TypeErrorException();
+		public bool Lt(JSValue value) {
+			Contract.Requires(value != null);
+			if (Type == JSValueType.String && value.Type == JSValueType.String)
+				return (string.CompareOrdinal(CastToString(), value.CastToString()) == -1);
+			return (ToNumber().Lt(value.ToNumber()));
+		}
+
+		public bool Lte(JSValue value) {
+			Contract.Requires(value != null);
+			if (Type == JSValueType.String && value.Type == JSValueType.String)
+				return (string.CompareOrdinal(CastToString(), value.CastToString()) <= 0);
+			return (ToNumber().Lte(value.ToNumber()));
 		}
 
 		public virtual bool IsInstanceOf(JSFunction constructor) {
-			return (false);
+			Contract.Requires(constructor != null);
+			throw new TypeErrorException();
 		}
 
-		public abstract string TypeOf();
+		public virtual string TypeOf() {
+			throw new TypeErrorException();
+		}
 
 		public virtual bool CastToBoolean() {
 			throw new TypeErrorException();
 		}
+
 		public virtual int CastToInteger() {
 			throw new TypeErrorException();
 		}
+
 		public virtual double CastToFloat() {
 			throw new TypeErrorException();
 		}
+
 		public virtual string CastToString() {
 			throw new TypeErrorException();
 		}
@@ -128,25 +113,31 @@ namespace YaJS.Runtime {
 		public virtual int RequireInteger() {
 			throw new TypeErrorException();
 		}
+
 		public virtual JSObject RequireObject() {
 			throw new TypeErrorException();
 		}
+
 		public virtual JSFunction RequireFunction() {
 			throw new TypeErrorException();
 		}
-		public virtual JSEnumerator RequireEnumerator() {
-			throw new TypeErrorException();
-		}
 
-		public virtual JSValue ToPrimitiveValue() {
-			return (this);
+		internal virtual JSEnumerator RequireEnumerator() {
+			throw new TypeErrorException();
 		}
 
 		public virtual JSNumberValue ToNumber() {
 			throw new TypeErrorException();
 		}
 
+		public virtual void CastToPrimitiveValue(ExecutionThread thread, Action<JSValue> onCompleteCallback) {
+			Contract.Requires(thread != null);
+			Contract.Requires(onCompleteCallback != null);
+			throw new NotSupportedException();
+		}
+
 		public virtual JSObject ToObject(VirtualMachine vm) {
+			Contract.Requires(vm != null);
 			throw new TypeErrorException();
 		}
 

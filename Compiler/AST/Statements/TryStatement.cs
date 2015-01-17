@@ -6,11 +6,11 @@ namespace YaJS.Compiler.AST.Statements {
 	/// Оператор try (См. http://www.ecma-international.org/ecma-262/5.1/#sec-12.14)
 	/// </summary>
 	public sealed class TryStatement : Statement {
-		private BlockStatement _tryBlock;
-		private string _catchBlockVariable;
+		private readonly List<Statement> _exitPoints;
 		private BlockStatement _catchBlock;
+		private string _catchBlockVariable;
 		private BlockStatement _finallyBlock;
-		private List<Statement> _exitPoints;
+		private BlockStatement _tryBlock;
 
 		public TryStatement(Statement parent, int lineNo)
 			: base(parent, StatementType.Try, lineNo) {
@@ -29,6 +29,7 @@ namespace YaJS.Compiler.AST.Statements {
 				_tryBlock = value;
 			}
 		}
+
 		public string CatchBlockVariable {
 			get { return (_catchBlockVariable); }
 			set {
@@ -37,6 +38,7 @@ namespace YaJS.Compiler.AST.Statements {
 				_catchBlockVariable = value;
 			}
 		}
+
 		public BlockStatement CatchBlock {
 			get { return (_catchBlock); }
 			set {
@@ -45,6 +47,7 @@ namespace YaJS.Compiler.AST.Statements {
 				_catchBlock = value;
 			}
 		}
+
 		public BlockStatement FinallyBlock {
 			get { return (_finallyBlock); }
 			set {

@@ -1,7 +1,7 @@
 ﻿namespace YaJS.Compiler.AST.Expressions {
 	internal sealed class BitNotOperator : UnaryOperator {
 		public BitNotOperator(Expression operand)
-			: base(operand) {
+			: base(ExpressionType.BitNot, operand) {
 		}
 
 		public override string ToString() {

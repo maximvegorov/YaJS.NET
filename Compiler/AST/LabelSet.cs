@@ -6,19 +6,21 @@ namespace YaJS.Compiler.AST {
 	/// <summary>
 	/// Набор меток оператора
 	/// </summary>
-	[ContractClass(typeof(ContractClassForILabelSet))]
+	[ContractClass(typeof (ContractClassForILabelSet))]
 	public interface ILabelSet {
 		[Pure]
 		bool Contains(string label);
+
 		ILabelSet UnionWith(string label);
 	}
 
-	[ContractClassFor(typeof(ILabelSet))]
+	[ContractClassFor(typeof (ILabelSet))]
 	internal abstract class ContractClassForILabelSet : ILabelSet {
 		public bool Contains(string label) {
 			Contract.Requires(label != null);
 			throw new NotImplementedException();
 		}
+
 		public ILabelSet UnionWith(string label) {
 			Contract.Requires(!Contains(label));
 			throw new NotImplementedException();
@@ -38,8 +40,7 @@ namespace YaJS.Compiler.AST {
 		public ILabelSet UnionWith(string label) {
 			if (string.IsNullOrEmpty(label))
 				return (OneEmptyStringLabelSet);
-			else
-				return (new SingletonLabelSet(label));
+			return (new SingletonLabelSet(label));
 		}
 	}
 
@@ -84,21 +85,21 @@ namespace YaJS.Compiler.AST {
 		}
 
 		public ILabelSet UnionWith(string label) {
-			return (new HashLabelSet(_label1, _label2, label));
+			return (new LabelSet(_label1, _label2, label));
 		}
 	}
 
 	/// <summary>
 	/// Набор содержащий произвольное кол-во меток
 	/// </summary>
-	internal sealed class HashLabelSet : ILabelSet {
+	internal sealed class LabelSet : ILabelSet {
 		private readonly HashSet<string> _set;
 
-		public HashLabelSet(string label1, string label2, string label3) {
+		public LabelSet(string label1, string label2, string label3) {
 			Contract.Requires(label1 != null);
 			Contract.Requires(label2 != null);
 			Contract.Requires(label3 != null);
-			_set = new HashSet<string>() { label1, label2, label3 };
+			_set = new HashSet<string> {label1, label2, label3};
 		}
 
 		[Pure]

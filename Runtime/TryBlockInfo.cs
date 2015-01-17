@@ -17,10 +17,12 @@ namespace YaJS.Runtime {
 		/// Внешний блок try в выполняемой функции
 		/// </summary>
 		public TryBlockInfo OuterBlock { get; private set; }
+
 		/// <summary>
 		/// Смещение в коде блока catch/finally
 		/// </summary>
 		public int HandlerOffset { get; private set; }
+
 		/// <summary>
 		/// Область локальных переменных на момент входа в блок try
 		/// </summary>

@@ -1,33 +1,27 @@
-﻿namespace YaJS.Runtime {
-	using Runtime.Enumerators;
-	using Runtime.Exceptions;
+﻿using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 
+namespace YaJS.Runtime {
 	/// <summary>
 	/// Перечислитель. Используется для реализации for-in
 	/// </summary>
-	public abstract class JSEnumerator : JSValue {
-		public static readonly JSEnumerator Empty = new JSEmptyEnumerator();
+	internal sealed class JSEnumerator : JSValue {
+		private readonly IEnumerator<JSValue> _enumerator;
 
-		protected JSEnumerator() : base(JSValueType.Enumerator) {
+		public JSEnumerator(IEnumerator<JSValue> enumerator)
+			: base(JSValueType.Enumerator) {
+			Contract.Requires(enumerator != null);
+			_enumerator = enumerator;
 		}
 
-		public abstract bool MoveNext();
-		public abstract JSValue Current { get; }
-
-		public override JSEnumerator GetEnumerator() {
-			throw new TypeErrorException();
+		public bool MoveNext() {
+			return (_enumerator.MoveNext());
 		}
 
-		public override string TypeOf() {
-			throw new TypeErrorException();
-		}
-
-		public override JSEnumerator RequireEnumerator() {
+		internal override JSEnumerator RequireEnumerator() {
 			return (this);
 		}
 
-		public override JSValue ToPrimitiveValue() {
-			throw new TypeErrorException();
-		}
+		public JSValue Current { get { return (_enumerator.Current); } }
 	}
 }

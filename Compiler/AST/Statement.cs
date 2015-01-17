@@ -39,6 +39,7 @@ namespace YaJS.Compiler.AST {
 			Contract.Requires(targetLabel != null);
 			return (false);
 		}
+
 		public virtual bool IsContinueTarget(string targetLabel) {
 			Contract.Requires(targetLabel != null);
 			return (false);
@@ -57,19 +58,20 @@ namespace YaJS.Compiler.AST {
 		/// Зарегистрировать оператор как точку выхода. Используется для правильной обработки блоков finally оператора try
 		/// </summary>
 		public void RegisterAsExitPoint() {
-			for (var current = Parent; current != null && !current.IsTarget(this); current = current.Parent) {
+			for (var current = Parent; current != null && !current.IsTarget(this); current = current.Parent)
 				current.RegisterAsExitPoint(this);
-			}
 		}
 
 		/// <summary>
 		/// Оператор содержащий данный оператор или null
 		/// </summary>
 		public Statement Parent { get; private set; }
+
 		/// <summary>
 		/// Тип оператора
 		/// </summary>
 		public StatementType Type { get; private set; }
+
 		/// <summary>
 		/// Строка на которой начинается оператор
 		/// </summary>

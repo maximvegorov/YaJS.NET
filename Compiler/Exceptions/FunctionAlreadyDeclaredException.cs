@@ -6,8 +6,7 @@ namespace YaJS.Compiler.Exceptions {
 	/// </summary>
 	[Serializable]
 	public sealed class FunctionAlreadyDeclaredException : ParserException {
-		public FunctionAlreadyDeclaredException()
-			: base() {
+		public FunctionAlreadyDeclaredException() {
 		}
 
 		public FunctionAlreadyDeclaredException(string message)

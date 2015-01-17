@@ -3,12 +3,12 @@
 namespace YaJS.Compiler.AST.Expressions {
 	internal sealed class DecOperator : UnaryOperator {
 		public DecOperator(Expression operand)
-			: base(operand) {
+			: base(ExpressionType.Dec, operand) {
 			Contract.Requires(operand.IsReference);
 		}
 
 		public override string ToString() {
-			return ("--" + Operand.ToString());
+			return ("--" + Operand);
 		}
 
 		public override bool CanHaveMembers { get { return (true); } }

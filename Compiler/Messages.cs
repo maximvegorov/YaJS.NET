@@ -12,7 +12,7 @@ namespace YaJS.Compiler {
 				message,
 				lineNo.ToString(CultureInfo.InvariantCulture),
 				columnNo.ToString(CultureInfo.InvariantCulture)
-			));
+				));
 		}
 	}
 }

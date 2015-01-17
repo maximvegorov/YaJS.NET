@@ -2,20 +2,22 @@
 
 namespace YaJS.Compiler.AST.Expressions {
 	internal sealed class FunctionLiteral : Expression {
-		public FunctionLiteral(Function function) {
+		private readonly Function _function;
+
+		public FunctionLiteral(Function function)
+			: base(ExpressionType.FunctionLiteral) {
 			Contract.Requires(function != null);
-			Function = function;
+			_function = function;
 		}
 
 		public override string ToString() {
-			return (Function.ToString());
+			return (_function.ToString());
 		}
 
 		public override bool CanHaveMembers { get { return (true); } }
 		public override bool CanHaveMutableMembers { get { return (true); } }
 		public override bool CanBeConstructor { get { return (true); } }
 		public override bool CanBeFunction { get { return (true); } }
-
-		public new Function Function { get; private set; }
+		public override bool CanBeObject { get { return (true); } }
 	}
 }

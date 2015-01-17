@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using YaJS.Runtime.Exceptions;
 
 namespace YaJS.Runtime {
-	using Runtime.Exceptions;
-
 	/// <summary>
 	/// Область локальных переменных
 	/// </summary>
@@ -56,6 +55,7 @@ namespace YaJS.Runtime {
 		/// Внешняя область локальных переменных
 		/// </summary>
 		public LocalScope OuterScope { get; private set; }
+
 		/// <summary>
 		/// Значения локальных переменных
 		/// </summary>

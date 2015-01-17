@@ -1,29 +1,28 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using YaJS.Compiler.AST;
+using YaJS.Compiler.AST.Statements;
 
 namespace YaJS.Compiler {
-	using AST;
-	using AST.Statements;
-
 	/// <summary>
-	/// Контекст parsing-га функции
+	/// Анализируемая parser-ом функция
 	/// </summary>
-	internal sealed class FunctionContext {
-		private readonly string _name;
+	internal sealed class FunctionBuilder {
+		private readonly bool _isDeclaration;
 		private readonly int _lineNo;
+		private readonly string _name;
 		private readonly IVariableCollection _parameterNames;
 		private readonly List<TryStatement> _tryBlocks;
-		private readonly bool _isDeclaration;
 
-		public FunctionContext(
-			FunctionContext outer,
+		public FunctionBuilder(
+			FunctionBuilder outer,
 			string name,
 			int lineNo,
 			IVariableCollection parameterNames,
 			FunctionBody functionBody,
 			bool isDeclaration
-		) {
+			) {
 			Contract.Requires(outer != null);
 			Contract.Requires(!(isDeclaration && string.IsNullOrEmpty(name)));
 			Contract.Requires(parameterNames != null);
@@ -55,10 +54,10 @@ namespace YaJS.Compiler {
 				FunctionBody,
 				_tryBlocks.Count == 0 ? Enumerable.Empty<TryStatement>() : _tryBlocks,
 				_isDeclaration
-			));
+				));
 		}
 
-		public FunctionContext Outer { get; private set; }
+		public FunctionBuilder Outer { get; private set; }
 		public IVariableCollection DeclaredVariables { get; private set; }
 		public FunctionCollection NestedFunctions { get; private set; }
 		public FunctionBody FunctionBody { get; private set; }

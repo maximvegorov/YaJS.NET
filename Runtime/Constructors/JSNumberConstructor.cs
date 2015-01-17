@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using YaJS.Runtime.Objects;
 
 namespace YaJS.Runtime.Constructors {
-	using Runtime.Objects;
-	using Runtime.Values;
-
 	/// <summary>
 	/// Native-конструктор JSNumber
 	/// </summary>
@@ -23,12 +21,19 @@ namespace YaJS.Runtime.Constructors {
 			return (VM.Number);
 		}
 
-		public override JSValue Construct(LocalScope outerScope, List<JSValue> args) {
-			return (VM.NewNumber(args.Count > 0 ? args[0].ToNumber() : (JSNumberValue)0));
+		public override JSValue Construct(ExecutionThread thread, LocalScope outerScope, List<JSValue> args) {
+			return (VM.NewNumber(args.Count > 0 ? args[0].ToNumber() : 0));
 		}
 
-		public override JSValue Invoke(JSObject context, LocalScope outerScope, List<JSValue> args) {
+		public override JSValue Invoke(
+			ExecutionThread thread,
+			JSObject context,
+			LocalScope outerScope,
+			List<JSValue> args
+			) {
 			return (args.Count > 0 ? args[0].ToNumber() : 0);
 		}
+
+		public override int ParameterCount { get { return (1); } }
 	}
 }

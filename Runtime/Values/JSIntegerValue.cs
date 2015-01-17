@@ -26,5 +26,90 @@ namespace YaJS.Runtime.Values {
 		public override string ToString() {
 			return (_value.ToString(CultureInfo.InvariantCulture));
 		}
+
+		public override JSNumberValue Neg() {
+			return (-_value);
+		}
+
+		public override JSNumberValue Inc() {
+			return (_value + 1);
+		}
+
+		public override JSNumberValue Dec() {
+			return (_value - 1);
+		}
+
+		public override JSNumberValue Plus(JSNumberValue value) {
+			if (value.Type != JSValueType.Integer)
+				return (_value + value.CastToFloat());
+			return (unchecked(_value + value.CastToInteger()));
+		}
+
+		public override JSNumberValue Minus(JSNumberValue value) {
+			if (value.Type != JSValueType.Integer)
+				return (_value - value.CastToFloat());
+			return (unchecked(_value - value.CastToInteger()));
+		}
+
+		public override JSNumberValue Mul(JSNumberValue value) {
+			if (value.Type != JSValueType.Integer)
+				return (_value * value.CastToFloat());
+			return (unchecked(_value * value.CastToInteger()));
+		}
+
+		public override JSNumberValue Mod(JSNumberValue value) {
+			if (value.Type != JSValueType.Integer)
+				return (_value % value.CastToFloat());
+			return (_value % value.CastToInteger());
+		}
+
+		public override bool Lt(JSNumberValue value) {
+			if (value.Type != JSValueType.Integer)
+				return (_value < value.CastToFloat());
+			return (_value < value.CastToInteger());
+		}
+
+		public override bool Lte(JSNumberValue value) {
+			if (value.Type != JSValueType.Integer)
+				return (_value <= value.CastToFloat());
+			return (_value <= value.CastToInteger());
+		}
+
+		public override bool ConvEqualsTo(JSValue value) {
+			if (value.Type == JSValueType.String)
+				value = value.ToNumber();
+			switch (value.Type) {
+				case JSValueType.Integer:
+					return (_value == value.CastToInteger());
+				case JSValueType.Float:
+					return (_value == value.CastToFloat());
+				default:
+					return (false);
+			}
+		}
+
+		public override bool StrictEqualsTo(JSValue value) {
+			return (value.Type == JSValueType.Integer && _value == value.CastToInteger());
+		}
+
+		public override bool CastToBoolean() {
+			return (_value != 0);
+		}
+
+		public override int CastToInteger() {
+			return (_value);
+		}
+
+		public override double CastToFloat() {
+			return (_value);
+		}
+
+		public override string CastToString() {
+			return (_value.ToString(CultureInfo.InvariantCulture));
+		}
+
+		public override int RequireInteger() {
+			return (_value);
+		}
 	}
 }

@@ -1,23 +1,28 @@
-﻿using System.Text;
+﻿using System.Diagnostics.Contracts;
+using System.Text;
 
 namespace YaJS.Compiler.AST.Expressions {
 	internal class GroupingOperator : Expression {
-		public GroupingOperator(Expression operand) {
+		private readonly Expression _operand;
+
+		public GroupingOperator(Expression operand)
+			: base(ExpressionType.Grouping) {
+			Contract.Requires(operand != null);
+			_operand = operand;
 		}
 
 		public override string ToString() {
 			var result = new StringBuilder();
-			result.Append('(').Append(Operand.ToString()).Append(')');
+			result.Append('(').Append(_operand).Append(')');
 			return (result.ToString());
 		}
 
-		public override bool CanHaveMembers { get { return (Operand.CanHaveMembers); } }
-		public override bool CanHaveMutableMembers { get { return (Operand.CanHaveMutableMembers); } }
-		public override bool CanBeConstructor { get { return (Operand.CanBeConstructor); } }
-		public override bool CanBeFunction { get { return (Operand.CanBeFunction); } }
-		public override bool CanBeDeleted { get { return (Operand.CanBeDeleted); } }
-		public override bool IsConstant { get { return (Operand.IsConstant); } }
-
-		public Expression Operand { get; private set; }
+		public override bool CanHaveMembers { get { return (_operand.CanHaveMembers); } }
+		public override bool CanHaveMutableMembers { get { return (_operand.CanHaveMutableMembers); } }
+		public override bool CanBeConstructor { get { return (_operand.CanBeConstructor); } }
+		public override bool CanBeFunction { get { return (_operand.CanBeFunction); } }
+		public override bool CanBeDeleted { get { return (_operand.CanBeDeleted); } }
+		public override bool CanBeObject { get { return (_operand.CanBeObject); } }
+		public override bool IsConstant { get { return (_operand.IsConstant); } }
 	}
 }

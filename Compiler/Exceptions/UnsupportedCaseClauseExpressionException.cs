@@ -6,8 +6,7 @@ namespace YaJS.Compiler.Exceptions {
 	/// </summary>
 	[Serializable]
 	public sealed class UnsupportedCaseClauseExpressionException : ParserException {
-		public UnsupportedCaseClauseExpressionException()
-			: base() {
+		public UnsupportedCaseClauseExpressionException() {
 		}
 
 		public UnsupportedCaseClauseExpressionException(string message)

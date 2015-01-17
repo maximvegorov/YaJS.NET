@@ -6,8 +6,7 @@ namespace YaJS.Runtime {
 	/// </summary>
 	[Serializable]
 	public abstract class RuntimeException : Exception {
-		public RuntimeException()
-			: base() {
+		public RuntimeException() {
 		}
 
 		public RuntimeException(string message)
