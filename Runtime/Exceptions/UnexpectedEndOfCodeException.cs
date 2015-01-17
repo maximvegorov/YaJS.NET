@@ -6,8 +6,7 @@ namespace YaJS.Runtime.Exceptions {
 	/// </summary>
 	[Serializable]
 	public sealed class UnexpectedEndOfCodeException : InternalErrorException {
-		public UnexpectedEndOfCodeException()
-			: base() {
+		public UnexpectedEndOfCodeException() {
 		}
 
 		public UnexpectedEndOfCodeException(string message)

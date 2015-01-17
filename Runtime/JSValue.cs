@@ -1,120 +1,92 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.Contracts;
+using YaJS.Runtime.Exceptions;
+using YaJS.Runtime.Objects;
+using YaJS.Runtime.Values;
 
 namespace YaJS.Runtime {
-	using Runtime.Exceptions;
-	using Runtime.Objects;
-	using Runtime.Values;
-
 	/// <summary>
 	/// Типы примитивных значений
 	/// </summary>
-	public enum JSValueType { Undefined, Null, Boolean, Integer, Float, String, Object }
+	public enum JSValueType {
+		Undefined,
+		Null,
+		Boolean,
+		Integer,
+		Float,
+		String,
+		Object,
+		Enumerator
+	}
 
 	/// <summary>
 	/// Примитивное значение
 	/// </summary>
 	[Serializable]
-	public abstract class JSValue : IComparable<JSValue> {
-		public static readonly JSUndefinedValue Undefined = new JSUndefinedValue();
-		public static readonly JSNullValue Null = new JSNullValue();
+	public abstract class JSValue {
+		public static readonly JSValue Undefined = new JSUndefinedValue();
+		public static readonly JSValue Null = new JSNullValue();
 
-		public JSValue(JSValueType type) {
+		protected JSValue(JSValueType type) {
 			Type = type;
 		}
 
-		public virtual bool ContainsMember(JSValue name) {
+		public virtual IEnumerator<JSValue> GetEnumerator() {
 			throw new TypeErrorException();
 		}
 
-		public virtual JSValue GetMember(VirtualMachine runtime, JSValue name) {
-			throw new TypeErrorException();
+		internal JSEnumerator GetJSEnumerator() {
+			return (new JSEnumerator(GetEnumerator()));
 		}
 
-		public virtual void SetMember(VirtualMachine runtime, JSValue name, JSValue value) {
-			throw new TypeErrorException();
-		}
-
-		public virtual bool DeleteMember(JSValue name) {
-			throw new TypeErrorException();
-		}
-
-		public virtual JSValue Neg() {
-			throw new TypeErrorException();
-		}
-
-		public virtual JSValue Plus(JSValue value) {
-			throw new TypeErrorException();
-		}
-
-		public virtual JSValue Minus(JSValue value) {
-			throw new TypeErrorException();
-		}
-
-		public virtual JSValue Mul(JSValue value) {
-			throw new TypeErrorException();
-		}
-
-		public virtual JSValue Div(JSValue value) {
-			throw new TypeErrorException();
-		}
-
-		public virtual JSValue Mod(JSValue value) {
-			throw new TypeErrorException();
-		}
-
-		public virtual JSValue BitNot() {
-			throw new TypeErrorException();
-		}
-
-		public virtual JSValue BitAnd(JSValue value) {
-			throw new TypeErrorException();
-		}
-
-		public virtual JSValue BitOr(JSValue value) {
-			throw new TypeErrorException();
-		}
-
-		public virtual JSValue BitXor(JSValue value) {
-			throw new TypeErrorException();
-		}
-
-		public virtual JSValue BitShl(JSValue value) {
-			throw new TypeErrorException();
-		}
-
-		public virtual JSValue BitShrS(JSValue value) {
-			throw new TypeErrorException();
-		}
-
-		public virtual JSValue BitShrU(JSValue value) {
-			throw new TypeErrorException();
+		public JSValue Plus(JSValue value) {
+			Contract.Requires(value != null);
+			if (Type == JSValueType.String || value.Type == JSValueType.String)
+				return (CastToString() + CastToString());
+			return (ToNumber().Plus(value.ToNumber()));
 		}
 
 		public JSValue Not() {
-			return (JSValue.Create(!CastToBoolean()));
+			return (!CastToBoolean());
 		}
 
 		public JSValue And(JSValue value) {
+			Contract.Requires(value != null);
 			return (!CastToBoolean() ? this : value);
 		}
 
 		public JSValue Or(JSValue value) {
+			Contract.Requires(value != null);
 			return (CastToBoolean() ? this : value);
 		}
 
-		public virtual bool EqualsTo(JSValue value) {
-			return (false);
-		}
-
-		public virtual bool StrictEqualsTo(JSValue value) {
-			return (false);
-		}
-
-		public virtual int CompareTo(JSValue value) {
+		public virtual bool ConvEqualsTo(JSValue value) {
+			Contract.Requires(value != null);
 			throw new TypeErrorException();
 		}
 
+		public virtual bool StrictEqualsTo(JSValue value) {
+			Contract.Requires(value != null);
+			throw new TypeErrorException();
+		}
+
+		public bool Lt(JSValue value) {
+			Contract.Requires(value != null);
+			if (Type == JSValueType.String && value.Type == JSValueType.String)
+				return (string.CompareOrdinal(CastToString(), value.CastToString()) == -1);
+			return (ToNumber().Lt(value.ToNumber()));
+		}
+
+		public bool Lte(JSValue value) {
+			Contract.Requires(value != null);
+			if (Type == JSValueType.String && value.Type == JSValueType.String)
+				return (string.CompareOrdinal(CastToString(), value.CastToString()) <= 0);
+			return (ToNumber().Lte(value.ToNumber()));
+		}
+
 		public virtual bool IsInstanceOf(JSFunction constructor) {
+			Contract.Requires(constructor != null);
 			throw new TypeErrorException();
 		}
 
@@ -125,61 +97,55 @@ namespace YaJS.Runtime {
 		public virtual bool CastToBoolean() {
 			throw new TypeErrorException();
 		}
-		public virtual double CastToInteger() {
+
+		public virtual int CastToInteger() {
 			throw new TypeErrorException();
 		}
+
 		public virtual double CastToFloat() {
 			throw new TypeErrorException();
 		}
+
 		public virtual string CastToString() {
 			throw new TypeErrorException();
 		}
 
-		public virtual bool GetAsBoolean() {
+		public virtual int RequireInteger() {
 			throw new TypeErrorException();
 		}
-		public virtual int GetAsInteger() {
+
+		public virtual JSObject RequireObject() {
 			throw new TypeErrorException();
 		}
-		public virtual double GetAsFloat() {
+
+		public virtual JSFunction RequireFunction() {
 			throw new TypeErrorException();
 		}
-		public virtual string GetAsString() {
+
+		internal virtual JSEnumerator RequireEnumerator() {
 			throw new TypeErrorException();
 		}
-		public virtual JSObject GetAsObject() {
+
+		public virtual JSNumberValue ToNumber() {
 			throw new TypeErrorException();
 		}
-		public virtual JSFunction GetAsFunction() {
-			throw new TypeErrorException();
+
+		public virtual void CastToPrimitiveValue(ExecutionThread thread, Action<JSValue> onCompleteCallback) {
+			Contract.Requires(thread != null);
+			Contract.Requires(onCompleteCallback != null);
+			throw new NotSupportedException();
 		}
 
 		public virtual JSObject ToObject(VirtualMachine vm) {
-			throw new NotImplementedException();
-		}
-		public virtual JSValue ValueOf() {
-			return (this);
+			Contract.Requires(vm != null);
+			throw new TypeErrorException();
 		}
 
-		public static JSValue ToPrimitiveValue(JSValue value) {
-			if (value.Type == JSValueType.Object)
-				value = value.ValueOf();
-			return (value);
-		}
-
-		public static JSValue Create(bool value) {
+		public static implicit operator JSValue(bool value) {
 			return (new JSBooleanValue(value));
 		}
 
-		public static JSValue Create(int value) {
-			return (new JSIntegerValue(value));
-		}
-
-		public static JSValue Create(double value) {
-			return (new JSFloatValue(value));
-		}
-
-		public static JSValue Create(string value) {
+		public static implicit operator JSValue(string value) {
 			return (new JSStringValue(value));
 		}
 

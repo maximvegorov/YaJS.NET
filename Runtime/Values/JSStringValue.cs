@@ -1,20 +1,68 @@
 ﻿using System;
+using YaJS.Runtime.Objects;
 
 namespace YaJS.Runtime.Values {
 	/// <summary>
 	/// Строковое значение
 	/// </summary>
 	[Serializable]
-	public sealed class JSStringValue : JSValue {
-		internal JSStringValue(string value)
+	internal sealed class JSStringValue : JSValue {
+		private readonly string _value;
+
+		public JSStringValue(string value)
 			: base(JSValueType.String) {
-			Value = value ?? string.Empty;
+			_value = value ?? string.Empty;
+		}
+
+		public override bool Equals(object other) {
+			var otherValue = other as JSStringValue;
+			return (otherValue != null && _value.Equals(otherValue._value));
+		}
+
+		public override int GetHashCode() {
+			return (_value.GetHashCode());
 		}
 
 		public override string ToString() {
-			return (Value);
+			return (_value);
 		}
 
-		public string Value { get; private set; }
+		public override bool ConvEqualsTo(JSValue value) {
+			if (value.Type == JSValueType.String)
+				return (_value == value.CastToString());
+			return (value.ToNumber().ConvEqualsTo(value));
+		}
+
+		public override bool StrictEqualsTo(JSValue value) {
+			return (value.Type == JSValueType.Integer && _value == value.CastToString());
+		}
+
+		public override string TypeOf() {
+			return ("string");
+		}
+
+		public override bool CastToBoolean() {
+			return (!string.IsNullOrEmpty(_value));
+		}
+
+		public override int CastToInteger() {
+			return (JSNumberValue.ParseInteger(_value));
+		}
+
+		public override double CastToFloat() {
+			return (JSNumberValue.ParseFloat(_value));
+		}
+
+		public override string CastToString() {
+			return (_value);
+		}
+
+		public override JSNumberValue ToNumber() {
+			return (JSNumberValue.ParseNumber(_value));
+		}
+
+		public override JSObject ToObject(VirtualMachine vm) {
+			return (vm.NewString(_value));
+		}
 	}
 }

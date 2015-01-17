@@ -6,8 +6,7 @@ namespace YaJS.Compiler.Exceptions {
 	/// </summary>
 	[Serializable]
 	public sealed class UnexpectedEndOfFileException : ParserException {
-		public UnexpectedEndOfFileException()
-			: base() {
+		public UnexpectedEndOfFileException() {
 		}
 
 		public UnexpectedEndOfFileException(string message)

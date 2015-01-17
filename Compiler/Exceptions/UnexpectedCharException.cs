@@ -6,8 +6,7 @@ namespace YaJS.Compiler.Exceptions {
 	/// </summary>
 	[Serializable]
 	public sealed class UnexpectedCharException : ParserException {
-		public UnexpectedCharException()
-			: base() {
+		public UnexpectedCharException() {
 		}
 
 		public UnexpectedCharException(string message)

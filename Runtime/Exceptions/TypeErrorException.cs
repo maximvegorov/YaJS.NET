@@ -6,8 +6,7 @@ namespace YaJS.Runtime.Exceptions {
 	/// </summary>
 	[Serializable]
 	public sealed class TypeErrorException : RuntimeErrorException {
-		public TypeErrorException()
-			: base() {
+		public TypeErrorException() {
 		}
 
 		public TypeErrorException(string message)

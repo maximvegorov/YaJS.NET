@@ -1,11 +1,12 @@
 ﻿using System.Diagnostics.Contracts;
 
-namespace YaJS.Runtime.Objects {
+namespace YaJS.Runtime.Objects.Errors {
 	internal sealed class JSInternalError : JSError {
-		public JSInternalError(string message, string stackTrace, JSObject inherited)
-			: base(message, inherited) {
+		public JSInternalError(VirtualMachine vm, string message, string stackTrace, JSObject inherited)
+			: base(vm, message, inherited) {
 			Contract.Requires(!string.IsNullOrEmpty(stackTrace));
-			OwnMembers.Add("stackTrace", JSValue.Create(stackTrace));
+			Contract.Requires(inherited == vm.InternalError);
+			OwnMembers.Add("stackTrace", stackTrace);
 		}
 	}
 }

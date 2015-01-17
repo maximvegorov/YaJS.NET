@@ -6,8 +6,7 @@ namespace YaJS.Runtime.Exceptions {
 	/// </summary>
 	[Serializable]
 	public sealed class UnhandledExceptionException : InternalErrorException {
-		public UnhandledExceptionException()
-			: base() {
+		public UnhandledExceptionException() {
 		}
 
 		public UnhandledExceptionException(string message)

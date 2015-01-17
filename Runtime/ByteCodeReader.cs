@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
 using System.Text;
+using YaJS.Runtime.Exceptions;
 
 namespace YaJS.Runtime {
-	using Runtime.Exceptions;
-
 	/// <summary>
 	/// Reader byte-кода
 	/// </summary>
 	internal struct ByteCodeReader {
-		private byte[] _compiledCode;
+		private readonly byte[] _compiledCode;
 		private int _offset;
 
 		public ByteCodeReader(byte[] compiledCode) {
@@ -28,25 +27,28 @@ namespace YaJS.Runtime {
 			if (_offset >= _compiledCode.Length)
 				throw new UnexpectedEndOfCodeException();
 			var result = BitConverter.ToBoolean(_compiledCode, _offset);
-			_offset += sizeof(bool);
+			_offset += sizeof (bool);
 			return (result);
 		}
+
 		public int ReadInteger() {
-			if (_offset + sizeof(int) > _compiledCode.Length)
+			if (_offset + sizeof (int) > _compiledCode.Length)
 				throw new UnexpectedEndOfCodeException();
 			var result = BitConverter.ToInt32(_compiledCode, _offset);
-			_offset += sizeof(int);
+			_offset += sizeof (int);
 			return (result);
 		}
+
 		public double ReadFloat() {
-			if (_offset + sizeof(double) > _compiledCode.Length)
+			if (_offset + sizeof (double) > _compiledCode.Length)
 				throw new UnexpectedEndOfCodeException();
 			var result = BitConverter.ToDouble(_compiledCode, _offset);
-			_offset += sizeof(double);
+			_offset += sizeof (double);
 			return (result);
 		}
+
 		public string ReadString() {
-			if (_offset + sizeof(int) > _compiledCode.Length)
+			if (_offset + sizeof (int) > _compiledCode.Length)
 				throw new UnexpectedEndOfCodeException();
 			var length = BitConverter.ToInt32(_compiledCode, _offset);
 			if (length < 0)

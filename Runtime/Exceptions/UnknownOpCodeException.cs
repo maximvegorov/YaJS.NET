@@ -6,8 +6,7 @@ namespace YaJS.Runtime.Exceptions {
 	/// </summary>
 	[Serializable]
 	public sealed class UnknownOpCodeException : InternalErrorException {
-		public UnknownOpCodeException()
-			: base() {
+		public UnknownOpCodeException() {
 		}
 
 		public UnknownOpCodeException(string message)

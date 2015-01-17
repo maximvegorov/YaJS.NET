@@ -3,8 +3,8 @@
 	/// Является базовым классом для всех native-функций
 	/// </summary>
 	public abstract class JSNativeFunction : JSFunction {
-		protected JSNativeFunction(JSObject inherited)
-			: base(inherited) {
+		protected JSNativeFunction(VirtualMachine vm, JSObject inherited)
+			: base(vm, inherited) {
 		}
 
 		/// <summary>

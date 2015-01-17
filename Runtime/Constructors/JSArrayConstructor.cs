@@ -1,15 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using YaJS.Runtime.Objects;
 
 namespace YaJS.Runtime.Constructors {
-	using Runtime.Objects;
-
 	/// <summary>
 	/// Native-конструктор JSArray
 	/// </summary>
 	internal sealed class JSArrayConstructor : JSNativeFunction {
-		public JSArrayConstructor(JSObject inherited)
-			: base(inherited) {
+		public JSArrayConstructor(VirtualMachine vm, JSObject inherited)
+			: base(vm, inherited) {
 		}
 
 		public static void InitPrototype(JSObject proto, JSObject functionPrototype) {
@@ -18,14 +17,23 @@ namespace YaJS.Runtime.Constructors {
 			// TODO
 		}
 
-		public override JSObject GetPrototype(VirtualMachine vm) {
-			return (vm.Array);
+		public override JSObject GetPrototype() {
+			return (VM.Array);
+		}
+
+		public override JSValue Construct(ExecutionThread thread, LocalScope outerScope, List<JSValue> args) {
+			return (VM.NewArray(args));
 		}
 
 		public override JSValue Invoke(
-			VirtualMachine vm, JSObject context, LocalScope outerScope, List<JSValue> args
-		) {
-			return (vm.NewArray(args));
+			ExecutionThread thread,
+			JSObject context,
+			LocalScope outerScope,
+			List<JSValue> args
+			) {
+			return (Construct(thread, outerScope, args));
 		}
+
+		public override int ParameterCount { get { return (0); } }
 	}
 }

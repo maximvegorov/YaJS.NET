@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using YaJS.Runtime.Constructors;
+using YaJS.Runtime.Constructors.Errors;
+using YaJS.Runtime.Objects;
+using YaJS.Runtime.Objects.Errors;
+using YaJS.Runtime.Values;
 
 namespace YaJS.Runtime {
-	using Runtime.Constructors;
-	using Runtime.Objects;
-	using Runtime.Objects.Errors;
-
 	/// <summary>
 	/// Виртуальная машина
 	/// </summary>
@@ -17,24 +18,25 @@ namespace YaJS.Runtime {
 			Compiler = compiler;
 
 			// Создать глобальный объект
-			Global = new JSObject();
+			Global = new JSObject(this);
 
 			// Так как существуют циклические зависимости между прототипами встроенных объектов и встроенными методами
 			// создание и инициализация разделены между собой
 
 			// Создать прототипы встроенных объектов
-			Object = new JSObject();
-			Boolean = new JSObject(Object);
-			Number = new JSObject(Object);
-			String = new JSObject(Object);
-			Array = new JSObject(Object);
-			Function = new JSObject(Object);
+			Object = new JSObject(this);
+			Boolean = new JSObject(this, Object);
+			Number = new JSObject(this, Object);
+			String = new JSObject(this, Object);
+			Array = new JSObject(this, Object);
+			Function = new JSObject(this, Object);
 
-			Error = new JSObject(Object);
-			InternalError = new JSObject(Error);
-			ReferenceError = new JSObject(Error);
-			SyntaxError = new JSObject(Error);
-			TypeError = new JSObject(Error);
+			Error = new JSObject(this, Object);
+			InternalError = new JSObject(this, Error);
+			ReferenceError = new JSObject(this, Error);
+			SyntaxError = new JSObject(this, Error);
+			TypeError = new JSObject(this, Error);
+			RangeError = new JSObject(this, Error);
 
 			// Инициализировать прототипы встроенных объектов (все конструкторы являются функциями в JS)
 			JSObjectConstructor.InitPrototype(Object, Function);
@@ -46,65 +48,82 @@ namespace YaJS.Runtime {
 			JSErrorConstructor.InitPrototype(Error, Function);
 
 			// Инициализировать глобальный объект
-			Global.OwnMembers.Add("Object", new JSObjectConstructor(Function));
-			Global.OwnMembers.Add("Boolean", new JSBooleanConstructor(Function));
-			Global.OwnMembers.Add("Number", new JSNumberConstructor(Function));
-			Global.OwnMembers.Add("String", new JSStringConstructor(Function));
-			Global.OwnMembers.Add("Array", new JSArrayConstructor(Function));
-			Global.OwnMembers.Add("Function", new JSFunctionConstructor(Function));
+			Global.OwnMembers.Add("Object", new JSObjectConstructor(this, Function));
+			Global.OwnMembers.Add("Boolean", new JSBooleanConstructor(this, Function));
+			Global.OwnMembers.Add("Number", new JSNumberConstructor(this, Function));
+			Global.OwnMembers.Add("String", new JSStringConstructor(this, Function));
+			Global.OwnMembers.Add("Array", new JSArrayConstructor(this, Function));
+			Global.OwnMembers.Add("Function", new JSFunctionConstructor(this, Function));
 
-			Global.OwnMembers.Add("Error", new JSErrorConstructor(Function));
+			Global.OwnMembers.Add("Error", new JSErrorConstructor(this, Function));
+			Global.OwnMembers.Add("InternalError", new JSInternalErrorConstructor(this, Function));
+			Global.OwnMembers.Add("ReferenceError", new JSReferenceErrorConstructor(this, Function));
+			Global.OwnMembers.Add("SyntaxError", new JSSyntaxErrorConstructor(this, Function));
+			Global.OwnMembers.Add("TypeError", new JSTypeErrorConstructor(this, Function));
+			Global.OwnMembers.Add("RangeError", new JSRangeErrorConstructor(this, Function));
 		}
 
-		public ExecutionThread NewThread(CompiledFunction mainFunction) {
-			Contract.Requires<ArgumentNullException>(mainFunction != null, "mainFunction");
-			return (new ExecutionThread(this, mainFunction));
+		public ExecutionThread NewThread(CompiledFunction globalFunction) {
+			Contract.Requires<ArgumentNullException>(globalFunction != null, "globalFunction");
+			return (new ExecutionThread(this, globalFunction));
+		}
+
+		public JSValue Execute(CompiledFunction globalFunction) {
+			var thread = NewThread(globalFunction);
+			while (thread.ExecuteStep()) {
+			}
+			return (thread.Result);
 		}
 
 		public JSObject NewObject() {
-			return (new JSObject(Object));
+			return (new JSObject(this, Object));
 		}
 
-		public JSBoolean NewBoolean(bool value) {
-			return (new JSBoolean(value, Boolean));
+		public JSObject NewBoolean(bool value) {
+			return (new JSBoolean(this, value, Boolean));
 		}
 
-		public JSNumber NewNumber(double value) {
-			return (new JSNumber(value, Number));
+		public JSObject NewNumber(JSNumberValue value) {
+			return (new JSNumber(this, value, Number));
 		}
 
-		public JSString NewString(string value) {
-			return (new JSString(value, String));
+		public JSObject NewString(string value) {
+			return (new JSString(this, value, String));
 		}
 
-		public JSArray NewArray(List<JSValue> items) {
-			Contract.Requires<ArgumentNullException>(items != null, "function");
-			return (new JSArray(items, Array));
+		public JSObject NewArray(List<JSValue> items) {
+			Contract.Requires<ArgumentNullException>(items != null, "items");
+			return (new JSArray(this, items, Array));
 		}
 
-		public JSFunction NewFunction(CompiledFunction compiledFunction, LocalScope outerScope) {
+		public JSFunction NewFunction(LocalScope outerScope, CompiledFunction compiledFunction) {
+			Contract.Requires<ArgumentNullException>(outerScope != null, "outerScope");
 			Contract.Requires<ArgumentNullException>(compiledFunction != null, "compiledFunction");
-			return (new JSManagedFunction(compiledFunction, outerScope, Function));
+			return (new JSManagedFunction(this, outerScope, compiledFunction, Function));
 		}
 
 		public JSError NewError(string message) {
-			return (new JSError(message, Error));
+			return (new JSError(this, message, Error));
 		}
 
 		internal JSError NewInternalError(string message, string stackTrace) {
-			return (new JSInternalError(message, stackTrace, InternalError));
+			return (new JSInternalError(this, message, stackTrace, InternalError));
 		}
 
 		public JSError NewReferenceError(string message) {
-			return (new JSReferenceError(message, ReferenceError));
+			return (new JSReferenceError(this, message, ReferenceError));
 		}
 
 		public JSError NewSyntaxError(string message) {
-			return (new JSSyntaxError(message, SyntaxError));
+			return (new JSSyntaxError(this, message, SyntaxError));
 		}
 
 		public JSError NewTypeError(string message) {
-			return (new JSTypeError(message, TypeError));
+			return (new JSTypeError(this, message, TypeError));
+		}
+
+		public JSError NewRangeError(string message) {
+			return (new JSRangeError(this, message, RangeError));
 		}
 
 		/// <summary>
@@ -121,16 +140,17 @@ namespace YaJS.Runtime {
 		/// Прототипы встроенных объектов
 		/// </summary>
 		public JSObject Object { get; private set; }
+
 		public JSObject Boolean { get; private set; }
 		public JSObject Number { get; private set; }
 		public JSObject String { get; private set; }
 		public JSObject Array { get; private set; }
 		public JSObject Function { get; private set; }
-
-		public JSObject Error { get; private set; }
-		public JSObject InternalError { get; private set; }
-		public JSObject ReferenceError { get; private set; }
-		public JSObject SyntaxError { get; private set; }
-		public JSObject TypeError { get; private set; }
+		internal JSObject Error { get; private set; }
+		internal JSObject InternalError { get; private set; }
+		internal JSObject ReferenceError { get; private set; }
+		internal JSObject SyntaxError { get; private set; }
+		internal JSObject TypeError { get; private set; }
+		internal JSObject RangeError { get; private set; }
 	}
 }

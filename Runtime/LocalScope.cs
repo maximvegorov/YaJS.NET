@@ -1,58 +1,61 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using YaJS.Runtime.Exceptions;
 
 namespace YaJS.Runtime {
-	using Runtime.Exceptions;
-
 	/// <summary>
 	/// Область локальных переменных
 	/// </summary>
 	public sealed class LocalScope {
-		public LocalScope(LocalScope outerScope) {
+		private readonly bool _isGlobal;
+
+		internal LocalScope(Dictionary<string, JSValue> variables) {
+			Contract.Requires(variables != null);
+			Variables = variables;
+			_isGlobal = true;
+		}
+
+		internal LocalScope(LocalScope outerScope) {
+			Contract.Requires(outerScope != null);
 			OuterScope = outerScope;
 			Variables = new Dictionary<string, JSValue>();
 		}
 
-		internal void DeclareLocal(string variableName) {
+		internal JSValue GetVariable(string variableName) {
 			if (string.IsNullOrEmpty(variableName))
 				throw new InvalidVariableNameException();
-			Variables[variableName] = JSValue.Undefined;
-		}
-
-		internal JSValue GetLocalVariable(ExecutionThread thread, string variableName) {
-			Contract.Requires(thread != null);
-			if (string.IsNullOrEmpty(variableName))
-				throw new InvalidVariableNameException();
-			JSValue result = null;
 			for (var scope = this; scope != null; scope = scope.OuterScope) {
+				JSValue result = null;
 				if (scope.Variables.TryGetValue(variableName, out result))
 					return (result);
 			}
-			if (!thread.VM.Global.OwnMembers.TryGetValue(variableName, out result))
-				throw new ReferenceErrorException(variableName);
-			return (result);
+			throw new ReferenceErrorException(variableName);
 		}
 
-		internal void SetLocalVariable(ExecutionThread thread, string variableName, JSValue value) {
-			Contract.Requires(thread != null);
+		internal void SetVariable(string variableName, JSValue value) {
 			Contract.Requires(value != null);
 			if (string.IsNullOrEmpty(variableName))
 				throw new InvalidVariableNameException();
 			for (var scope = this; scope != null; scope = scope.OuterScope) {
 				var localVariables = scope.Variables;
-				if (localVariables.ContainsKey(variableName))
+				if (localVariables.ContainsKey(variableName)) {
 					localVariables[variableName] = value;
+					return;
+				}
 			}
-			var globalVariables = thread.VM.Global.OwnMembers;
-			if (!globalVariables.ContainsKey(variableName))
-				throw new ReferenceErrorException(variableName);
-			globalVariables[variableName] = value;
+			throw new ReferenceErrorException(variableName);
+		}
+
+		internal JSValue DeleteVariable(string variableName) {
+			Contract.Requires(variableName != null);
+			return (_isGlobal && Variables.Remove(variableName));
 		}
 
 		/// <summary>
 		/// Внешняя область локальных переменных
 		/// </summary>
 		public LocalScope OuterScope { get; private set; }
+
 		/// <summary>
 		/// Значения локальных переменных
 		/// </summary>
