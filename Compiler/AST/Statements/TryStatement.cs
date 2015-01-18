@@ -5,7 +5,7 @@ namespace YaJS.Compiler.AST.Statements {
 	/// <summary>
 	/// Оператор try (См. http://www.ecma-international.org/ecma-262/5.1/#sec-12.14)
 	/// </summary>
-	public sealed class TryStatement : Statement {
+	internal sealed class TryStatement : LanguageStatement {
 		private readonly List<Statement> _exitPoints;
 		private BlockStatement _catchBlock;
 		private string _catchBlockVariable;

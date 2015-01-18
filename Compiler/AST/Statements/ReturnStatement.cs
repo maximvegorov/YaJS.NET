@@ -4,7 +4,7 @@ namespace YaJS.Compiler.AST.Statements {
 	/// <summary>
 	/// Оператор return (См. http://www.ecma-international.org/ecma-262/5.1/#sec-12.9)
 	/// </summary>
-	internal sealed class ReturnStatement : Statement {
+	internal sealed class ReturnStatement : LanguageStatement {
 		private Expression _expression;
 
 		public ReturnStatement(Statement parent, int lineNo, Expression expression)

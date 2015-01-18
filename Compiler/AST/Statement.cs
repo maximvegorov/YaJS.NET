@@ -19,7 +19,8 @@ namespace YaJS.Compiler.AST {
 		Throw,
 		Try,
 		Switch,
-		While
+		While,
+		Reference
 	}
 
 	/// <summary>
@@ -28,11 +29,9 @@ namespace YaJS.Compiler.AST {
 	public abstract class Statement {
 		internal static readonly ILabelSet EmptyLabelSet = new EmptyLabelSet();
 
-		protected Statement(Statement parent, StatementType type, int lineNo) {
-			Contract.Requires(lineNo >= 1);
+		protected Statement(Statement parent, StatementType type) {
 			Parent = parent;
 			Type = type;
-			LineNo = lineNo;
 		}
 
 		public virtual bool IsBreakTarget(string targetLabel) {
@@ -65,7 +64,7 @@ namespace YaJS.Compiler.AST {
 		/// <summary>
 		/// Оператор содержащий данный оператор или null
 		/// </summary>
-		public Statement Parent { get; private set; }
+		public Statement Parent { get; protected set; }
 
 		/// <summary>
 		/// Тип оператора
@@ -75,6 +74,6 @@ namespace YaJS.Compiler.AST {
 		/// <summary>
 		/// Строка на которой начинается оператор
 		/// </summary>
-		public int LineNo { get; private set; }
+		public abstract int LineNo { get;  }
 	}
 }

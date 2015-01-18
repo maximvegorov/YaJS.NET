@@ -1,20 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using YaJS.Compiler.AST.Statements;
 
 namespace YaJS.Compiler.AST {
 	/// <summary>
 	/// Представляет в AST дереве функцию
 	/// </summary>
 	public sealed class Function {
-		public Function(
+		internal Function(
 			string name,
 			int lineNo,
 			List<string> parameterNames,
 			List<string> declaredVariables,
 			List<Function> nestedFunctions,
 			Statement functionBody,
-			IEnumerable<TryStatement> tryBlocks,
+			IEnumerable<Statement> tryBlocks,
 			bool isDeclaration
 			) {
 			Contract.Requires(!(isDeclaration && string.IsNullOrEmpty(name)));
@@ -84,7 +83,7 @@ namespace YaJS.Compiler.AST {
 		/// <summary>
 		/// Блоки try содержащиеся в функции
 		/// </summary>
-		public IEnumerable<TryStatement> TryBlocks { get; private set; }
+		public IEnumerable<Statement> TryBlocks { get; private set; }
 
 		/// <summary>
 		/// Является ли функция FunctionDeclaration

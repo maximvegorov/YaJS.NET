@@ -4,7 +4,7 @@ namespace YaJS.Compiler.AST {
 	/// <summary>
 	/// Базовый класс для всех операторов, которые могут иметь набор меток do/while, for, while, switch
 	/// </summary>
-	internal class LabellableStatement : Statement {
+	internal class LabellableStatement : LanguageStatement {
 		private readonly ILabelSet _labelSet;
 
 		protected LabellableStatement(Statement parent, StatementType type, int lineNo, ILabelSet labelSet)

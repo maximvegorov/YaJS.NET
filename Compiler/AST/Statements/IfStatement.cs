@@ -4,7 +4,7 @@ namespace YaJS.Compiler.AST.Statements {
 	/// <summary>
 	/// Оператор if (См. http://www.ecma-international.org/ecma-262/5.1/#sec-12.5)
 	/// </summary>
-	internal sealed class IfStatement : Statement {
+	internal sealed class IfStatement : LanguageStatement {
 		private Expression _condition;
 		private Statement _elseStatement;
 		private Statement _thenStatement;

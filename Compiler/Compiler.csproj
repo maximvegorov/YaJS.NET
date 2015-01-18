@@ -94,6 +94,8 @@
     <Compile Include="AST\LabellableStatement.cs" />
     <Compile Include="AST\LabelSet.cs" />
     <Compile Include="AST\CompoundStatement.cs" />
+    <Compile Include="AST\LanguageStatement.cs" />
+    <Compile Include="AST\ReferenceStatement.cs" />
     <Compile Include="AST\Statements\BreakStatement.cs" />
     <Compile Include="AST\Statements\EmptyStatement.cs" />
     <Compile Include="AST\FunctionBody.cs" />

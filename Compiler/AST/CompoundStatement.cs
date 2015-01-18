@@ -6,7 +6,7 @@ namespace YaJS.Compiler.AST {
 	/// <summary>
 	/// Базовый класс для всех составных операторов
 	/// </summary>
-	public abstract class CompoundStatement : Statement, IEnumerable<Statement> {
+	public abstract class CompoundStatement : LanguageStatement, IEnumerable<Statement> {
 		private readonly List<Statement> _statements;
 
 		protected CompoundStatement(Statement parent, StatementType type, int lineNo)

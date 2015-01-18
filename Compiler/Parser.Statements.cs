@@ -55,7 +55,7 @@ namespace YaJS.Compiler {
 				target = target.Parent;
 			if (target == null)
 				ThrowUnreachableLabel(startPosition, targetLabel);
-			var result = new BreakStatement(parent, startPosition.LineNo, target);
+			var result = new BreakStatement(parent, startPosition.LineNo, target as LabellableStatement);
 			result.RegisterAsExitPoint();
 			return (result);
 		}
@@ -80,7 +80,7 @@ namespace YaJS.Compiler {
 				target = target.Parent;
 			if (target == null)
 				ThrowUnreachableLabel(startPosition, targetLabel);
-			var result = new ContinueStatement(parent, startPosition.LineNo, target);
+			var result = new ContinueStatement(parent, startPosition.LineNo, target as IterationStatement);
 			result.RegisterAsExitPoint();
 			return (result);
 		}

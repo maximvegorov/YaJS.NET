@@ -4,7 +4,7 @@ namespace YaJS.Compiler.AST.Statements {
 	/// <summary>
 	/// Оператор выражение (См. http://www.ecma-international.org/ecma-262/5.1/#sec-12.4)
 	/// </summary>
-	internal sealed class ExpressionStatement : Statement {
+	internal sealed class ExpressionStatement : LanguageStatement {
 		private Expression _expression;
 
 		public ExpressionStatement(Statement parent, int lineNo, Expression expression)
