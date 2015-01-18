@@ -44,9 +44,6 @@ namespace YaJS.Compiler {
 		}
 
 		public CompiledFunction Compile(string functionName, IEnumerable<string> parameterNames, string functionBody) {
-			Contract.Requires<ArgumentNullException>(string.IsNullOrEmpty(functionName), "functionName");
-			Contract.Requires<ArgumentNullException>(parameterNames != null, "parameterNames");
-			Contract.Requires<ArgumentNullException>(functionBody != null, "functionBody");
 			return (Compile(Parse(functionName, parameterNames, new StringReader(functionBody))));
 		}
 	}

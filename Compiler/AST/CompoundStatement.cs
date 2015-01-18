@@ -6,7 +6,7 @@ namespace YaJS.Compiler.AST {
 	/// <summary>
 	/// Базовый класс для всех составных операторов
 	/// </summary>
-	public abstract class CompoundStatement : Statement, IEnumerable<Statement> {
+	public abstract class CompoundStatement : LanguageStatement, IEnumerable<Statement> {
 		private readonly List<Statement> _statements;
 
 		protected CompoundStatement(Statement parent, StatementType type, int lineNo)
@@ -16,7 +16,21 @@ namespace YaJS.Compiler.AST {
 
 		public void AddStatement(Statement statement) {
 			Contract.Requires(statement != null && statement.Parent == this);
-			_statements.Add(statement);
+			// Пропускаем сразу пустые операторы
+			if (statement.Type != StatementType.Empty)
+				_statements.Add(statement);
+		}
+
+		protected internal override void InsertBefore(Statement position, Statement newStatement) {
+			var index = _statements.IndexOf(position);
+			Contract.Assert(index != -1);
+			newStatement.Parent = this;
+			_statements.Insert(index, newStatement);
+		}
+
+		internal override void CompileBy(FunctionCompiler compiler) {
+			foreach (var statement in _statements)
+				statement.CompileBy(compiler);
 		}
 
 		#region IEnumerable<Statement>

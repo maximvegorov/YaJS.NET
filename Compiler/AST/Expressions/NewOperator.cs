@@ -4,8 +4,8 @@ using System.Text;
 
 namespace YaJS.Compiler.AST.Expressions {
 	internal sealed class NewOperator : Expression {
-		private readonly List<Expression> _arguments;
 		private readonly Expression _constructor;
+		private readonly List<Expression> _arguments;
 
 		public NewOperator(Expression constructor, List<Expression> arguments) : base(ExpressionType.New) {
 			Contract.Requires(constructor != null && constructor.CanBeConstructor);

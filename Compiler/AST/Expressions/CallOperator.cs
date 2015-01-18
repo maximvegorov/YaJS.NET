@@ -4,8 +4,8 @@ using System.Text;
 
 namespace YaJS.Compiler.AST.Expressions {
 	internal sealed class CallOperator : Expression {
-		private readonly List<Expression> _arguments;
 		private readonly Expression _function;
+		private readonly List<Expression> _arguments;
 
 		public CallOperator(Expression function, List<Expression> arguments)
 			: base(ExpressionType.Call) {

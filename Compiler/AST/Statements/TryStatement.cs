@@ -1,27 +1,20 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+﻿using System.Diagnostics.Contracts;
 
 namespace YaJS.Compiler.AST.Statements {
 	/// <summary>
 	/// Оператор try (См. http://www.ecma-international.org/ecma-262/5.1/#sec-12.14)
 	/// </summary>
-	public sealed class TryStatement : Statement {
-		private readonly List<Statement> _exitPoints;
-		private BlockStatement _catchBlock;
+	public sealed class TryStatement : LanguageStatement {
+		private TryBlockStatement _tryBlock;
 		private string _catchBlockVariable;
+		private BlockStatement _catchBlock;
 		private BlockStatement _finallyBlock;
-		private BlockStatement _tryBlock;
 
 		public TryStatement(Statement parent, int lineNo)
 			: base(parent, StatementType.Try, lineNo) {
-			_exitPoints = new List<Statement>();
 		}
 
-		protected override void RegisterAsExitPoint(Statement exitPoint) {
-			_exitPoints.Add(exitPoint);
-		}
-
-		public BlockStatement TryBlock {
+		public TryBlockStatement TryBlock {
 			get { return (_tryBlock); }
 			set {
 				Contract.Requires(value != null);

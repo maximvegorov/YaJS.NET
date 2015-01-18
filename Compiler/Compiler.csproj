@@ -94,9 +94,13 @@
     <Compile Include="AST\LabellableStatement.cs" />
     <Compile Include="AST\LabelSet.cs" />
     <Compile Include="AST\CompoundStatement.cs" />
+    <Compile Include="AST\LanguageStatement.cs" />
+    <Compile Include="AST\ReferenceStatement.cs" />
     <Compile Include="AST\Statements\BreakStatement.cs" />
     <Compile Include="AST\Statements\EmptyStatement.cs" />
     <Compile Include="AST\FunctionBody.cs" />
+    <Compile Include="AST\Statements\SwitchClauseStatement.cs" />
+    <Compile Include="AST\Statements\TryBlockStatement.cs" />
     <Compile Include="Emitter\ByteCodeEmitter.cs" />
     <Compile Include="Emitter\Label.cs" />
     <Compile Include="CompilerServices.cs" />

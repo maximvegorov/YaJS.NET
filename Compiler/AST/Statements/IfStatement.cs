@@ -4,13 +4,29 @@ namespace YaJS.Compiler.AST.Statements {
 	/// <summary>
 	/// Оператор if (См. http://www.ecma-international.org/ecma-262/5.1/#sec-12.5)
 	/// </summary>
-	internal sealed class IfStatement : Statement {
+	public sealed class IfStatement : LanguageStatement {
 		private Expression _condition;
-		private Statement _elseStatement;
 		private Statement _thenStatement;
+		private Statement _elseStatement;
 
 		public IfStatement(Statement parent, int lineNo)
 			: base(parent, StatementType.If, lineNo) {
+		}
+
+		protected internal override void InsertBefore(Statement position, Statement newStatement) {
+			Statement target;
+			if (ReferenceEquals(position, _thenStatement)) {
+				if (_thenStatement.Type != StatementType.Compound)
+					_thenStatement = _thenStatement.WrapToBlock();
+				target = _thenStatement;
+			}
+			else {
+				Contract.Assert(ReferenceEquals(position, _elseStatement));
+				if (_elseStatement.Type != StatementType.Compound)
+					_elseStatement = _elseStatement.WrapToBlock();
+				target = _elseStatement;
+			}
+			target.InsertBefore(position, newStatement);
 		}
 
 		public Expression Condition {

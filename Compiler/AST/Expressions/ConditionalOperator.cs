@@ -4,8 +4,8 @@ using System.Text;
 namespace YaJS.Compiler.AST.Expressions {
 	internal sealed class ConditionalOperator : Expression {
 		private readonly Expression _condition;
-		private readonly Expression _falseOperand;
 		private readonly Expression _trueOperand;
+		private readonly Expression _falseOperand;
 
 		public ConditionalOperator(Expression condition, Expression trueOperand, Expression falseOperand)
 			: base(ExpressionType.Conditional) {

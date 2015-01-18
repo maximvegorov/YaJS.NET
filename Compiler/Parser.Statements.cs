@@ -55,7 +55,7 @@ namespace YaJS.Compiler {
 				target = target.Parent;
 			if (target == null)
 				ThrowUnreachableLabel(startPosition, targetLabel);
-			var result = new BreakStatement(parent, startPosition.LineNo, target);
+			var result = new BreakStatement(parent, startPosition.LineNo, target as LabellableStatement);
 			result.RegisterAsExitPoint();
 			return (result);
 		}
@@ -80,7 +80,7 @@ namespace YaJS.Compiler {
 				target = target.Parent;
 			if (target == null)
 				ThrowUnreachableLabel(startPosition, targetLabel);
-			var result = new ContinueStatement(parent, startPosition.LineNo, target);
+			var result = new ContinueStatement(parent, startPosition.LineNo, target as IterationStatement);
 			result.RegisterAsExitPoint();
 			return (result);
 		}
@@ -224,10 +224,19 @@ namespace YaJS.Compiler {
 			return (new ThrowStatement(parent, startPosition.LineNo, ParseExpression()));
 		}
 
+		private TryBlockStatement ParseTryBlockStatement(Statement parent) {
+			var result = new TryBlockStatement(parent, Lookahead.StartPosition.LineNo);
+			Match(TokenType.LCurlyBrace);
+			foreach (var statement in ParseStatementList(result))
+				result.AddStatement(statement);
+			Match(TokenType.RCurlyBrace);
+			return (result);
+		}
+
 		private Statement ParseTryStatement(Statement parent) {
 			var result = new TryStatement(parent, Lookahead.StartPosition.LineNo);
 			Match(TokenType.Try);
-			result.TryBlock = ParseBlockStatement(result);
+			result.TryBlock = ParseTryBlockStatement(result);
 			var hasCatch = Lookahead.Type == TokenType.Catch;
 			if (hasCatch) {
 				ReadNextToken();
@@ -250,10 +259,10 @@ namespace YaJS.Compiler {
 			return (result);
 		}
 
-		private IEnumerable<Statement> ParseCaseClauseStatementList(Statement parent) {
-			var result = ParseStatementList(parent).ToList();
-			if (result.Count == 0)
-				return (Enumerable.Empty<Statement>());
+		private SwitchClauseStatement ParseSwitchClauseStatement(Statement parent) {
+			var result = new SwitchClauseStatement(parent, Lookahead.StartPosition.LineNo);
+			foreach (var statement in ParseStatementList(result))
+				result.AddStatement(statement);
 			return (result);
 		}
 
@@ -266,7 +275,7 @@ namespace YaJS.Compiler {
 			Match(TokenType.Colon);
 			return (new CaseClause(
 				expression,
-				ParseCaseClauseStatementList(parent)
+				ParseSwitchClauseStatement(parent)
 				));
 		}
 
@@ -290,7 +299,7 @@ namespace YaJS.Compiler {
 			if (hasDefaultClause) {
 				ReadNextToken();
 				Match(TokenType.Colon);
-				result.DefaultClause = ParseCaseClauseStatementList(result);
+				result.DefaultClause = ParseSwitchClauseStatement(result);
 
 				var afterDefaultClauses = new List<CaseClause>();
 				while (Lookahead.Type == TokenType.Case)

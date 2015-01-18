@@ -4,7 +4,7 @@
 	/// </summary>
 	internal sealed class FunctionBody : CompoundStatement {
 		public FunctionBody()
-			: base(null, StatementType.FunctionBody, 1) {
+			: base(null, StatementType.Compound, 1) {
 		}
 	}
 }
