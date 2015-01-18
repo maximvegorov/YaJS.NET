@@ -4,7 +4,7 @@ namespace YaJS.Compiler.AST.Statements {
 	/// <summary>
 	/// Оператор break (См. http://www.ecma-international.org/ecma-262/5.1/#sec-12.8)
 	/// </summary>
-	internal sealed class BreakStatement : LanguageStatement {
+	public sealed class BreakStatement : LanguageStatement {
 		private readonly LabellableStatement _target;
 
 		public BreakStatement(Statement parent, int lineNo, LabellableStatement target)
@@ -16,5 +16,7 @@ namespace YaJS.Compiler.AST.Statements {
 		protected override bool IsTarget(Statement target) {
 			return (ReferenceEquals(_target, target));
 		}
+
+		public LabellableStatement Target { get { return (_target); } }
 	}
 }

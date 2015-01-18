@@ -1,12 +1,13 @@
-﻿using System.Diagnostics.Contracts;
+﻿using System;
+using System.Diagnostics.Contracts;
+using YaJS.Compiler.AST.Statements;
 
 namespace YaJS.Compiler.AST {
 	/// <summary>
 	/// Тип оператора
 	/// </summary>
 	public enum StatementType {
-		FunctionBody,
-		Block,
+		Compound,
 		Break,
 		Continue,
 		DoWhile,
@@ -56,15 +57,38 @@ namespace YaJS.Compiler.AST {
 		/// <summary>
 		/// Зарегистрировать оператор как точку выхода. Используется для правильной обработки блоков finally оператора try
 		/// </summary>
-		public void RegisterAsExitPoint() {
+		internal void RegisterAsExitPoint() {
 			for (var current = Parent; current != null && !current.IsTarget(this); current = current.Parent)
 				current.RegisterAsExitPoint(this);
+		}
+
+		public Statement WrapToBlock() {
+			Contract.Requires(!(this is CompoundStatement));
+			var result = new BlockStatement(Parent, LineNo);
+			Parent = result;
+			result.AddStatement(this);
+			return (result);
+		}
+
+		protected internal virtual void InsertBefore(Statement position, Statement newStatement) {
+			throw new NotSupportedException();
+		}
+
+		public void InsertBefore(Statement newStatement) {
+			Contract.Requires(newStatement != null);
+			Contract.Requires(Parent != null);
+			Parent.InsertBefore(this, newStatement);
+		}
+
+		internal virtual void CompileBy(FunctionCompiler compiler) {
+			Contract.Requires(compiler != null);
+			throw new NotSupportedException();
 		}
 
 		/// <summary>
 		/// Оператор содержащий данный оператор или null
 		/// </summary>
-		public Statement Parent { get; protected set; }
+		public Statement Parent { get; internal set; }
 
 		/// <summary>
 		/// Тип оператора
@@ -74,6 +98,6 @@ namespace YaJS.Compiler.AST {
 		/// <summary>
 		/// Строка на которой начинается оператор
 		/// </summary>
-		public abstract int LineNo { get;  }
+		public abstract int LineNo { get; }
 	}
 }

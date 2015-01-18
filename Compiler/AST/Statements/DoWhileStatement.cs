@@ -4,7 +4,7 @@ namespace YaJS.Compiler.AST.Statements {
 	/// <summary>
 	/// Оператор do-while (См. http://www.ecma-international.org/ecma-262/5.1/#sec-12.6.1)
 	/// </summary>
-	internal sealed class DoWhileStatement : IterationStatement {
+	public sealed class DoWhileStatement : IterationStatement {
 		private Expression _condition;
 
 		public DoWhileStatement(Statement parent, int lineNo, ILabelSet labelSet)

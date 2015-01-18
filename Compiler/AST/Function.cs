@@ -1,19 +1,20 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using YaJS.Compiler.AST.Statements;
 
 namespace YaJS.Compiler.AST {
 	/// <summary>
 	/// Представляет в AST дереве функцию
 	/// </summary>
 	public sealed class Function {
-		internal Function(
+		public Function(
 			string name,
 			int lineNo,
 			List<string> parameterNames,
 			List<string> declaredVariables,
 			List<Function> nestedFunctions,
 			Statement functionBody,
-			IEnumerable<Statement> tryBlocks,
+			IEnumerable<TryStatement> tryStatements,
 			bool isDeclaration
 			) {
 			Contract.Requires(!(isDeclaration && string.IsNullOrEmpty(name)));
@@ -21,7 +22,7 @@ namespace YaJS.Compiler.AST {
 			Contract.Requires(declaredVariables != null);
 			Contract.Requires(nestedFunctions != null);
 			Contract.Requires(functionBody != null);
-			Contract.Requires(tryBlocks != null);
+			Contract.Requires(tryStatements != null);
 
 			Name = name;
 			LineNo = lineNo;
@@ -29,7 +30,7 @@ namespace YaJS.Compiler.AST {
 			DeclaredVariables = declaredVariables;
 			NestedFunctions = nestedFunctions;
 			FunctionBody = functionBody;
-			TryBlocks = tryBlocks;
+			TryStatements = tryStatements;
 			IsDeclaration = isDeclaration;
 
 			// Переупорядочить NestedFunctions переместив FunctionDeclaration в начало
@@ -48,6 +49,20 @@ namespace YaJS.Compiler.AST {
 			// Присвоить индексы всем оставшимся вложенным функциям 
 			for (var i = FunctionDeclarationCount; i < NestedFunctions.Count; i++)
 				NestedFunctions[i].Index = i;
+		}
+
+		/// <summary>
+		/// Копирует операторы блока finally перед каждой точкой выхода из блока try
+		/// </summary>
+		internal void ProcessTryFinallyStatements() {
+			foreach (var tryStatement in TryStatements) {
+				if (tryStatement.FinallyBlock == null || tryStatement.TryBlock.ExitPoints.Count == 0)
+					continue;
+				var finallyBlock = tryStatement.FinallyBlock;
+				foreach (var exitPoint in tryStatement.TryBlock.ExitPoints) {
+					exitPoint.InsertBefore(new ReferenceStatement(null, finallyBlock));
+				}
+			}
 		}
 
 		/// <summary>
@@ -81,9 +96,9 @@ namespace YaJS.Compiler.AST {
 		public Statement FunctionBody { get; private set; }
 
 		/// <summary>
-		/// Блоки try содержащиеся в функции
+		/// Операторы try содержащиеся в функции
 		/// </summary>
-		public IEnumerable<Statement> TryBlocks { get; private set; }
+		public IEnumerable<TryStatement> TryStatements { get; private set; }
 
 		/// <summary>
 		/// Является ли функция FunctionDeclaration

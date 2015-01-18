@@ -5,26 +5,26 @@ namespace YaJS.Compiler.AST.Statements {
 	/// <summary>
 	/// Элемент выбора оператора switch
 	/// </summary>
-	internal sealed class CaseClause {
-		public CaseClause(Expression selector, IEnumerable<Statement> statements) {
+	public sealed class CaseClause {
+		public CaseClause(Expression selector, SwitchClauseStatement statement) {
 			Contract.Requires(selector != null);
-			Contract.Requires(statements != null);
+			Contract.Requires(statement != null);
 			Selector = selector;
-			Statements = statements;
+			Statement = statement;
 		}
 
 		public Expression Selector { get; private set; }
-		public IEnumerable<Statement> Statements { get; private set; }
+		public SwitchClauseStatement Statement { get; private set; }
 	}
 
 	/// <summary>
 	/// Оператор switch (См. http://www.ecma-international.org/ecma-262/5.1/#sec-12.11)
 	/// </summary>
-	internal sealed class SwitchStatement : LabellableStatement {
-		private IEnumerable<CaseClause> _afterDefaultClauses;
-		private IEnumerable<CaseClause> _beforeDefaultClauses;
-		private IEnumerable<Statement> _defaultClause;
+	public sealed class SwitchStatement : LabellableStatement {
 		private Expression _expression;
+		private IEnumerable<CaseClause> _beforeDefaultClauses;
+		private SwitchClauseStatement _defaultClause;
+		private IEnumerable<CaseClause> _afterDefaultClauses;
 
 		public SwitchStatement(Statement parent, int lineNo, ILabelSet labelSet)
 			: base(parent, StatementType.Switch, lineNo, labelSet) {
@@ -46,7 +46,7 @@ namespace YaJS.Compiler.AST.Statements {
 			}
 		}
 
-		public IEnumerable<Statement> DefaultClause {
+		public SwitchClauseStatement DefaultClause {
 			set {
 				Contract.Requires(value != null);
 				Contract.Assert(_defaultClause == null);

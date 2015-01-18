@@ -2,7 +2,8 @@
 
 namespace YaJS.Compiler.AST {
 	/// <summary>
-	/// Базовый класс для всех операторов языка Javascript, согласно спецификации (См. http://www.ecma-international.org/ecma-262/5.1/#sec-12)
+	/// Базовый класс для всех операторов языка Javascript, согласно спецификации (См.
+	/// http://www.ecma-international.org/ecma-262/5.1/#sec-12)
 	/// </summary>
 	public abstract class LanguageStatement : Statement {
 		private readonly int _lineNo;

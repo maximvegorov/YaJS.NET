@@ -90,7 +90,7 @@ namespace YaJS.Compiler.Emitter {
 			label.Resolve(_byteLength);
 		}
 
-		public byte[] ToBytes() {
+		public byte[] ToCompiledCode() {
 			if (_buffer.Length == _byteLength)
 				return (_buffer);
 			var result = new byte[_byteLength];

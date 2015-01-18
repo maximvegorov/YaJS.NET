@@ -6,7 +6,7 @@ namespace YaJS.Runtime {
 	/// <summary>
 	/// Сервис компилятора. Используется для компиляции JS кода в byte-код на лету
 	/// </summary>
-	[ContractClass(typeof(ContractClassForICompilerServices))]
+	[ContractClass(typeof (ContractClassForICompilerServices))]
 	public interface ICompilerServices {
 		CompiledFunction Compile(
 			string functionName,
@@ -15,7 +15,7 @@ namespace YaJS.Runtime {
 			);
 	}
 
-	[ContractClassFor(typeof(ICompilerServices))]
+	[ContractClassFor(typeof (ICompilerServices))]
 	internal abstract class ContractClassForICompilerServices : ICompilerServices {
 		public CompiledFunction Compile(string functionName, IEnumerable<string> parameterNames, string functionBody) {
 			Contract.Requires<ArgumentNullException>(string.IsNullOrEmpty(functionName), "functionName");
