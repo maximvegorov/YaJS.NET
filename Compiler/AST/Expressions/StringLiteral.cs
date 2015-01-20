@@ -53,6 +53,10 @@ namespace YaJS.Compiler.AST.Expressions {
 			return (result.ToString());
 		}
 
+		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
+			base.CompileBy(compiler, isLast);
+		}
+
 		public override bool CanHaveMembers { get { return (true); } }
 		public override bool IsConstant { get { return (true); } }
 		public override bool CanBeUsedInCaseClause { get { return (true); } }

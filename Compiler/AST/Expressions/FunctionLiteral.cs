@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
 	internal sealed class FunctionLiteral : Expression {
@@ -12,6 +13,12 @@ namespace YaJS.Compiler.AST.Expressions {
 
 		public override string ToString() {
 			return (_function.ToString());
+		}
+
+		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
+			if (isLast)
+				return;
+			compiler.Emitter.Emit(OpCode.LdLocalFunc, compiler.Function.Index);
 		}
 
 		public override bool CanHaveMembers { get { return (true); } }

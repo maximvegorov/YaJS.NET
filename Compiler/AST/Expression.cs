@@ -24,6 +24,11 @@ namespace YaJS.Compiler.AST {
 			Type = type;
 		}
 
+		/// <summary>
+		/// Компилировать выражение
+		/// </summary>
+		/// <param name="compiler">компилятор функции</param>
+		/// <param name="isLast">является ли оператор последним применяемым</param>
 		internal virtual void CompileBy(FunctionCompiler compiler, bool isLast) {
 			Contract.Requires(compiler != null);
 		}

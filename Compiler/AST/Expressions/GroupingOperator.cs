@@ -17,6 +17,10 @@ namespace YaJS.Compiler.AST.Expressions {
 			return (result.ToString());
 		}
 
+		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
+			_operand.CompileBy(compiler, isLast);
+		}
+
 		public override bool CanHaveMembers { get { return (_operand.CanHaveMembers); } }
 		public override bool CanHaveMutableMembers { get { return (_operand.CanHaveMutableMembers); } }
 		public override bool CanBeConstructor { get { return (_operand.CanBeConstructor); } }

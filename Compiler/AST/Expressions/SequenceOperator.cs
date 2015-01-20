@@ -22,6 +22,12 @@ namespace YaJS.Compiler.AST.Expressions {
 			return (result.ToString());
 		}
 
+		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
+			for (var i = 0; i < _operands.Count; i++)
+				_operands[i].CompileBy(compiler, true);
+			base.CompileBy(compiler, isLast);
+		}
+
 		public override bool CanHaveMembers { get { return (_operands[_operands.Count - 1].CanHaveMembers); } }
 		public override bool CanHaveMutableMembers { get { return (_operands[_operands.Count - 1].CanHaveMutableMembers); } }
 		public override bool CanBeConstructor { get { return (_operands[_operands.Count - 1].CanBeConstructor); } }
