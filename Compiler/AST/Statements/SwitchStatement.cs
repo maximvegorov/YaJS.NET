@@ -1,33 +1,28 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+﻿using System.Diagnostics.Contracts;
 
 namespace YaJS.Compiler.AST.Statements {
-	/// <summary>
-	/// Элемент выбора оператора switch
-	/// </summary>
-	public sealed class CaseClause {
-		public CaseClause(Expression selector, SwitchClauseStatement statement) {
-			Contract.Requires(selector != null);
-			Contract.Requires(statement != null);
-			Selector = selector;
-			Statement = statement;
-		}
-
-		public Expression Selector { get; private set; }
-		public SwitchClauseStatement Statement { get; private set; }
-	}
-
 	/// <summary>
 	/// Оператор switch (См. http://www.ecma-international.org/ecma-262/5.1/#sec-12.11)
 	/// </summary>
 	public sealed class SwitchStatement : LabellableStatement {
 		private Expression _expression;
-		private IEnumerable<CaseClause> _beforeDefaultClauses;
-		private SwitchClauseStatement _defaultClause;
-		private IEnumerable<CaseClause> _afterDefaultClauses;
+		private CaseClauseBlockStatement _beforeDefault;
+		private StatementListStatement _defaultClause;
+		private CaseClauseBlockStatement _afterDefault;
 
-		public SwitchStatement(Statement parent, int lineNo, ILabelSet labelSet)
-			: base(parent, StatementType.Switch, lineNo, labelSet) {
+		public SwitchStatement(int lineNo, ILabelSet labelSet)
+			: base(StatementType.Switch, lineNo, labelSet) {
+		}
+
+		internal override void Preprocess(Function function) {
+			if (_beforeDefault == null)
+				Errors.ThrowInternalError();
+			else
+				_beforeDefault.Preprocess(function);
+			if (_defaultClause != null)
+				_defaultClause.Preprocess(function);
+			if (_afterDefault != null)
+				_afterDefault.Preprocess(function);
 		}
 
 		public Expression Expression {
@@ -38,27 +33,39 @@ namespace YaJS.Compiler.AST.Statements {
 			}
 		}
 
-		public IEnumerable<CaseClause> BeforeDefaultClauses {
+		public CaseClauseBlockStatement BeforeDefault {
+			get { return (_beforeDefault); }
 			set {
 				Contract.Requires(value != null);
-				Contract.Assert(_beforeDefaultClauses == null);
-				_beforeDefaultClauses = value;
+				Contract.Assert(_beforeDefault == null);
+				if (value.Parent != null)
+					Errors.ThrowInternalError();
+				value.Parent = this;
+				_beforeDefault = value;
 			}
 		}
 
-		public SwitchClauseStatement DefaultClause {
+		public StatementListStatement DefaultClause {
+			get { return (_defaultClause); }
 			set {
 				Contract.Requires(value != null);
 				Contract.Assert(_defaultClause == null);
+				if (value.Parent != null)
+					value.Remove();
+				value.Parent = this;
 				_defaultClause = value;
 			}
 		}
 
-		public IEnumerable<CaseClause> AfterDefaultClauses {
+		public CaseClauseBlockStatement AfterDefault {
+			get { return (_afterDefault); }
 			set {
 				Contract.Requires(value != null);
-				Contract.Assert(_afterDefaultClauses == null);
-				_afterDefaultClauses = value;
+				Contract.Assert(_afterDefault == null);
+				if (value.Parent != null)
+					Errors.ThrowInternalError();
+				value.Parent = this;
+				_afterDefault = value;
 			}
 		}
 	}

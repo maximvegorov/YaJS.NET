@@ -79,7 +79,7 @@ namespace YaJS.Compiler {
 					case TokenType.RCurlyBrace:
 						yield break;
 					default:
-						throw InvalidToken();
+						throw Errors.InvalidToken(Lookahead);
 				}
 			} while (Lookahead.Type == TokenType.Comma);
 		}
@@ -178,7 +178,7 @@ namespace YaJS.Compiler {
 					// ReadNextToken вызовет ParseGrouping
 					return (ParseGrouping());
 				default:
-					throw InvalidToken();
+					throw Errors.InvalidToken(Lookahead);
 			}
 		}
 
@@ -186,7 +186,7 @@ namespace YaJS.Compiler {
 			var result = baseValue;
 			while (Lookahead.Type == TokenType.LBracket || Lookahead.Type == TokenType.Dot) {
 				if (!result.CanHaveMembers)
-					ThrowExpectedObject(Lookahead.StartPosition);
+					Errors.ThrowExpectedObject(Lookahead.StartPosition);
 				var isLBracket = Lookahead.Type == TokenType.LBracket;
 				ReadNextToken();
 				if (isLBracket) {
@@ -195,7 +195,7 @@ namespace YaJS.Compiler {
 				}
 				else {
 					if (Lookahead.Type != TokenType.Ident)
-						ThrowUnmatchedToken(TokenType.Ident, Lookahead);
+						Errors.ThrowUnmatchedToken(TokenType.Ident, Lookahead);
 					result = Expression.Member(result, Expression.Ident(Lookahead.Value));
 					ReadNextToken();
 				}
@@ -212,7 +212,7 @@ namespace YaJS.Compiler {
 				var startPos = Lookahead.StartPosition;
 				var constructor = ParseMemberExpression();
 				if (!constructor.CanBeConstructor)
-					ThrowExpectedFunction(startPos);
+					Errors.ThrowExpectedFunction(startPos);
 				var arguments = ParseArguments();
 				baseValue = Expression.New(constructor, arguments);
 			}
@@ -225,13 +225,13 @@ namespace YaJS.Compiler {
 				Lookahead.Type == TokenType.Dot) {
 				if (Lookahead.Type == TokenType.LParenthesis) {
 					if (!result.CanBeFunction)
-						ThrowExpectedFunction(Lookahead.StartPosition);
+						Errors.ThrowExpectedFunction(Lookahead.StartPosition);
 					var arguments = ParseArguments();
 					result = Expression.Call(result, arguments);
 				}
 				else {
 					if (!result.CanHaveMembers)
-						ThrowExpectedObject(Lookahead.StartPosition);
+						Errors.ThrowExpectedObject(Lookahead.StartPosition);
 					var isLBracket = Lookahead.Type == TokenType.LBracket;
 					ReadNextToken();
 					if (isLBracket) {
@@ -240,7 +240,7 @@ namespace YaJS.Compiler {
 					}
 					else {
 						if (Lookahead.Type != TokenType.Ident)
-							ThrowUnmatchedToken(TokenType.Ident, Lookahead);
+							Errors.ThrowUnmatchedToken(TokenType.Ident, Lookahead);
 						result = Expression.Member(result, Expression.Ident(Lookahead.Value));
 						ReadNextToken();
 					}
@@ -268,18 +268,18 @@ namespace YaJS.Compiler {
 			var result = ParseMemberExpression();
 
 			// Обработать все MemberExpression
-			while (Lookahead.Type == TokenType.LParenthesis && newOperatorStack.Count >= 0) {
+			while (Lookahead.Type == TokenType.LParenthesis && newOperatorStack.Count > 0) {
 				if (!result.CanBeConstructor)
-					ThrowExpectedConstructor(newOperatorStack.Pop());
+					Errors.ThrowExpectedConstructor(newOperatorStack.Pop());
 				var arguments = ParseArguments();
 				result = EatMemberOperators(Expression.New(result, arguments));
 				newOperatorStack.Pop();
 			}
 
 			// Теперь остались только операторы new относящиеся к NewExpression
-			while (newOperatorStack.Count >= 0) {
+			while (newOperatorStack.Count > 0) {
 				if (!result.CanBeConstructor)
-					ThrowExpectedConstructor(newOperatorStack.Pop());
+					Errors.ThrowExpectedConstructor(newOperatorStack.Pop());
 				result = Expression.New(result, EmptyArgumentList);
 				newOperatorStack.Pop();
 			}
@@ -292,7 +292,7 @@ namespace YaJS.Compiler {
 			var result = ParseLeftHandSideExpression();
 			if (Lookahead.Type == TokenType.Inc || Lookahead.Type == TokenType.Dec) {
 				if (!result.IsReference)
-					ThrowExpectedReference(startPos);
+					Errors.ThrowExpectedReference(startPos);
 				result = Lookahead.Type == TokenType.Inc ? Expression.PostfixInc(result) : Expression.PostfixDec(result);
 			}
 			return (result);
@@ -306,7 +306,7 @@ namespace YaJS.Compiler {
 					var startPos = Lookahead.StartPosition;
 					var operand = ParsePostfixExpression();
 					if (!operand.CanBeDeleted)
-						ThrowExpectedReference(startPos);
+						Errors.ThrowExpectedReference(startPos);
 					result = Expression.Delete(operand);
 					break;
 				}
@@ -323,7 +323,7 @@ namespace YaJS.Compiler {
 					var startPos = Lookahead.StartPosition;
 					var operand = ParsePostfixExpression();
 					if (!operand.IsReference)
-						ThrowExpectedReference(startPos);
+						Errors.ThrowExpectedReference(startPos);
 					result = Expression.Inc(operand);
 					break;
 				}
@@ -332,7 +332,7 @@ namespace YaJS.Compiler {
 					var startPos = Lookahead.StartPosition;
 					var operand = ParsePostfixExpression();
 					if (!operand.IsReference)
-						ThrowExpectedReference(startPos);
+						Errors.ThrowExpectedReference(startPos);
 					result = Expression.Dec(operand);
 					break;
 				}
@@ -446,7 +446,7 @@ namespace YaJS.Compiler {
 						var startPos = Lookahead.StartPosition;
 						var rightOperand = ParseShiftExpression();
 						if (!rightOperand.CanBeConstructor)
-							ThrowExpectedConstructor(startPos);
+							Errors.ThrowExpectedConstructor(startPos);
 						result = Expression.InstanceOf(result, rightOperand);
 						break;
 					}
@@ -455,7 +455,7 @@ namespace YaJS.Compiler {
 						var startPos = Lookahead.StartPosition;
 						var rightOperand = ParseShiftExpression();
 						if (!rightOperand.CanHaveMembers)
-							ThrowExpectedObject(startPos);
+							Errors.ThrowExpectedObject(startPos);
 						result = Expression.In(result, rightOperand);
 						break;
 					}
@@ -552,73 +552,73 @@ namespace YaJS.Compiler {
 			switch (Lookahead.Type) {
 				case TokenType.Assign:
 					if (!result.IsReference)
-						ThrowExpectedReference(startPos);
+						Errors.ThrowExpectedReference(startPos);
 					ReadNextToken();
 					result = Expression.SimpleAssign(result, ParseAssignmentExpression());
 					break;
 				case TokenType.PlusAssign:
 					if (!result.IsReference)
-						ThrowExpectedReference(startPos);
+						Errors.ThrowExpectedReference(startPos);
 					ReadNextToken();
 					result = Expression.PlusAssign(result, ParseAssignmentExpression());
 					break;
 				case TokenType.MinusAssign:
 					if (!result.IsReference)
-						ThrowExpectedReference(startPos);
+						Errors.ThrowExpectedReference(startPos);
 					ReadNextToken();
 					result = Expression.MinusAssign(result, ParseAssignmentExpression());
 					break;
 				case TokenType.StarAssign:
 					if (!result.IsReference)
-						ThrowExpectedReference(startPos);
+						Errors.ThrowExpectedReference(startPos);
 					ReadNextToken();
 					result = Expression.MulAssign(result, ParseAssignmentExpression());
 					break;
 				case TokenType.SlashAssign:
 					if (!result.IsReference)
-						ThrowExpectedReference(startPos);
+						Errors.ThrowExpectedReference(startPos);
 					ReadNextToken();
 					result = Expression.DivAssign(result, ParseAssignmentExpression());
 					break;
 				case TokenType.ModAssign:
 					if (!result.IsReference)
-						ThrowExpectedReference(startPos);
+						Errors.ThrowExpectedReference(startPos);
 					ReadNextToken();
 					result = Expression.ModAssign(result, ParseAssignmentExpression());
 					break;
 				case TokenType.ShlAssign:
 					if (!result.IsReference)
-						ThrowExpectedReference(startPos);
+						Errors.ThrowExpectedReference(startPos);
 					ReadNextToken();
 					result = Expression.ShlAssign(result, ParseAssignmentExpression());
 					break;
 				case TokenType.ShrSAssign:
 					if (!result.IsReference)
-						ThrowExpectedReference(startPos);
+						Errors.ThrowExpectedReference(startPos);
 					ReadNextToken();
 					result = Expression.ShrSAssign(result, ParseAssignmentExpression());
 					break;
 				case TokenType.ShrUAssign:
 					if (!result.IsReference)
-						ThrowExpectedReference(startPos);
+						Errors.ThrowExpectedReference(startPos);
 					ReadNextToken();
 					result = Expression.ShrUAssign(result, ParseAssignmentExpression());
 					break;
 				case TokenType.BitAndAssign:
 					if (!result.IsReference)
-						ThrowExpectedReference(startPos);
+						Errors.ThrowExpectedReference(startPos);
 					ReadNextToken();
 					result = Expression.BitAndAssign(result, ParseAssignmentExpression());
 					break;
 				case TokenType.BitXorAssign:
 					if (!result.IsReference)
-						ThrowExpectedReference(startPos);
+						Errors.ThrowExpectedReference(startPos);
 					ReadNextToken();
 					result = Expression.BitXorAssign(result, ParseAssignmentExpression());
 					break;
 				case TokenType.BitOrAssign:
 					if (!result.IsReference)
-						ThrowExpectedReference(startPos);
+						Errors.ThrowExpectedReference(startPos);
 					ReadNextToken();
 					result = Expression.BitOrAssign(result, ParseAssignmentExpression());
 					break;

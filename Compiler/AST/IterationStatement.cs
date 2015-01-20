@@ -7,14 +7,26 @@ namespace YaJS.Compiler.AST {
 	public abstract class IterationStatement : LabellableStatement {
 		private Statement _statement;
 
-		protected IterationStatement(Statement parent, StatementType type, int lineNo, ILabelSet labelSet)
-			: base(parent, type, lineNo, labelSet) {
+		protected IterationStatement(StatementType type, int lineNo, ILabelSet labelSet)
+			: base(type, lineNo, labelSet) {
 		}
 
 		protected internal override void InsertBefore(Statement position, Statement newStatement) {
-			if (!(_statement is CompoundStatement))
+			if (_statement.Type != StatementType.Compound)
 				_statement = _statement.WrapToBlock();
 			_statement.InsertBefore(position, newStatement);
+		}
+
+		protected override void Remove(Statement child) {
+			if (ReferenceEquals(_statement, child))
+				_statement = null;
+		}
+
+		internal override void Preprocess(Function function) {
+			if (_statement == null)
+				Errors.ThrowInternalError();
+			else
+				_statement.Preprocess(function);
 		}
 
 		public Statement Statement {
@@ -22,6 +34,9 @@ namespace YaJS.Compiler.AST {
 			set {
 				Contract.Requires(value != null);
 				Contract.Assert(_statement == null);
+				if (value.Parent != null)
+					value.Parent.Remove();
+				value.Parent = this;
 				_statement = value;
 			}
 		}

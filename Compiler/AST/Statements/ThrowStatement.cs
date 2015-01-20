@@ -7,8 +7,8 @@ namespace YaJS.Compiler.AST.Statements {
 	public sealed class ThrowStatement : LanguageStatement {
 		private readonly Expression _expression;
 
-		public ThrowStatement(Statement parent, int lineNo, Expression expression)
-			: base(parent, StatementType.Throw, lineNo) {
+		public ThrowStatement(int lineNo, Expression expression)
+			: base(StatementType.Throw, lineNo) {
 			Contract.Requires(expression != null);
 			_expression = expression;
 		}

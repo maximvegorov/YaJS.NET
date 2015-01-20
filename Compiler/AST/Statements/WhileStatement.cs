@@ -7,8 +7,8 @@ namespace YaJS.Compiler.AST.Statements {
 	public sealed class WhileStatement : IterationStatement {
 		private Expression _condition;
 
-		public WhileStatement(Statement parent, int lineNo, ILabelSet labelSet)
-			: base(parent, StatementType.While, lineNo, labelSet) {
+		public WhileStatement(int lineNo, ILabelSet labelSet)
+			: base(StatementType.While, lineNo, labelSet) {
 		}
 
 		public Expression Condition {

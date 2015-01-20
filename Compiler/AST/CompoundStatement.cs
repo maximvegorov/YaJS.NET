@@ -9,23 +9,39 @@ namespace YaJS.Compiler.AST {
 	public abstract class CompoundStatement : LanguageStatement, IEnumerable<Statement> {
 		private readonly List<Statement> _statements;
 
-		protected CompoundStatement(Statement parent, StatementType type, int lineNo)
-			: base(parent, type, lineNo) {
+		protected CompoundStatement(int lineNo)
+			: base(StatementType.Compound, lineNo) {
 			_statements = new List<Statement>();
 		}
 
-		public void AddStatement(Statement statement) {
-			Contract.Requires(statement != null && statement.Parent == this);
-			// Пропускаем сразу пустые операторы
-			if (statement.Type != StatementType.Empty)
-				_statements.Add(statement);
+		public void Append(Statement statement) {
+			Contract.Requires(statement != null);
+			// Игнорируем пустые операторы
+			if (statement.Type == StatementType.Empty)
+				return;
+			if (statement.Parent != null)
+				statement.Remove();
+			statement.Parent = this;
+			_statements.Add(statement);
 		}
 
 		protected internal override void InsertBefore(Statement position, Statement newStatement) {
 			var index = _statements.IndexOf(position);
 			Contract.Assert(index != -1);
-			newStatement.Parent = this;
+			if (newStatement.Parent != null)
+				newStatement.Remove();
+			else
+				newStatement.Parent = this;
 			_statements.Insert(index, newStatement);
+		}
+
+		protected override void Remove(Statement child) {
+			_statements.Remove(child);
+		}
+
+		internal override void Preprocess(Function function) {
+			foreach (var statement in _statements)
+				statement.Preprocess(function);
 		}
 
 		internal override void CompileBy(FunctionCompiler compiler) {

@@ -8,7 +8,8 @@ namespace YaJS.Compiler.AST {
 	public abstract class LanguageStatement : Statement {
 		private readonly int _lineNo;
 
-		protected LanguageStatement(Statement parent, StatementType type, int lineNo) : base(parent, type) {
+		protected LanguageStatement(StatementType type, int lineNo)
+			: base(type) {
 			Contract.Requires(lineNo >= 1);
 			_lineNo = lineNo;
 		}

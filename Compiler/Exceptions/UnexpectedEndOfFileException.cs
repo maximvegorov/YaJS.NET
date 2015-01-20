@@ -5,7 +5,7 @@ namespace YaJS.Compiler.Exceptions {
 	/// Обнаружен преждевременный конец файла
 	/// </summary>
 	[Serializable]
-	public sealed class UnexpectedEndOfFileException : ParserException {
+	public sealed class UnexpectedEndOfFileException : TokenizerException {
 		public UnexpectedEndOfFileException() {
 		}
 

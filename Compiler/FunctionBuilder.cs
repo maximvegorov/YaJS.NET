@@ -12,36 +12,27 @@ namespace YaJS.Compiler {
 		private readonly bool _isDeclaration;
 		private readonly int _lineNo;
 		private readonly string _name;
-		private readonly IVariableCollection _parameterNames;
-		private readonly List<TryStatement> _tryBlocks;
+		private readonly IKeyedVariableCollection _parameterNames;
+		private FunctionBodyStatement _functionBody;
 
 		public FunctionBuilder(
 			FunctionBuilder outer,
 			string name,
 			int lineNo,
-			IVariableCollection parameterNames,
-			FunctionBody functionBody,
+			IKeyedVariableCollection parameterNames,
 			bool isDeclaration
 			) {
 			Contract.Requires(outer != null);
 			Contract.Requires(!(isDeclaration && string.IsNullOrEmpty(name)));
 			Contract.Requires(parameterNames != null);
-			Contract.Requires(functionBody != null);
 
 			Outer = outer;
 			_name = name;
 			_lineNo = lineNo;
 			_parameterNames = parameterNames;
-			DeclaredVariables = new VariableCollection();
-			NestedFunctions = new FunctionCollection();
-			FunctionBody = functionBody;
-			_tryBlocks = new List<TryStatement>();
+			DeclaredKeyedVariables = new KeyedVariableCollection();
+			NestedFunctions = new KeyedFunctionCollection();
 			_isDeclaration = isDeclaration;
-		}
-
-		public void RegisterTryBlock(TryStatement tryBlock) {
-			Contract.Requires(tryBlock != null);
-			_tryBlocks.Add(tryBlock);
 		}
 
 		public Function ToFunction() {
@@ -49,17 +40,23 @@ namespace YaJS.Compiler {
 				_name,
 				_lineNo,
 				_parameterNames.ToList(),
-				DeclaredVariables.ToList(),
+				DeclaredKeyedVariables.ToList(),
 				NestedFunctions.ToList(),
 				FunctionBody,
-				_tryBlocks.Count == 0 ? Enumerable.Empty<TryStatement>() : _tryBlocks,
 				_isDeclaration
 				));
 		}
 
 		public FunctionBuilder Outer { get; private set; }
-		public IVariableCollection DeclaredVariables { get; private set; }
-		public FunctionCollection NestedFunctions { get; private set; }
-		public FunctionBody FunctionBody { get; private set; }
+		public IKeyedVariableCollection DeclaredKeyedVariables { get; private set; }
+		public KeyedFunctionCollection NestedFunctions { get; private set; }
+		public FunctionBodyStatement FunctionBody {
+			get { return (_functionBody); }
+			set {
+				Contract.Requires(value != null);
+				Contract.Assert(_functionBody == null);
+				_functionBody = value;
+			}
+		}
 	}
 }

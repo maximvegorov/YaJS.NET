@@ -7,17 +7,17 @@ namespace YaJS.Compiler.AST {
 	public abstract class LabellableStatement : LanguageStatement {
 		private readonly ILabelSet _labelSet;
 
-		protected LabellableStatement(Statement parent, StatementType type, int lineNo, ILabelSet labelSet)
-			: base(parent, type, lineNo) {
+		protected LabellableStatement(StatementType type, int lineNo, ILabelSet labelSet)
+			: base(type, lineNo) {
 			Contract.Requires(labelSet != null);
 			_labelSet = labelSet.UnionWith(string.Empty);
 		}
 
-		public override bool IsBreakTarget(string targetLabel) {
+		internal override bool IsBreakTarget(string targetLabel) {
 			return (_labelSet.Contains(targetLabel));
 		}
 
-		public override bool IsContinueTarget(string targetLabel) {
+		internal override bool IsContinueTarget(string targetLabel) {
 			return (_labelSet.Contains(targetLabel));
 		}
 

@@ -20,8 +20,12 @@ namespace YaJS.Compiler.AST {
 		private static readonly Expression ArgumentsLiteral = new Arguments();
 		private static readonly Expression EvalLiteral = new Eval();
 
-		public Expression(ExpressionType type) {
+		protected Expression(ExpressionType type) {
 			Type = type;
+		}
+
+		internal virtual void CompileBy(FunctionCompiler compiler, bool isLast) {
+			Contract.Requires(compiler != null);
 		}
 
 		public static Expression Undefined() {

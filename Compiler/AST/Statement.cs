@@ -9,6 +9,8 @@ namespace YaJS.Compiler.AST {
 	public enum StatementType {
 		Compound,
 		Break,
+		CaseClause,
+		CaseClauseBlock,
 		Continue,
 		DoWhile,
 		Empty,
@@ -30,43 +32,29 @@ namespace YaJS.Compiler.AST {
 	public abstract class Statement {
 		internal static readonly ILabelSet EmptyLabelSet = new EmptyLabelSet();
 
-		protected Statement(Statement parent, StatementType type) {
-			Parent = parent;
+		protected Statement(StatementType type) {
 			Type = type;
 		}
 
-		public virtual bool IsBreakTarget(string targetLabel) {
+		internal virtual bool IsBreakTarget(string targetLabel) {
 			Contract.Requires(targetLabel != null);
 			return (false);
 		}
 
-		public virtual bool IsContinueTarget(string targetLabel) {
+		internal virtual bool IsContinueTarget(string targetLabel) {
 			Contract.Requires(targetLabel != null);
 			return (false);
 		}
 
-		protected virtual bool IsTarget(Statement target) {
-			Contract.Requires(target != null);
-			return (false);
-		}
-
-		protected virtual void RegisterAsExitPoint(Statement exitPoint) {
+		internal virtual void RegisterExitPoint(Statement exitPoint) {
 			Contract.Requires(exitPoint != null);
 		}
 
-		/// <summary>
-		/// Зарегистрировать оператор как точку выхода. Используется для правильной обработки блоков finally оператора try
-		/// </summary>
-		internal void RegisterAsExitPoint() {
-			for (var current = Parent; current != null && !current.IsTarget(this); current = current.Parent)
-				current.RegisterAsExitPoint(this);
-		}
-
 		public Statement WrapToBlock() {
-			Contract.Requires(!(this is CompoundStatement));
-			var result = new BlockStatement(Parent, LineNo);
+			Contract.Requires(Type != StatementType.Compound);
+			var result = new BlockStatement(LineNo);
 			Parent = result;
-			result.AddStatement(this);
+			result.Append(this);
 			return (result);
 		}
 
@@ -77,12 +65,26 @@ namespace YaJS.Compiler.AST {
 		public void InsertBefore(Statement newStatement) {
 			Contract.Requires(newStatement != null);
 			Contract.Requires(Parent != null);
+			Contract.Ensures(newStatement.Parent == Parent);
 			Parent.InsertBefore(this, newStatement);
+		}
+
+		protected virtual void Remove(Statement child) {
+			throw new NotSupportedException();
+		}
+
+		public void Remove() {
+			Contract.Requires(Parent != null);
+			Parent.Remove(this);
+			Parent = null;
+		}
+
+		internal virtual void Preprocess(Function function) {
+			Contract.Requires(function != null);
 		}
 
 		internal virtual void CompileBy(FunctionCompiler compiler) {
 			Contract.Requires(compiler != null);
-			throw new NotSupportedException();
 		}
 
 		/// <summary>

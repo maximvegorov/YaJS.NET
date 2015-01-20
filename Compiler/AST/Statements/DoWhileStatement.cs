@@ -7,8 +7,8 @@ namespace YaJS.Compiler.AST.Statements {
 	public sealed class DoWhileStatement : IterationStatement {
 		private Expression _condition;
 
-		public DoWhileStatement(Statement parent, int lineNo, ILabelSet labelSet)
-			: base(parent, StatementType.DoWhile, lineNo, labelSet) {
+		public DoWhileStatement(int lineNo, ILabelSet labelSet)
+			: base(StatementType.DoWhile, lineNo, labelSet) {
 		}
 
 		public Expression Condition {

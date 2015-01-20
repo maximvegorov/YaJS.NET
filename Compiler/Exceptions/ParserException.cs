@@ -5,7 +5,7 @@ namespace YaJS.Compiler.Exceptions {
 	/// Базовый класс для всех исключений парсера
 	/// </summary>
 	[Serializable]
-	public abstract class ParserException : Exception {
+	public abstract class ParserException : CompilerException {
 		protected ParserException() {
 		}
 

@@ -10,8 +10,13 @@ namespace YaJS.Compiler.AST.Statements {
 		private BlockStatement _catchBlock;
 		private BlockStatement _finallyBlock;
 
-		public TryStatement(Statement parent, int lineNo)
-			: base(parent, StatementType.Try, lineNo) {
+		public TryStatement(int lineNo)
+			: base(StatementType.Try, lineNo) {
+		}
+
+		internal override void Preprocess(Function function) {
+			Contract.Assert(function.FunctionBody != null);
+			function.FunctionBody.RegisterTryStatement(this);
 		}
 
 		public TryBlockStatement TryBlock {
@@ -19,6 +24,9 @@ namespace YaJS.Compiler.AST.Statements {
 			set {
 				Contract.Requires(value != null);
 				Contract.Assert(_tryBlock == null);
+				if (value.Parent != null)
+					value.Remove();
+				value.Parent = this;
 				_tryBlock = value;
 			}
 		}
@@ -37,6 +45,9 @@ namespace YaJS.Compiler.AST.Statements {
 			set {
 				Contract.Requires(value != null);
 				Contract.Assert(_catchBlock == null);
+				if (value.Parent != null)
+					value.Remove();
+				value.Parent = this;
 				_catchBlock = value;
 			}
 		}
@@ -46,6 +57,9 @@ namespace YaJS.Compiler.AST.Statements {
 			set {
 				Contract.Requires(value != null);
 				Contract.Assert(_finallyBlock == null);
+				if (value.Parent != null)
+					value.Remove();
+				value.Parent = this;
 				_finallyBlock = value;
 			}
 		}

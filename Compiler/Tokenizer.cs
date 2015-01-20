@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text;
-using YaJS.Compiler.Exceptions;
 
 namespace YaJS.Compiler {
 	/// <summary>
@@ -202,13 +201,7 @@ namespace YaJS.Compiler {
 		}
 
 		private void ThrowUnexpectedEndOfFile() {
-			throw new UnexpectedEndOfFileException(
-				Messages.Error(
-					_input.LineNo,
-					_input.ColumnNo,
-					"Unexpected end of file."
-					)
-				);
+			Errors.ThrowUnexpectedEndOfFile(_input.LineNo, _input.ColumnNo);
 		}
 
 		private void SkipMultiLineComment() {
@@ -313,13 +306,7 @@ namespace YaJS.Compiler {
 		}
 
 		private void ThrowUnexpectedChar() {
-			throw new UnexpectedCharException(
-				Messages.Error(
-					_input.LineNo,
-					_input.ColumnNo,
-					string.Format("Unexpected char \"{0}\".", _input.CurChar)
-					)
-				);
+			Errors.ThrowUnexpectedChar(_input.LineNo, _input.ColumnNo, _input.CurChar);
 		}
 
 		private void ReadIntegerOrFloatNumber() {

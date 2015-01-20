@@ -46,6 +46,12 @@ namespace YaJS.Compiler {
 			Lookahead = _tokenizer.ReadToken();
 		}
 
+		private void Match(TokenType expectedTokenType) {
+			if (Lookahead.Type != expectedTokenType)
+				Errors.ThrowUnmatchedToken(expectedTokenType, Lookahead);
+			ReadNextToken();
+		}
+
 		private Function ParseFunction(bool isDeclaration) {
 			Contract.Requires(_currentFunction != null);
 			Contract.Ensures(_currentFunction != null);
@@ -58,24 +64,24 @@ namespace YaJS.Compiler {
 			if (Lookahead.Type == TokenType.Ident) {
 				name = Lookahead.Value;
 				if (_currentFunction.Outer.NestedFunctions.Contains(name))
-					ThrowFunctionAlreadyDeclared(startPosition, name);
+					Errors.ThrowFunctionAlreadyDeclared(startPosition, name);
 				ReadNextToken();
 			}
 
-			var parameterNames = new VariableCollection();
+			var parameterNames = new KeyedVariableCollection();
 			Match(TokenType.LParenthesis);
 			if (Lookahead.Type != TokenType.RParenthesis) {
 				if (Lookahead.Type != TokenType.Ident)
-					ThrowUnmatchedToken(TokenType.Ident, Lookahead);
+					Errors.ThrowUnmatchedToken(TokenType.Ident, Lookahead);
 				parameterNames.Add(Lookahead.Value);
 				ReadNextToken();
 				while (Lookahead.Type == TokenType.Comma) {
 					ReadNextToken();
 					if (Lookahead.Type != TokenType.Ident)
-						ThrowUnmatchedToken(TokenType.Ident, Lookahead);
+						Errors.ThrowUnmatchedToken(TokenType.Ident, Lookahead);
 					var parameterName = Lookahead.Value;
 					if (parameterNames.Contains(parameterName))
-						ThrowParameterAlreadyDeclared(Lookahead.StartPosition, parameterName);
+						Errors.ThrowParameterAlreadyDeclared(Lookahead.StartPosition, parameterName);
 					parameterNames.Add(parameterName);
 					ReadNextToken();
 				}
@@ -87,11 +93,10 @@ namespace YaJS.Compiler {
 				name,
 				startPosition.LineNo,
 				parameterNames,
-				new FunctionBody(),
 				isDeclaration
 				);
 			Match(TokenType.LCurlyBrace);
-			ParseFunctionBody(_currentFunction.FunctionBody);
+			_currentFunction.FunctionBody = ParseFunctionBody();
 			Match(TokenType.RCurlyBrace);
 
 			var result = _currentFunction.ToFunction();
@@ -100,11 +105,11 @@ namespace YaJS.Compiler {
 			return (result);
 		}
 
-		private static IVariableCollection ToVariableCollection(IEnumerable<string> parameterNames) {
-			var result = new VariableCollection();
+		private static IKeyedVariableCollection ToVariableCollection(IEnumerable<string> parameterNames) {
+			var result = new KeyedVariableCollection();
 			foreach (var parameterName in parameterNames) {
 				if (result.Contains(parameterName))
-					ThrowParameterAlreadyDeclared(parameterName);
+					Errors.ThrowParameterAlreadyDeclared(parameterName);
 				result.Add(parameterName);
 			}
 			return (result);
@@ -118,206 +123,13 @@ namespace YaJS.Compiler {
 				functionName,
 				1,
 				ToVariableCollection(parameterNames),
-				new FunctionBody(),
 				false
 				);
-			ParseFunctionBody(_currentFunction.FunctionBody);
+			_currentFunction.FunctionBody = ParseFunctionBody();
 			Contract.Assert(Lookahead.Type == TokenType.Unknown);
 			return (_currentFunction.ToFunction());
 		}
 
 		public Token Lookahead { get; private set; }
-
-		#region Errors
-
-		private InvalidTokenException InvalidToken() {
-			throw new InvalidTokenException(
-				Messages.Error(
-					Lookahead.StartPosition.LineNo,
-					Lookahead.StartPosition.ColumnNo,
-					string.Format(
-						"Invalid token \"{0}\".",
-						Lookahead.Type
-						)
-					)
-				);
-		}
-
-		private static void ThrowUnmatchedToken(TokenType expectedTokenType, Token actualToken) {
-			throw new UnmatchedTokenException(
-				Messages.Error(
-					actualToken.StartPosition.LineNo,
-					actualToken.StartPosition.ColumnNo,
-					string.Format(
-						"Expected \"{0}\" but found \"{1}\".",
-						expectedTokenType,
-						actualToken.Type
-						)
-					)
-				);
-		}
-
-		private void Match(TokenType expectedTokenType) {
-			if (Lookahead.Type != expectedTokenType)
-				ThrowUnmatchedToken(expectedTokenType, Lookahead);
-			ReadNextToken();
-		}
-
-		private static void ThrowExpectedReference(TokenPosition startPosition) {
-			throw new ExpectedConstructorException(
-				Messages.Error(
-					startPosition.LineNo,
-					startPosition.ColumnNo,
-					"Expected reference."
-					)
-				);
-		}
-
-		private static void ThrowExpectedObject(TokenPosition startPosition) {
-			throw new ExpectedConstructorException(
-				Messages.Error(
-					startPosition.LineNo,
-					startPosition.ColumnNo,
-					"Expected object."
-					)
-				);
-		}
-
-		private static void ThrowExpectedConstructor(TokenPosition startPosition) {
-			throw new ExpectedConstructorException(
-				Messages.Error(
-					startPosition.LineNo,
-					startPosition.ColumnNo,
-					"Expected constructor."
-					)
-				);
-		}
-
-		private static void ThrowExpectedFunction(TokenPosition startPosition) {
-			throw new ExpectedConstructorException(
-				Messages.Error(
-					startPosition.LineNo,
-					startPosition.ColumnNo,
-					"Expected function."
-					)
-				);
-		}
-
-		private static void ThrowDuplicatedLabel(TokenPosition position, string label) {
-			Contract.Requires(!string.IsNullOrEmpty(label));
-			throw new DuplicatedLabelException(
-				Messages.Error(
-					position.LineNo,
-					position.ColumnNo,
-					string.Format("Duplicated label \"{0}\".", label)
-					)
-				);
-		}
-
-		private static string FormatParameterAlreadyDeclared(string parameterName) {
-			return (string.Format("Parameter \"{0}\" was already declared.", parameterName));
-		}
-
-		private static void ThrowParameterAlreadyDeclared(string parameterName) {
-			Contract.Requires(!string.IsNullOrEmpty(parameterName));
-			throw new ParameterAlreadyDeclaredException(
-				FormatParameterAlreadyDeclared(parameterName)
-				);
-		}
-
-		private static void ThrowParameterAlreadyDeclared(TokenPosition position, string parameterName) {
-			Contract.Requires(!string.IsNullOrEmpty(parameterName));
-			throw new ParameterAlreadyDeclaredException(
-				Messages.Error(
-					position.LineNo,
-					position.ColumnNo,
-					FormatParameterAlreadyDeclared(parameterName)
-					)
-				);
-		}
-
-		private static void ThrowFunctionAlreadyDeclared(TokenPosition position, string functionName) {
-			Contract.Requires(!string.IsNullOrEmpty(functionName));
-			throw new FunctionAlreadyDeclaredException(
-				Messages.Error(
-					position.LineNo,
-					position.ColumnNo,
-					string.Format("Function \"{0}\" was already declared.", functionName)
-					)
-				);
-		}
-
-		private static void ThrowUnreachableLabel(TokenPosition position, string label) {
-			Contract.Requires(label != null);
-			throw new UnreachableLabelException(
-				Messages.Error(
-					position.LineNo,
-					position.ColumnNo,
-					string.Format("Can't find target of label \"{0}\".", label)
-					)
-				);
-		}
-
-		private static void ThrowExpectedStatement(TokenPosition position) {
-			throw new ExpectedStatementException(
-				Messages.Error(
-					position.LineNo,
-					position.ColumnNo,
-					"Expected statement."
-					)
-				);
-		}
-
-		private static void ThrowInvalidStatement(TokenPosition position) {
-			throw new InvalidStatementException(
-				Messages.Error(
-					position.LineNo,
-					position.ColumnNo,
-					"Invalid statement."
-					)
-				);
-		}
-
-		private static void ThrowUnexpectedLineTerminator(TokenPosition position) {
-			throw new UnexpectedLineTerminatorException(
-				Messages.Error(
-					position.LineNo,
-					position.ColumnNo,
-					"Unexpected line terminator."
-					)
-				);
-		}
-
-		private static void ThrowExpectedCatchOrFinally(TokenPosition position) {
-			throw new ExpectedCatchOrFinallyException(
-				Messages.Error(
-					position.LineNo,
-					position.ColumnNo,
-					"Expected catch or finally block."
-					)
-				);
-		}
-
-		private static void ThrowUnsupportedCaseClauseExpression(TokenPosition position) {
-			throw new UnsupportedCaseClauseExpressionException(
-				Messages.Error(
-					position.LineNo,
-					position.ColumnNo,
-					"Unsupported case clause expression."
-					)
-				);
-		}
-
-		private static void ThrowExpectedCaseClause(TokenPosition position) {
-			throw new ExpectedCaseClauseException(
-				Messages.Error(
-					position.LineNo,
-					position.ColumnNo,
-					"Expected case clause."
-					)
-				);
-		}
-
-		#endregion
 	}
 }

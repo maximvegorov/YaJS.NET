@@ -5,7 +5,7 @@ namespace YaJS.Compiler.Exceptions {
 	/// Обнаружен недопустимый символ
 	/// </summary>
 	[Serializable]
-	public sealed class UnexpectedCharException : ParserException {
+	public sealed class UnexpectedCharException : TokenizerException {
 		public UnexpectedCharException() {
 		}
 

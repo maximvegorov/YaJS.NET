@@ -7,12 +7,12 @@ namespace YaJS.Compiler.AST.Statements {
 	public sealed class TryBlockStatement : CompoundStatement {
 		private readonly List<Statement> _exitPoints;
 
-		public TryBlockStatement(Statement parent, int lineNo)
-			: base(parent, StatementType.Compound, lineNo) {
+		public TryBlockStatement(int lineNo)
+			: base(lineNo) {
 			_exitPoints = new List<Statement>();
 		}
 
-		protected override void RegisterAsExitPoint(Statement exitPoint) {
+		internal override void RegisterExitPoint(Statement exitPoint) {
 			_exitPoints.Add(exitPoint);
 		}
 

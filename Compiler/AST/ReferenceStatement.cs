@@ -4,11 +4,11 @@ namespace YaJS.Compiler.AST {
 	/// <summary>
 	/// Псевдооператор используемый для ссылки на блоки finally перед точками выхода из блоков try
 	/// </summary>
-	internal sealed class ReferenceStatement : Statement {
+	public sealed class ReferenceStatement : Statement {
 		private readonly Statement _reference;
 
-		public ReferenceStatement(Statement parent, Statement reference)
-			: base(parent, StatementType.Reference) {
+		public ReferenceStatement(Statement reference)
+			: base(StatementType.Reference) {
 			Contract.Requires(reference != null);
 			_reference = reference;
 		}

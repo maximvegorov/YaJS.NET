@@ -18,8 +18,8 @@ namespace YaJS.Compiler {
 		}
 
 		private CompiledFunction Compile(CompiledFunction[] nestedFunctions) {
-			Function.ProcessTryFinallyStatements();
-			Function.FunctionBody.CompileBy(this);
+			Function.Preprocess();
+			Function.CompileBy(this);
 			return (new CompiledFunction(
 				Function.Name,
 				Function.LineNo,

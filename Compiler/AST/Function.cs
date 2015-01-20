@@ -13,8 +13,7 @@ namespace YaJS.Compiler.AST {
 			List<string> parameterNames,
 			List<string> declaredVariables,
 			List<Function> nestedFunctions,
-			Statement functionBody,
-			IEnumerable<TryStatement> tryStatements,
+			FunctionBodyStatement functionBody,
 			bool isDeclaration
 			) {
 			Contract.Requires(!(isDeclaration && string.IsNullOrEmpty(name)));
@@ -22,7 +21,6 @@ namespace YaJS.Compiler.AST {
 			Contract.Requires(declaredVariables != null);
 			Contract.Requires(nestedFunctions != null);
 			Contract.Requires(functionBody != null);
-			Contract.Requires(tryStatements != null);
 
 			Name = name;
 			LineNo = lineNo;
@@ -30,7 +28,6 @@ namespace YaJS.Compiler.AST {
 			DeclaredVariables = declaredVariables;
 			NestedFunctions = nestedFunctions;
 			FunctionBody = functionBody;
-			TryStatements = tryStatements;
 			IsDeclaration = isDeclaration;
 
 			// Переупорядочить NestedFunctions переместив FunctionDeclaration в начало
@@ -52,17 +49,18 @@ namespace YaJS.Compiler.AST {
 		}
 
 		/// <summary>
-		/// Копирует операторы блока finally перед каждой точкой выхода из блока try
+		/// Подготовить функцию к компиляции
 		/// </summary>
-		internal void ProcessTryFinallyStatements() {
-			foreach (var tryStatement in TryStatements) {
-				if (tryStatement.FinallyBlock == null || tryStatement.TryBlock.ExitPoints.Count == 0)
-					continue;
-				var finallyBlock = tryStatement.FinallyBlock;
-				foreach (var exitPoint in tryStatement.TryBlock.ExitPoints) {
-					exitPoint.InsertBefore(new ReferenceStatement(null, finallyBlock));
-				}
-			}
+		internal void Preprocess() {
+			FunctionBody.Preprocess(this);
+		}
+
+		/// <summary>
+		/// Компилировать функцию
+		/// </summary>
+		internal void CompileBy(FunctionCompiler compiler) {
+			Contract.Requires(compiler != null);
+			FunctionBody.CompileBy(compiler);
 		}
 
 		/// <summary>
@@ -93,12 +91,7 @@ namespace YaJS.Compiler.AST {
 		/// <summary>
 		/// Тело функции
 		/// </summary>
-		public Statement FunctionBody { get; private set; }
-
-		/// <summary>
-		/// Операторы try содержащиеся в функции
-		/// </summary>
-		public IEnumerable<TryStatement> TryStatements { get; private set; }
+		public FunctionBodyStatement FunctionBody { get; private set; }
 
 		/// <summary>
 		/// Является ли функция FunctionDeclaration

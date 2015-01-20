@@ -8,13 +8,12 @@
 		private readonly Expression _increment;
 
 		internal ForStatement(
-			Statement parent,
 			int lineNo,
 			Expression initialization,
 			Expression condition,
 			Expression increment,
 			ILabelSet labelSet
-			) : base(parent, StatementType.For, lineNo, labelSet) {
+			) : base(StatementType.For, lineNo, labelSet) {
 			_initialization = initialization;
 			_condition = condition;
 			_increment = increment;

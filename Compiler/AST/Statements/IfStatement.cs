@@ -9,8 +9,8 @@ namespace YaJS.Compiler.AST.Statements {
 		private Statement _thenStatement;
 		private Statement _elseStatement;
 
-		public IfStatement(Statement parent, int lineNo)
-			: base(parent, StatementType.If, lineNo) {
+		public IfStatement(int lineNo)
+			: base(StatementType.If, lineNo) {
 		}
 
 		protected internal override void InsertBefore(Statement position, Statement newStatement) {
@@ -29,6 +29,25 @@ namespace YaJS.Compiler.AST.Statements {
 			target.InsertBefore(position, newStatement);
 		}
 
+		protected override void Remove(Statement child) {
+			if (ReferenceEquals(_thenStatement, child)) {
+				_thenStatement = null;
+			}
+			else {
+				Contract.Assert(ReferenceEquals(_elseStatement, child));
+				_elseStatement = null;
+			}
+		}
+
+		internal override void Preprocess(Function function) {
+			if (_thenStatement == null)
+				Errors.ThrowInternalError();
+			else
+				_thenStatement.Preprocess(function);
+			if (_elseStatement != null)
+				_elseStatement.Preprocess(function);
+		}
+
 		public Expression Condition {
 			get { return (_condition); }
 			set {
@@ -43,6 +62,9 @@ namespace YaJS.Compiler.AST.Statements {
 			set {
 				Contract.Requires(value != null);
 				Contract.Assert(_thenStatement == null);
+				if (value.Parent != null)
+					value.Parent.Remove();
+				value.Parent = this;
 				_thenStatement = value;
 			}
 		}
@@ -52,6 +74,9 @@ namespace YaJS.Compiler.AST.Statements {
 			set {
 				Contract.Requires(value != null);
 				Contract.Assert(_elseStatement == null);
+				if (value.Parent != null)
+					value.Parent.Remove();
+				value.Parent = this;
 				_elseStatement = value;
 			}
 		}

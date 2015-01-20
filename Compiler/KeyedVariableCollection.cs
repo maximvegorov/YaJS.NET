@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
 namespace YaJS.Compiler {
-	[ContractClass(typeof (ContractClassForIVariableCollection))]
-	internal interface IVariableCollection {
+	[ContractClass(typeof (ContractClassForIKeyedVariableCollection))]
+	internal interface IKeyedVariableCollection {
 		[Pure]
 		bool Contains(string variableName);
 
@@ -12,8 +12,8 @@ namespace YaJS.Compiler {
 		List<string> ToList();
 	}
 
-	[ContractClassFor(typeof (IVariableCollection))]
-	internal abstract class ContractClassForIVariableCollection : IVariableCollection {
+	[ContractClassFor(typeof (IKeyedVariableCollection))]
+	internal abstract class ContractClassForIKeyedVariableCollection : IKeyedVariableCollection {
 		public bool Contains(string variableName) {
 			Contract.Requires(!string.IsNullOrEmpty(variableName));
 			throw new NotImplementedException();
@@ -29,7 +29,7 @@ namespace YaJS.Compiler {
 		}
 	}
 
-	internal sealed class EmptyVariableCollection : IVariableCollection {
+	internal sealed class EmptyKeyedVariableCollection : IKeyedVariableCollection {
 		public bool Contains(string variableName) {
 			return (false);
 		}
@@ -43,12 +43,13 @@ namespace YaJS.Compiler {
 		}
 	}
 
-	internal sealed class VariableCollection : IVariableCollection {
-		public static readonly IVariableCollection Empty = new EmptyVariableCollection();
+	internal sealed class KeyedVariableCollection : IKeyedVariableCollection {
+		public static readonly IKeyedVariableCollection Empty = new EmptyKeyedVariableCollection();
+
 		private readonly List<string> _list;
 		private readonly HashSet<string> _set;
 
-		public VariableCollection() {
+		public KeyedVariableCollection() {
 			_list = new List<string>();
 			_set = new HashSet<string>();
 		}
