@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Text;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
 	internal sealed class ObjectLiteral : Expression {
@@ -25,6 +26,19 @@ namespace YaJS.Compiler.AST.Expressions {
 			}
 			result.Append('}');
 			return (result.ToString());
+		}
+
+		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
+			// Надо учесть возможность побочных эффектов вызова выражений
+			foreach (var property in _properties) {
+				property.Value.CompileBy(compiler, isLast);
+				if (!isLast)
+					compiler.Emitter.Emit(OpCode.LdString, property.Key);
+			}
+			if (isLast)
+				return;
+			compiler.Emitter.Emit(OpCode.LdInteger, _properties.Count);
+			compiler.Emitter.Emit(OpCode.MakeObject);
 		}
 
 		public override bool CanHaveMembers { get { return (true); } }

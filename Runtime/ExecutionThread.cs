@@ -187,26 +187,26 @@ namespace YaJS.Runtime {
 						#region Свойства объектов
 
 					case OpCode.IsMember: {
-						var obj = currentFrame.Pop().ToObject(VM);
 						var member = currentFrame.Pop();
+						var obj = currentFrame.Pop().ToObject(VM);
 						currentFrame.Push(obj.ContainsMember(member));
 						break;
 					}
 					case OpCode.LdMember: {
-						var obj = currentFrame.Pop().ToObject(VM);
 						var member = currentFrame.Pop();
+						var obj = currentFrame.Pop().ToObject(VM);
 						currentFrame.Push(obj.GetMember(member));
 						break;
 					}
 					case OpCode.StMember: {
-						var obj = currentFrame.Pop().RequireObject();
 						var member = currentFrame.Pop();
+						var obj = currentFrame.Pop().RequireObject();
 						obj.SetMember(member, currentFrame.Pop());
 						break;
 					}
 					case OpCode.DelMember: {
-						var obj = currentFrame.Pop().RequireObject();
 						var member = currentFrame.Pop();
+						var obj = currentFrame.Pop().RequireObject();
 						currentFrame.Push(obj.DeleteMember(member));
 						break;
 					}
@@ -275,7 +275,7 @@ namespace YaJS.Runtime {
 
 						#endregion
 
-						#region Вызов функций
+						#region Вызовы функций
 
 					case OpCode.NewObj:
 						var constructor = currentFrame.Pop().RequireFunction();
@@ -291,10 +291,11 @@ namespace YaJS.Runtime {
 
 					case OpCode.Call: {
 						var function = currentFrame.Pop().RequireFunction();
+						var arguments = currentFrame.PopArguments();
 						CallFunction(
 							function,
 							VM.Global,
-							currentFrame.PopArguments(),
+							arguments,
 							currentFrame.CodeReader.ReadBoolean()
 							);
 						break;
@@ -302,10 +303,12 @@ namespace YaJS.Runtime {
 
 					case OpCode.CallMember: {
 						var function = currentFrame.Pop().RequireFunction();
+						var context = currentFrame.Pop().RequireObject();
+						var arguments = currentFrame.PopArguments();
 						CallFunction(
 							function,
-							currentFrame.Pop().RequireObject(),
-							currentFrame.PopArguments(),
+							context,
+							arguments,
 							currentFrame.CodeReader.ReadBoolean()
 							);
 						break;

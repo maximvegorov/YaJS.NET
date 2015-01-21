@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Text;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
 	internal sealed class CallOperator : Expression {
@@ -28,6 +29,26 @@ namespace YaJS.Compiler.AST.Expressions {
 			}
 			result.Append(')');
 			return (result.ToString());
+		}
+
+		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
+			foreach (var argument in _arguments)
+				argument.CompileBy(compiler, false);
+			compiler.Emitter.Emit(OpCode.LdInteger, _arguments.Count);
+
+			if (_function.Type != ExpressionType.Member) {
+				_function.CompileBy(compiler, false);
+				compiler.Emitter.Emit(OpCode.Call, !isLast);
+			}
+			else {
+				var memberOperator = _function as MemberOperator;
+				Contract.Assert(memberOperator != null);
+				memberOperator.BaseValue.CompileBy(compiler, false);
+				compiler.Emitter.Emit(OpCode.Dup);
+				memberOperator.Member.CompileBy(compiler, false);
+				compiler.Emitter.Emit(OpCode.LdMember);
+				compiler.Emitter.Emit(OpCode.CallMember, !isLast);
+			}
 		}
 
 		public override bool CanHaveMembers { get { return (true); } }

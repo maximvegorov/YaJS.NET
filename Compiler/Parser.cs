@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using YaJS.Compiler.AST;
-using YaJS.Compiler.Exceptions;
 
 namespace YaJS.Compiler {
 	/// <summary>

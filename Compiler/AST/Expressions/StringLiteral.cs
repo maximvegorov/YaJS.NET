@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Text;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
 	internal sealed class StringLiteral : Expression {
@@ -54,7 +55,9 @@ namespace YaJS.Compiler.AST.Expressions {
 		}
 
 		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
-			base.CompileBy(compiler, isLast);
+			if (isLast)
+				return;
+			compiler.Emitter.Emit(OpCode.LdString, _value);
 		}
 
 		public override bool CanHaveMembers { get { return (true); } }

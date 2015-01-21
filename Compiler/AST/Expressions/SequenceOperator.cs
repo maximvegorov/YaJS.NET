@@ -23,9 +23,9 @@ namespace YaJS.Compiler.AST.Expressions {
 		}
 
 		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
-			for (var i = 0; i < _operands.Count; i++)
+			for (var i = 0; i < _operands.Count - 1; i++)
 				_operands[i].CompileBy(compiler, true);
-			base.CompileBy(compiler, isLast);
+			_operands[_operands.Count - 1].CompileBy(compiler, isLast);
 		}
 
 		public override bool CanHaveMembers { get { return (_operands[_operands.Count - 1].CanHaveMembers); } }

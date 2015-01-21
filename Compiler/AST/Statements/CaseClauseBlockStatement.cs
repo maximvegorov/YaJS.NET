@@ -28,6 +28,8 @@ namespace YaJS.Compiler.AST.Statements {
 				caseClause.Preprocess(function);
 		}
 
+		public bool IsEmpty { get { return (_caseClauses.Count == 0); } }
+
 		#region IEnumerable<CaseClauseStatement>
 
 		public IEnumerator<CaseClauseStatement> GetEnumerator() {
@@ -39,7 +41,5 @@ namespace YaJS.Compiler.AST.Statements {
 		}
 
 		#endregion
-
-		public bool IsEmpty { get { return (_caseClauses.Count == 0); } }
 	}
 }

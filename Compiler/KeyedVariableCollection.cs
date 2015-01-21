@@ -45,7 +45,6 @@ namespace YaJS.Compiler {
 
 	internal sealed class KeyedVariableCollection : IKeyedVariableCollection {
 		public static readonly IKeyedVariableCollection Empty = new EmptyKeyedVariableCollection();
-
 		private readonly List<string> _list;
 		private readonly HashSet<string> _set;
 

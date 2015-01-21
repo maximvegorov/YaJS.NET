@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Text;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
 	internal sealed class NewOperator : Expression {
@@ -28,6 +29,14 @@ namespace YaJS.Compiler.AST.Expressions {
 			}
 			result.Append(')');
 			return (result.ToString());
+		}
+
+		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
+			foreach (var argument in _arguments)
+				argument.CompileBy(compiler, false);
+			compiler.Emitter.Emit(OpCode.LdInteger, _arguments.Count);
+			_constructor.CompileBy(compiler, false);
+			compiler.Emitter.Emit(OpCode.NewObj);
 		}
 
 		public override bool CanHaveMembers { get { return (true); } }

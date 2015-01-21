@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Linq;
+﻿using System.Diagnostics.Contracts;
 using YaJS.Compiler.AST;
 using YaJS.Compiler.AST.Statements;
 
@@ -50,6 +48,7 @@ namespace YaJS.Compiler {
 		public FunctionBuilder Outer { get; private set; }
 		public IKeyedVariableCollection DeclaredKeyedVariables { get; private set; }
 		public KeyedFunctionCollection NestedFunctions { get; private set; }
+
 		public FunctionBodyStatement FunctionBody {
 			get { return (_functionBody); }
 			set {

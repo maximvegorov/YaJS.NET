@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Text;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
 	internal sealed class ArrayLiteral : Expression {
@@ -24,6 +25,16 @@ namespace YaJS.Compiler.AST.Expressions {
 			}
 			result.Append(']');
 			return (result.ToString());
+		}
+
+		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
+			// Надо учесть возможность побочных эффектов вызова выражений
+			foreach (var item in _items)
+				item.CompileBy(compiler, isLast);
+			if (isLast)
+				return;
+			compiler.Emitter.Emit(OpCode.LdInteger, _items.Count);
+			compiler.Emitter.Emit(OpCode.MakeArray);
 		}
 
 		public override bool CanHaveMembers { get { return (true); } }

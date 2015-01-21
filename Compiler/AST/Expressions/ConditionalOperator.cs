@@ -1,47 +1,60 @@
 ﻿using System.Diagnostics.Contracts;
 using System.Text;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
 	internal sealed class ConditionalOperator : Expression {
-		private readonly Expression _condition;
-		private readonly Expression _trueOperand;
-		private readonly Expression _falseOperand;
-
 		public ConditionalOperator(Expression condition, Expression trueOperand, Expression falseOperand)
 			: base(ExpressionType.Conditional) {
 			Contract.Requires(condition != null);
 			Contract.Requires(trueOperand != null);
 			Contract.Requires(falseOperand != null);
-			_condition = condition;
-			_trueOperand = trueOperand;
-			_falseOperand = falseOperand;
+			Condition = condition;
+			TrueOperand = trueOperand;
+			FalseOperand = falseOperand;
 		}
 
 		public override string ToString() {
 			var result = new StringBuilder();
-			result.Append(_condition)
+			result.Append(Condition)
 				.Append('?')
-				.Append(_trueOperand)
+				.Append(TrueOperand)
 				.Append(':')
-				.Append(_falseOperand);
+				.Append(FalseOperand);
 			return (result.ToString());
 		}
 
-		public override bool CanHaveMembers { get { return (_trueOperand.CanHaveMembers || _falseOperand.CanHaveMembers); } }
+		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
+			var endLabel = compiler.Emitter.DefineLabel();
+			var falseLabel = compiler.Emitter.DefineLabel();
+			Condition.CompileBy(compiler, false);
+			compiler.Emitter.Emit(OpCode.GotoIfFalse, falseLabel);
+			TrueOperand.CompileBy(compiler, false);
+			compiler.Emitter.Emit(OpCode.Goto, endLabel);
+			compiler.Emitter.MarkLabel(falseLabel);
+			FalseOperand.CompileBy(compiler, false);
+			compiler.Emitter.MarkLabel(endLabel);
+		}
+
+		public override bool CanHaveMembers { get { return (TrueOperand.CanHaveMembers || FalseOperand.CanHaveMembers); } }
 
 		public override bool CanHaveMutableMembers {
-			get { return (_trueOperand.CanHaveMutableMembers || _falseOperand.CanHaveMutableMembers); }
+			get { return (TrueOperand.CanHaveMutableMembers || FalseOperand.CanHaveMutableMembers); }
 		}
 
 		public override bool CanBeConstructor {
-			get { return (_trueOperand.CanBeConstructor || _falseOperand.CanBeConstructor); }
+			get { return (TrueOperand.CanBeConstructor || FalseOperand.CanBeConstructor); }
 		}
 
-		public override bool CanBeFunction { get { return (_trueOperand.CanBeFunction || _falseOperand.CanBeFunction); } }
-		public override bool CanBeObject { get { return (_trueOperand.CanBeObject || _falseOperand.CanBeObject); } }
+		public override bool CanBeFunction { get { return (TrueOperand.CanBeFunction || FalseOperand.CanBeFunction); } }
+		public override bool CanBeObject { get { return (TrueOperand.CanBeObject || FalseOperand.CanBeObject); } }
 
 		public override bool IsConstant {
-			get { return (_condition.IsConstant && _trueOperand.IsConstant && _falseOperand.IsConstant); }
+			get { return (Condition.IsConstant && TrueOperand.IsConstant && FalseOperand.IsConstant); }
 		}
+
+		public Expression Condition { get; private set; }
+		public Expression TrueOperand { get; private set; }
+		public Expression FalseOperand { get; private set; }
 	}
 }

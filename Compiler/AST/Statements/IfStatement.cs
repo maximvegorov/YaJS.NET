@@ -30,9 +30,8 @@ namespace YaJS.Compiler.AST.Statements {
 		}
 
 		protected override void Remove(Statement child) {
-			if (ReferenceEquals(_thenStatement, child)) {
+			if (ReferenceEquals(_thenStatement, child))
 				_thenStatement = null;
-			}
 			else {
 				Contract.Assert(ReferenceEquals(_elseStatement, child));
 				_elseStatement = null;
