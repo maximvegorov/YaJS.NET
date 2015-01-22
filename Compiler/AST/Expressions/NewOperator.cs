@@ -32,10 +32,10 @@ namespace YaJS.Compiler.AST.Expressions {
 		}
 
 		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
+			_constructor.CompileBy(compiler, false);
 			foreach (var argument in _arguments)
 				argument.CompileBy(compiler, false);
 			compiler.Emitter.Emit(OpCode.LdInteger, _arguments.Count);
-			_constructor.CompileBy(compiler, false);
 			compiler.Emitter.Emit(OpCode.NewObj);
 		}
 

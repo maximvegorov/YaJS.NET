@@ -277,21 +277,29 @@ namespace YaJS.Runtime {
 
 						#region Вызовы функций
 
-					case OpCode.NewObj:
+					case OpCode.NewObj: {
+						var arguments = currentFrame.PopArguments();
 						var constructor = currentFrame.Pop().RequireFunction();
-						NewObject(constructor, currentFrame.PopArguments());
+						NewObject(constructor, arguments);
 						break;
+					}
 
+					case OpCode.MakeEmptyObject:
+						currentFrame.Push(VM.NewObject());
+						break;
 					case OpCode.MakeObject:
 						MakeObject(currentFrame.Pop().RequireInteger());
+						break;
+					case OpCode.MakeEmptyArray:
+						currentFrame.Push(VM.NewArray(new List<JSValue>()));
 						break;
 					case OpCode.MakeArray:
 						MakeArray(currentFrame.Pop().RequireInteger());
 						break;
 
 					case OpCode.Call: {
-						var function = currentFrame.Pop().RequireFunction();
 						var arguments = currentFrame.PopArguments();
+						var function = currentFrame.Pop().RequireFunction();
 						CallFunction(
 							function,
 							VM.Global,
@@ -302,9 +310,9 @@ namespace YaJS.Runtime {
 					}
 
 					case OpCode.CallMember: {
-						var function = currentFrame.Pop().RequireFunction();
-						var context = currentFrame.Pop().RequireObject();
 						var arguments = currentFrame.PopArguments();
+						var context = currentFrame.Pop().ToObject(VM);
+						var function = currentFrame.Pop().RequireFunction();
 						CallFunction(
 							function,
 							context,

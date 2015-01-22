@@ -32,13 +32,10 @@ namespace YaJS.Compiler.AST.Expressions {
 		}
 
 		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
-			foreach (var argument in _arguments)
-				argument.CompileBy(compiler, false);
-			compiler.Emitter.Emit(OpCode.LdInteger, _arguments.Count);
-
+			OpCode callOpCode;
 			if (_function.Type != ExpressionType.Member) {
 				_function.CompileBy(compiler, false);
-				compiler.Emitter.Emit(OpCode.Call, !isLast);
+				callOpCode = OpCode.Call;
 			}
 			else {
 				var memberOperator = _function as MemberOperator;
@@ -47,8 +44,12 @@ namespace YaJS.Compiler.AST.Expressions {
 				compiler.Emitter.Emit(OpCode.Dup);
 				memberOperator.Member.CompileBy(compiler, false);
 				compiler.Emitter.Emit(OpCode.LdMember);
-				compiler.Emitter.Emit(OpCode.CallMember, !isLast);
+				callOpCode = OpCode.CallMember;
 			}
+			foreach (var argument in _arguments)
+				argument.CompileBy(compiler, false);
+			compiler.Emitter.Emit(OpCode.LdInteger, _arguments.Count);
+			compiler.Emitter.Emit(callOpCode, !isLast);
 		}
 
 		public override bool CanHaveMembers { get { return (true); } }

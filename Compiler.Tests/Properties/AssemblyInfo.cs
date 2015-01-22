@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("YaJS.NET")]
-[assembly: AssemblyCopyright("Copyright © Maxim V Egorov 2014")]
+[assembly: AssemblyCopyright("Copyright © Maxim V Egorov")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
