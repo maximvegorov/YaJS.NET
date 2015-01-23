@@ -3,23 +3,20 @@ using System.Text;
 using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
-	internal sealed class MemberOperator : Expression {
-		private readonly Expression _baseValue;
-		private readonly Expression _member;
-
-		public MemberOperator(Expression baseValue, Expression member)
+	public sealed class MemberOperator : Expression {
+		internal MemberOperator(Expression baseValue, Expression member)
 			: base(ExpressionType.Member) {
 			Contract.Requires(baseValue != null && baseValue.CanHaveMembers);
 			Contract.Requires(member != null);
-			_baseValue = baseValue;
-			_member = member;
+			BaseValue = baseValue;
+			Member = member;
 		}
 
 		public override string ToString() {
 			var result = new StringBuilder();
-			result.Append(_baseValue)
+			result.Append(BaseValue)
 				.Append('[')
-				.Append(_member)
+				.Append(Member)
 				.Append(']');
 			return (result.ToString());
 		}
@@ -27,19 +24,19 @@ namespace YaJS.Compiler.AST.Expressions {
 		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
 			if (isLast)
 				return;
-			_baseValue.CompileBy(compiler, false);
-			_member.CompileBy(compiler, false);
+			BaseValue.CompileBy(compiler, false);
+			Member.CompileBy(compiler, false);
 			compiler.Emitter.Emit(OpCode.LdMember);
 		}
 
-		public override bool IsReference { get { return (_baseValue.CanHaveMutableMembers); } }
+		public override bool IsReference { get { return (BaseValue.CanHaveMutableMembers); } }
 		public override bool CanHaveMembers { get { return (true); } }
 		public override bool CanHaveMutableMembers { get { return (true); } }
 		public override bool CanBeConstructor { get { return (true); } }
 		public override bool CanBeFunction { get { return (true); } }
 		public override bool CanBeDeleted { get { return (true); } }
 		public override bool CanBeObject { get { return (true); } }
-		public Expression BaseValue { get { return (_baseValue); } }
-		public Expression Member { get { return (_member); } }
+		public Expression BaseValue { get; private set; }
+		public Expression Member { get; private set; }
 	}
 }

@@ -6,7 +6,7 @@ using YaJS.Compiler.Exceptions;
 
 namespace YaJS.Compiler.Tests {
 	[TestClass]
-	public class TokenizerTests {
+	public sealed class TokenizerTests {
 		private static Token RunTokenizer(string source) {
 			var tokenizer = new Tokenizer(new StringReader(source));
 			tokenizer.ReadToken();

@@ -2,23 +2,21 @@
 using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
-	internal sealed class Identifier : Expression {
-		private readonly string _value;
-
-		public Identifier(string value)
+	public sealed class Identifier : Expression {
+		internal Identifier(string value)
 			: base(ExpressionType.Ident) {
 			Contract.Requires(!string.IsNullOrEmpty(value));
-			_value = value;
+			Value = value;
 		}
 
 		public override string ToString() {
-			return (_value);
+			return (Value);
 		}
 
 		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
 			if (isLast)
 				return;
-			compiler.Emitter.Emit(OpCode.LdLocal, _value);
+			compiler.Emitter.Emit(OpCode.LdLocal, Value);
 		}
 
 		public override bool IsReference { get { return (true); } }
@@ -28,5 +26,6 @@ namespace YaJS.Compiler.AST.Expressions {
 		public override bool CanBeFunction { get { return (true); } }
 		public override bool CanBeDeleted { get { return (true); } }
 		public override bool CanBeObject { get { return (true); } }
+		public string Value { get; private set; }
 	}
 }

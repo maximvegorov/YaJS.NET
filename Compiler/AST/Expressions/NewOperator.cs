@@ -4,24 +4,21 @@ using System.Text;
 using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
-	internal sealed class NewOperator : Expression {
-		private readonly Expression _constructor;
-		private readonly List<Expression> _arguments;
-
-		public NewOperator(Expression constructor, List<Expression> arguments) : base(ExpressionType.New) {
+	public sealed class NewOperator : Expression {
+		internal NewOperator(Expression constructor, List<Expression> arguments) : base(ExpressionType.New) {
 			Contract.Requires(constructor != null && constructor.CanBeConstructor);
 			Contract.Requires(arguments != null);
-			_constructor = constructor;
-			_arguments = arguments;
+			Constructor = constructor;
+			Arguments = arguments;
 		}
 
 		public override string ToString() {
 			var result = new StringBuilder();
 			result.Append("new ")
-				.Append(_constructor)
+				.Append(Constructor)
 				.Append('(');
-			if (_arguments.Count > 0) {
-				foreach (var argument in _arguments) {
+			if (Arguments.Count > 0) {
+				foreach (var argument in Arguments) {
 					result.Append(argument)
 						.Append(',');
 				}
@@ -32,10 +29,10 @@ namespace YaJS.Compiler.AST.Expressions {
 		}
 
 		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
-			_constructor.CompileBy(compiler, false);
-			foreach (var argument in _arguments)
+			Constructor.CompileBy(compiler, false);
+			foreach (var argument in Arguments)
 				argument.CompileBy(compiler, false);
-			compiler.Emitter.Emit(OpCode.LdInteger, _arguments.Count);
+			compiler.Emitter.Emit(OpCode.LdInteger, Arguments.Count);
 			compiler.Emitter.Emit(OpCode.NewObj);
 		}
 
@@ -44,5 +41,7 @@ namespace YaJS.Compiler.AST.Expressions {
 		public override bool CanBeConstructor { get { return (true); } }
 		public override bool CanBeFunction { get { return (true); } }
 		public override bool CanBeObject { get { return (true); } }
+		public Expression Constructor { get; private set; }
+		public List<Expression> Arguments { get; private set; }
 	}
 }

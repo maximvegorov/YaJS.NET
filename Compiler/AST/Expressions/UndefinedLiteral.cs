@@ -1,9 +1,9 @@
 ﻿using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
-	internal sealed class UndefinedLiteral : Expression {
-		public UndefinedLiteral()
-			: base(ExpressionType.Undefined) {
+	public sealed class UndefinedLiteral : Expression {
+		internal UndefinedLiteral()
+			: base(ExpressionType.UndefinedLiteral) {
 		}
 
 		public override string ToString() {

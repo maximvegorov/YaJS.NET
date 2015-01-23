@@ -1,8 +1,8 @@
 ﻿using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
-	internal sealed class NullLiteral : Expression {
-		public NullLiteral() : base(ExpressionType.Null) {
+	public sealed class NullLiteral : Expression {
+		internal NullLiteral() : base(ExpressionType.NullLiteral) {
 		}
 
 		public override string ToString() {

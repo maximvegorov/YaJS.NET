@@ -3,8 +3,8 @@ using System.Text;
 using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
-	internal sealed class ConditionalOperator : Expression {
-		public ConditionalOperator(Expression condition, Expression trueOperand, Expression falseOperand)
+	public sealed class ConditionalOperator : Expression {
+		internal ConditionalOperator(Expression condition, Expression trueOperand, Expression falseOperand)
 			: base(ExpressionType.Conditional) {
 			Contract.Requires(condition != null);
 			Contract.Requires(trueOperand != null);

@@ -131,7 +131,7 @@ namespace YaJS.Compiler.AST {
 			return (new ArrayLiteral(items));
 		}
 
-		public static Expression Function(Function function) {
+		public static Expression MakeFunction(Function function) {
 			return (new FunctionLiteral(function));
 		}
 
@@ -139,7 +139,7 @@ namespace YaJS.Compiler.AST {
 			return (ThisLiteral);
 		}
 
-		public static Expression Arguments() {
+		public static Expression MakeArguments() {
 			return (ArgumentsLiteral);
 		}
 
@@ -151,7 +151,7 @@ namespace YaJS.Compiler.AST {
 			return (new GroupingOperator(operand));
 		}
 
-		public static Expression Member(Expression baseValue, Expression member) {
+		public static Expression MakeMember(Expression baseValue, Expression member) {
 			return (new MemberOperator(baseValue, member));
 		}
 

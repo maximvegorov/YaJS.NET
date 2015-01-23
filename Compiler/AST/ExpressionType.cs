@@ -3,12 +3,12 @@ namespace YaJS.Compiler.AST {
 	/// Тип выражения
 	/// </summary>
 	public enum ExpressionType {
-		Undefined,
-		Null,
+		UndefinedLiteral,
+		NullLiteral,
 		BooleanLiteral,
 		IntegerLiteral,
 		FloatLiteral,
-		String,
+		StringLiteral,
 		Ident,
 		ObjectLiteral,
 		ArrayLiteral,

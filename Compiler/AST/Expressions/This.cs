@@ -1,8 +1,8 @@
 ﻿using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
-	internal sealed class This : Expression {
-		public This() : base(ExpressionType.This) {
+	public sealed class This : Expression {
+		internal This() : base(ExpressionType.This) {
 		}
 
 		public override string ToString() {
