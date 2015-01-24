@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using YaJS.Compiler.AST;
 
@@ -103,7 +102,7 @@ namespace YaJS.Compiler {
 		}
 
 		private Expression ParseFunctionLiteral() {
-			return (Expression.MakeFunction(ParseFunction(false)));
+			return (Expression.Function(ParseFunction(false)));
 		}
 
 		private Expression ParseGrouping() {
@@ -163,7 +162,7 @@ namespace YaJS.Compiler {
 					return (Expression.This());
 				case TokenType.Arguments:
 					ReadNextToken();
-					return (Expression.MakeArguments());
+					return (Expression.Arguments());
 				case TokenType.Eval:
 					ReadNextToken();
 					return (Expression.Eval());
@@ -183,13 +182,13 @@ namespace YaJS.Compiler {
 				var isLBracket = Lookahead.Type == TokenType.LBracket;
 				ReadNextToken();
 				if (isLBracket) {
-					result = Expression.MakeMember(result, ParseExpression());
+					result = Expression.Member(result, ParseExpression());
 					Match(TokenType.RBracket);
 				}
 				else {
 					if (Lookahead.Type != TokenType.Ident)
 						Errors.ThrowUnmatchedToken(TokenType.Ident, Lookahead);
-					result = Expression.MakeMember(result, Expression.Ident(Lookahead.Value));
+					result = Expression.Member(result, Expression.Ident(Lookahead.Value));
 					ReadNextToken();
 				}
 			}
@@ -228,13 +227,13 @@ namespace YaJS.Compiler {
 					var isLBracket = Lookahead.Type == TokenType.LBracket;
 					ReadNextToken();
 					if (isLBracket) {
-						result = Expression.MakeMember(result, ParseExpression());
+						result = Expression.Member(result, ParseExpression());
 						Match(TokenType.RBracket);
 					}
 					else {
 						if (Lookahead.Type != TokenType.Ident)
 							Errors.ThrowUnmatchedToken(TokenType.Ident, Lookahead);
-						result = Expression.MakeMember(result, Expression.Ident(Lookahead.Value));
+						result = Expression.Member(result, Expression.Ident(Lookahead.Value));
 						ReadNextToken();
 					}
 				}

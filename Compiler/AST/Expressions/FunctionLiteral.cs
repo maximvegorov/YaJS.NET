@@ -3,20 +3,20 @@ using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
 	public sealed class FunctionLiteral : Expression {
-		internal FunctionLiteral(Function function)
+		internal FunctionLiteral(Function value)
 			: base(ExpressionType.FunctionLiteral) {
-			Contract.Requires(function != null);
-			Function = function;
+			Contract.Requires(value != null);
+			Value = value;
 		}
 
 		public override string ToString() {
-			return (Function.ToString());
+			return (Value.ToString());
 		}
 
 		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
 			if (isLast)
 				return;
-			compiler.Emitter.Emit(OpCode.LdLocalFunc, compiler.Function.Index);
+			compiler.Emitter.Emit(OpCode.LdLocalFunc, Value.Index);
 		}
 
 		public override bool CanHaveMembers { get { return (true); } }
@@ -24,6 +24,6 @@ namespace YaJS.Compiler.AST.Expressions {
 		public override bool CanBeConstructor { get { return (true); } }
 		public override bool CanBeFunction { get { return (true); } }
 		public override bool CanBeObject { get { return (true); } }
-		public Function Function { get; private set; }
+		public Function Value { get; private set; }
 	}
 }

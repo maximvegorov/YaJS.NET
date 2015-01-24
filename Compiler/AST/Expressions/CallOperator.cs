@@ -5,20 +5,20 @@ using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
 	public sealed class CallOperator : Expression {
-		internal CallOperator(Expression function, List<Expression> arguments)
+		internal CallOperator(Expression callFunction, List<Expression> argumentList)
 			: base(ExpressionType.Call) {
-			Contract.Requires(function != null && function.CanBeFunction);
-			Contract.Requires(arguments != null);
-			Function = function;
-			Arguments = arguments;
+			Contract.Requires(callFunction != null && callFunction.CanBeFunction);
+			Contract.Requires(argumentList != null);
+			CallFunction = callFunction;
+			ArgumentList = argumentList;
 		}
 
 		public override string ToString() {
 			var result = new StringBuilder();
-			result.Append(Function)
+			result.Append(CallFunction)
 				.Append('(');
-			if (Arguments.Count > 0) {
-				foreach (var argument in Arguments) {
+			if (ArgumentList.Count > 0) {
+				foreach (var argument in ArgumentList) {
 					result.Append(argument)
 						.Append(',');
 				}
@@ -30,22 +30,22 @@ namespace YaJS.Compiler.AST.Expressions {
 
 		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
 			OpCode callOpCode;
-			if (Function.Type != ExpressionType.Member) {
-				Function.CompileBy(compiler, false);
+			if (CallFunction.Type != ExpressionType.Member) {
+				CallFunction.CompileBy(compiler, false);
 				callOpCode = OpCode.Call;
 			}
 			else {
-				var memberOperator = Function as MemberOperator;
+				var memberOperator = CallFunction as MemberOperator;
 				Contract.Assert(memberOperator != null);
 				memberOperator.BaseValue.CompileBy(compiler, false);
 				compiler.Emitter.Emit(OpCode.Dup);
-				memberOperator.Member.CompileBy(compiler, false);
+				memberOperator.MemberName.CompileBy(compiler, false);
 				compiler.Emitter.Emit(OpCode.LdMember);
 				callOpCode = OpCode.CallMember;
 			}
-			foreach (var argument in Arguments)
+			foreach (var argument in ArgumentList)
 				argument.CompileBy(compiler, false);
-			compiler.Emitter.Emit(OpCode.LdInteger, Arguments.Count);
+			compiler.Emitter.Emit(OpCode.LdInteger, ArgumentList.Count);
 			compiler.Emitter.Emit(callOpCode, !isLast);
 		}
 
@@ -54,7 +54,7 @@ namespace YaJS.Compiler.AST.Expressions {
 		public override bool CanBeConstructor { get { return (true); } }
 		public override bool CanBeFunction { get { return (true); } }
 		public override bool CanBeObject { get { return (true); } }
-		public Expression Function { get; private set; }
-		public List<Expression> Arguments { get; private set; }
+		public Expression CallFunction { get; private set; }
+		public List<Expression> ArgumentList { get; private set; }
 	}
 }

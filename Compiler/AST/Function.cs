@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Text;
 using YaJS.Compiler.AST.Statements;
 
 namespace YaJS.Compiler.AST {
@@ -46,6 +47,26 @@ namespace YaJS.Compiler.AST {
 			// Присвоить индексы всем оставшимся вложенным функциям 
 			for (var i = FunctionDeclarationCount; i < NestedFunctions.Count; i++)
 				NestedFunctions[i].Index = i;
+		}
+
+		[Pure]
+		public override string ToString() {
+			var result = new StringBuilder();
+			result.Append("function");
+			if (!string.IsNullOrEmpty(Name)) {
+				result.Append(" ")
+					.Append(Name);
+			}
+			result.Append("(");
+			if (ParameterNames.Count > 0) {
+				foreach (var parameterName in ParameterNames) {
+					result.Append(parameterName).Append(",");
+				}
+				result.Length -= 1;
+			}
+			result.AppendLine(")");
+			result.Append(FunctionBody.ToString());
+			return (result.ToString());
 		}
 
 		/// <summary>

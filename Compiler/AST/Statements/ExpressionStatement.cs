@@ -13,6 +13,10 @@ namespace YaJS.Compiler.AST.Statements {
 			_expression = expression;
 		}
 
+		public override string ToString() {
+			return (Expression.ToString());
+		}
+
 		public Expression Expression { get { return (_expression); } }
 	}
 }

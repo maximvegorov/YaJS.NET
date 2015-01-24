@@ -117,6 +117,7 @@ namespace YaJS.Compiler {
 		public Function ParseFunction(string functionName, IEnumerable<string> parameterNames) {
 			Contract.Requires<ArgumentNullException>(!string.IsNullOrEmpty(functionName), "functionName");
 			Contract.Requires<ArgumentNullException>(parameterNames != null, "parameterNames");
+			// ReSharper disable once UseObjectOrCollectionInitializer
 			_currentFunction = new FunctionBuilder(
 				null,
 				functionName,

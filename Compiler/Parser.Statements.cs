@@ -28,7 +28,7 @@ namespace YaJS.Compiler {
 			var result = new BlockStatement(Lookahead.StartPosition.LineNo);
 			Match(TokenType.LCurlyBrace);
 			foreach (var statement in ParseStatementList())
-				result.Append(statement);
+				result.Add(statement);
 			Match(TokenType.RCurlyBrace);
 			return (result);
 		}
@@ -208,7 +208,7 @@ namespace YaJS.Compiler {
 			var result = new TryBlockStatement(Lookahead.StartPosition.LineNo);
 			Match(TokenType.LCurlyBrace);
 			foreach (var statement in ParseStatementList())
-				result.Append(statement);
+				result.Add(statement);
 			Match(TokenType.RCurlyBrace);
 			return (result);
 		}
@@ -241,7 +241,7 @@ namespace YaJS.Compiler {
 		private StatementListStatement ParseStatementListStatement() {
 			var result = new StatementListStatement(Lookahead.StartPosition.LineNo);
 			foreach (var statement in ParseStatementList())
-				result.Append(statement);
+				result.Add(statement);
 			return (result);
 		}
 
@@ -380,7 +380,7 @@ namespace YaJS.Compiler {
 					var statement = ParseStatement(false);
 					if (statement == null)
 						break;
-					result.Append(statement);
+					result.Add(statement);
 					if (Lookahead.Type == TokenType.Unknown)
 						break;
 					if (Lookahead.Type == TokenType.Semicolon)

@@ -20,7 +20,6 @@ namespace YaJS.Compiler {
 			IKeyedVariableCollection parameterNames,
 			bool isDeclaration
 			) {
-			Contract.Requires(outer != null);
 			Contract.Requires(!(isDeclaration && string.IsNullOrEmpty(name)));
 			Contract.Requires(parameterNames != null);
 

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
+using System.Text;
 
 namespace YaJS.Compiler.AST.Statements {
 	/// <summary>
@@ -9,6 +10,16 @@ namespace YaJS.Compiler.AST.Statements {
 			: base(StatementType.Return, lineNo) {
 			Contract.Requires(expression != null);
 			Expression = expression;
+		}
+
+		public override string ToString() {
+			var result = new StringBuilder();
+			result.Append("return");
+			if (Expression.Type != ExpressionType.UndefinedLiteral) {
+				result.Append(" ")
+					.Append(Expression.ToString());
+			}
+			return (result.ToString());
 		}
 
 		internal override void Preprocess(Function function) {

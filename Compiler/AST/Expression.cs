@@ -49,6 +49,10 @@ namespace YaJS.Compiler.AST {
 			return (TrueLiteral);
 		}
 
+		public static Expression Integer(int value) {
+			return (new IntegerLiteral(value));
+		}
+
 		public static Expression Integer(string value) {
 			Contract.Requires(!string.IsNullOrEmpty(value));
 			var prevIntegerValue = 0;
@@ -102,6 +106,10 @@ namespace YaJS.Compiler.AST {
 			return (new IntegerLiteral(integerValue));
 		}
 
+		public static Expression Float(double value) {
+			return (new FloatLiteral(value));
+		}
+
 		public static Expression Float(string value) {
 			Contract.Requires(!string.IsNullOrEmpty(value));
 			return (new FloatLiteral(double.Parse(value, CultureInfo.InvariantCulture)));
@@ -131,7 +139,7 @@ namespace YaJS.Compiler.AST {
 			return (new ArrayLiteral(items));
 		}
 
-		public static Expression MakeFunction(Function function) {
+		public static Expression Function(Function function) {
 			return (new FunctionLiteral(function));
 		}
 
@@ -139,7 +147,7 @@ namespace YaJS.Compiler.AST {
 			return (ThisLiteral);
 		}
 
-		public static Expression MakeArguments() {
+		public static Expression Arguments() {
 			return (ArgumentsLiteral);
 		}
 
@@ -151,16 +159,16 @@ namespace YaJS.Compiler.AST {
 			return (new GroupingOperator(operand));
 		}
 
-		public static Expression MakeMember(Expression baseValue, Expression member) {
-			return (new MemberOperator(baseValue, member));
+		public static Expression Member(Expression baseValue, Expression memberName) {
+			return (new MemberOperator(baseValue, memberName));
 		}
 
-		public static Expression New(Expression constructor, List<Expression> arguments) {
-			return (new NewOperator(constructor, arguments));
+		public static Expression New(Expression constructor, List<Expression> argumentList) {
+			return (new NewOperator(constructor, argumentList));
 		}
 
-		public static Expression Call(Expression function, List<Expression> arguments) {
-			return (new CallOperator(function, arguments));
+		public static Expression Call(Expression function, List<Expression> argumentList) {
+			return (new CallOperator(function, argumentList));
 		}
 
 		public static Expression PostfixInc(Expression operand) {

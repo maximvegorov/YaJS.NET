@@ -11,7 +11,7 @@ namespace YaJS.Compiler.AST.Expressions {
 		public override string ToString() {
 			var result = new StringBuilder();
 			result.Append('"');
-			for (var i = 0; i < result.Length; i++) {
+			for (var i = 0; i < Value.Length; i++) {
 				var c = Value[i];
 				switch (c) {
 					case '"':

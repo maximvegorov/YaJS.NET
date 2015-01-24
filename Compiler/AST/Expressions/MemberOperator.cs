@@ -4,19 +4,19 @@ using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
 	public sealed class MemberOperator : Expression {
-		internal MemberOperator(Expression baseValue, Expression member)
+		internal MemberOperator(Expression baseValue, Expression memberName)
 			: base(ExpressionType.Member) {
 			Contract.Requires(baseValue != null && baseValue.CanHaveMembers);
-			Contract.Requires(member != null);
+			Contract.Requires(memberName != null);
 			BaseValue = baseValue;
-			Member = member;
+			MemberName = memberName;
 		}
 
 		public override string ToString() {
 			var result = new StringBuilder();
 			result.Append(BaseValue)
 				.Append('[')
-				.Append(Member)
+				.Append(MemberName)
 				.Append(']');
 			return (result.ToString());
 		}
@@ -25,7 +25,7 @@ namespace YaJS.Compiler.AST.Expressions {
 			if (isLast)
 				return;
 			BaseValue.CompileBy(compiler, false);
-			Member.CompileBy(compiler, false);
+			MemberName.CompileBy(compiler, false);
 			compiler.Emitter.Emit(OpCode.LdMember);
 		}
 
@@ -37,6 +37,6 @@ namespace YaJS.Compiler.AST.Expressions {
 		public override bool CanBeDeleted { get { return (true); } }
 		public override bool CanBeObject { get { return (true); } }
 		public Expression BaseValue { get; private set; }
-		public Expression Member { get; private set; }
+		public Expression MemberName { get; private set; }
 	}
 }

@@ -5,11 +5,11 @@ using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
 	public sealed class NewOperator : Expression {
-		internal NewOperator(Expression constructor, List<Expression> arguments) : base(ExpressionType.New) {
+		internal NewOperator(Expression constructor, List<Expression> argumentList) : base(ExpressionType.New) {
 			Contract.Requires(constructor != null && constructor.CanBeConstructor);
-			Contract.Requires(arguments != null);
+			Contract.Requires(argumentList != null);
 			Constructor = constructor;
-			Arguments = arguments;
+			ArgumentList = argumentList;
 		}
 
 		public override string ToString() {
@@ -17,8 +17,8 @@ namespace YaJS.Compiler.AST.Expressions {
 			result.Append("new ")
 				.Append(Constructor)
 				.Append('(');
-			if (Arguments.Count > 0) {
-				foreach (var argument in Arguments) {
+			if (ArgumentList.Count > 0) {
+				foreach (var argument in ArgumentList) {
 					result.Append(argument)
 						.Append(',');
 				}
@@ -30,9 +30,9 @@ namespace YaJS.Compiler.AST.Expressions {
 
 		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
 			Constructor.CompileBy(compiler, false);
-			foreach (var argument in Arguments)
+			foreach (var argument in ArgumentList)
 				argument.CompileBy(compiler, false);
-			compiler.Emitter.Emit(OpCode.LdInteger, Arguments.Count);
+			compiler.Emitter.Emit(OpCode.LdInteger, ArgumentList.Count);
 			compiler.Emitter.Emit(OpCode.NewObj);
 		}
 
@@ -42,6 +42,6 @@ namespace YaJS.Compiler.AST.Expressions {
 		public override bool CanBeFunction { get { return (true); } }
 		public override bool CanBeObject { get { return (true); } }
 		public Expression Constructor { get; private set; }
-		public List<Expression> Arguments { get; private set; }
+		public List<Expression> ArgumentList { get; private set; }
 	}
 }
