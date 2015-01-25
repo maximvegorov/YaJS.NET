@@ -8,6 +8,8 @@
 			return ('~' + Operand.ToString());
 		}
 
-		public override bool CanHaveMembers { get { return (true); } }
+		public override bool CanHaveMembers {
+			get { return (true); }
+		}
 	}
 }

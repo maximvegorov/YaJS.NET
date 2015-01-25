@@ -70,6 +70,8 @@ namespace YaJS.Runtime {
 			_offset = newOffset;
 		}
 
-		public int Offset { get { return (_offset); } }
+		public int Offset {
+			get { return (_offset); }
+		}
 	}
 }

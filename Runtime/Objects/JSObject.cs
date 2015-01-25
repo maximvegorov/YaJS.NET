@@ -25,14 +25,8 @@ namespace YaJS.Runtime.Objects {
 				return ("{}");
 			var result = new StringBuilder();
 			result.Append('{');
-			foreach (var member in _ownMembers) {
-				result.Append('"')
-					.Append(member.Key.Replace("\"", "\\\""))
-					.Append('"')
-					.Append(':')
-					.Append(member.Value)
-					.Append(',');
-			}
+			foreach (var member in _ownMembers)
+				result.Append('"').Append(member.Key.Replace("\"", "\\\"")).Append('"').Append(':').Append(member.Value).Append(',');
 			if (result.Length > 1)
 				result.Length -= 2;
 			result.Append('}');
@@ -123,8 +117,7 @@ namespace YaJS.Runtime.Objects {
 				this,
 				new List<JSValue>(),
 				true,
-				() => onCompleteCallback(thread.CurrentFrame.Pop())
-				);
+				() => onCompleteCallback(thread.CurrentFrame.Pop()));
 		}
 
 		public override JSObject ToObject(VirtualMachine vm) {
@@ -157,7 +150,9 @@ namespace YaJS.Runtime.Objects {
 		/// <summary>
 		/// Прототип объекта
 		/// </summary>
-		public JSObject Inherited { get { return (_inherited); } }
+		public JSObject Inherited {
+			get { return (_inherited); }
+		}
 
 		/// <summary>
 		/// Коллекция собственных свойств

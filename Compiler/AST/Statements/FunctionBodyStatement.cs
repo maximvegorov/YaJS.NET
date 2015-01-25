@@ -6,7 +6,7 @@ namespace YaJS.Compiler.AST.Statements {
 	/// Псевдооператор представляющий тело функции
 	/// </summary>
 	public sealed class FunctionBodyStatement : CompoundStatement {
-		private List<TryStatement> _tryStatements;
+		private readonly List<TryStatement> _tryStatements;
 
 		public FunctionBodyStatement()
 			: base(1) {
@@ -25,9 +25,8 @@ namespace YaJS.Compiler.AST.Statements {
 				if (tryStatement.FinallyBlock == null || tryStatement.TryBlock.ExitPoints.Count == 0)
 					continue;
 				var finallyBlock = tryStatement.FinallyBlock;
-				foreach (var exitPoint in tryStatement.TryBlock.ExitPoints) {
+				foreach (var exitPoint in tryStatement.TryBlock.ExitPoints)
 					exitPoint.InsertBefore(new ReferenceStatement(finallyBlock));
-				}
 			}
 		}
 	}

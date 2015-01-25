@@ -6,7 +6,6 @@ namespace YaJS.Compiler.AST.Statements {
 	/// </summary>
 	public sealed class ContinueStatement : LanguageStatement {
 		private readonly string _targetLabel;
-		private IterationStatement _target;
 
 		public ContinueStatement(int lineNo, string targetLabel)
 			: base(StatementType.Continue, lineNo) {
@@ -23,10 +22,13 @@ namespace YaJS.Compiler.AST.Statements {
 			var target = current as IterationStatement;
 			if (target == null)
 				Errors.ThrowUnreachableLabel(LineNo, _targetLabel);
-			_target = target;
+			Target = target;
 		}
 
-		public string TargetLabel { get { return (_targetLabel); } }
-		public IterationStatement Target { get { return (_target); } }
+		public string TargetLabel {
+			get { return (_targetLabel); }
+		}
+
+		public IterationStatement Target { get; private set; }
 	}
 }

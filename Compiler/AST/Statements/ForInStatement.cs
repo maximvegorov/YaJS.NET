@@ -8,12 +8,7 @@ namespace YaJS.Compiler.AST.Statements {
 		private readonly string _variableName;
 		private readonly Expression _enumerable;
 
-		public ForInStatement(
-			int lineNo,
-			string variableName,
-			Expression enumerable,
-			ILabelSet labelSet
-			)
+		public ForInStatement(int lineNo, string variableName, Expression enumerable, ILabelSet labelSet)
 			: base(StatementType.ForIn, lineNo, labelSet) {
 			Contract.Requires(!string.IsNullOrEmpty(variableName));
 			Contract.Requires(enumerable != null);
@@ -21,7 +16,12 @@ namespace YaJS.Compiler.AST.Statements {
 			_enumerable = enumerable;
 		}
 
-		public string VariableName { get { return (_variableName); } }
-		public Expression Enumerable { get { return (_enumerable); } }
+		public string VariableName {
+			get { return (_variableName); }
+		}
+
+		public Expression Enumerable {
+			get { return (_enumerable); }
+		}
 	}
 }

@@ -12,7 +12,9 @@ namespace YaJS.Compiler.AST.Expressions {
 			return (result.ToString());
 		}
 
-		public override bool CanHaveMembers { get { return (LeftOperand.CanHaveMembers || RightOperand.CanHaveMembers); } }
+		public override bool CanHaveMembers {
+			get { return (LeftOperand.CanHaveMembers || RightOperand.CanHaveMembers); }
+		}
 
 		public override bool CanHaveMutableMembers {
 			get { return (LeftOperand.CanHaveMutableMembers || RightOperand.CanHaveMutableMembers); }
@@ -22,7 +24,12 @@ namespace YaJS.Compiler.AST.Expressions {
 			get { return (LeftOperand.CanBeConstructor || RightOperand.CanBeConstructor); }
 		}
 
-		public override bool CanBeFunction { get { return (LeftOperand.CanBeFunction || RightOperand.CanBeFunction); } }
-		public override bool CanBeObject { get { return (LeftOperand.CanBeObject || RightOperand.CanBeObject); } }
+		public override bool CanBeFunction {
+			get { return (LeftOperand.CanBeFunction || RightOperand.CanBeFunction); }
+		}
+
+		public override bool CanBeObject {
+			get { return (LeftOperand.CanBeObject || RightOperand.CanBeObject); }
+		}
 	}
 }

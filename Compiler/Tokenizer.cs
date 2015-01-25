@@ -324,11 +324,13 @@ namespace YaJS.Compiler {
 				builder.Append((char)_input.CurChar);
 				_input.ReadChar();
 				if (!char.IsDigit((char)_input.CurChar))
-					ThrowUnexpectedChar();
-				do {
-					builder.Append((char)_input.CurChar);
-					_input.ReadChar();
-				} while (char.IsDigit((char)_input.CurChar));
+					builder.Append('0');
+				else {
+					do {
+						builder.Append((char)_input.CurChar);
+						_input.ReadChar();
+					} while (char.IsDigit((char)_input.CurChar));
+				}
 			}
 			if (_input.CurChar == 'e' || _input.CurChar == 'E') {
 				Lookahead.Type = TokenType.Float;

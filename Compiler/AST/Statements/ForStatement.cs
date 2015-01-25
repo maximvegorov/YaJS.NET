@@ -12,15 +12,23 @@
 			Expression initialization,
 			Expression condition,
 			Expression increment,
-			ILabelSet labelSet
-			) : base(StatementType.For, lineNo, labelSet) {
+			ILabelSet labelSet)
+			: base(StatementType.For, lineNo, labelSet) {
 			_initialization = initialization;
 			_condition = condition;
 			_increment = increment;
 		}
 
-		public Expression Initialization { get { return (_initialization); } }
-		public Expression Condition { get { return (_condition); } }
-		public Expression Increment { get { return (_increment); } }
+		public Expression Initialization {
+			get { return (_initialization); }
+		}
+
+		public Expression Condition {
+			get { return (_condition); }
+		}
+
+		public Expression Increment {
+			get { return (_increment); }
+		}
 	}
 }

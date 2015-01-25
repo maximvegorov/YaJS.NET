@@ -1,39 +1,72 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Text;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
-	internal sealed class NewOperator : Expression {
-		private readonly Expression _constructor;
-		private readonly List<Expression> _arguments;
-
-		public NewOperator(Expression constructor, List<Expression> arguments) : base(ExpressionType.New) {
+	public sealed class NewOperator : Expression {
+		internal NewOperator(Expression constructor, List<Expression> argumentList)
+			: base(ExpressionType.New) {
 			Contract.Requires(constructor != null && constructor.CanBeConstructor);
-			Contract.Requires(arguments != null);
-			_constructor = constructor;
-			_arguments = arguments;
+			Contract.Requires(argumentList != null);
+			Constructor = constructor;
+			ArgumentList = argumentList;
 		}
 
 		public override string ToString() {
 			var result = new StringBuilder();
-			result.Append("new ")
-				.Append(_constructor)
-				.Append('(');
-			if (_arguments.Count > 0) {
-				foreach (var argument in _arguments) {
-					result.Append(argument)
-						.Append(',');
-				}
+			result.Append("new ").Append(Constructor).Append('(');
+			if (ArgumentList.Count > 0) {
+				foreach (var argument in ArgumentList)
+					result.Append(argument).Append(',');
 				result.Length -= 1;
 			}
 			result.Append(')');
 			return (result.ToString());
 		}
 
-		public override bool CanHaveMembers { get { return (true); } }
-		public override bool CanHaveMutableMembers { get { return (true); } }
-		public override bool CanBeConstructor { get { return (true); } }
-		public override bool CanBeFunction { get { return (true); } }
-		public override bool CanBeObject { get { return (true); } }
+		public override bool Equals(object obj) {
+			var other = obj as NewOperator;
+			return (other != null && Constructor.Equals(other.Constructor) == ArgumentList.SequenceEqual(other.ArgumentList));
+		}
+
+		public override int GetHashCode() {
+			return
+				(GetHashCode(
+					GetHashCode(Type.GetHashCode(), Constructor.GetHashCode()),
+					GetHashCode(ArgumentList.Select(a => a.GetHashCode()))));
+		}
+
+		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
+			Constructor.CompileBy(compiler, false);
+			foreach (var argument in ArgumentList)
+				argument.CompileBy(compiler, false);
+			compiler.Emitter.Emit(OpCode.LdInteger, ArgumentList.Count);
+			compiler.Emitter.Emit(OpCode.NewObj);
+		}
+
+		public override bool CanHaveMembers {
+			get { return (true); }
+		}
+
+		public override bool CanHaveMutableMembers {
+			get { return (true); }
+		}
+
+		public override bool CanBeConstructor {
+			get { return (true); }
+		}
+
+		public override bool CanBeFunction {
+			get { return (true); }
+		}
+
+		public override bool CanBeObject {
+			get { return (true); }
+		}
+
+		public Expression Constructor { get; private set; }
+		public List<Expression> ArgumentList { get; private set; }
 	}
 }

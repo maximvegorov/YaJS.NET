@@ -54,7 +54,7 @@ namespace YaJS.Compiler.AST {
 			Contract.Requires(Type != StatementType.Compound);
 			var result = new BlockStatement(LineNo);
 			Parent = result;
-			result.Append(this);
+			result.Add(this);
 			return (result);
 		}
 

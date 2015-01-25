@@ -1,19 +1,19 @@
 ﻿using System.Globalization;
 using System.Text;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
-	internal sealed class StringLiteral : Expression {
-		private readonly string _value;
-
-		public StringLiteral(string value) : base(ExpressionType.String) {
-			_value = value ?? string.Empty;
+	public sealed class StringLiteral : Expression {
+		internal StringLiteral(string value)
+			: base(ExpressionType.StringLiteral) {
+			Value = value ?? string.Empty;
 		}
 
 		public override string ToString() {
 			var result = new StringBuilder();
 			result.Append('"');
-			for (var i = 0; i < result.Length; i++) {
-				var c = _value[i];
+			for (var i = 0; i < Value.Length; i++) {
+				var c = Value[i];
 				switch (c) {
 					case '"':
 						result.Append("\\\"");
@@ -42,10 +42,8 @@ namespace YaJS.Compiler.AST.Expressions {
 					default:
 						if (!char.IsControl(c))
 							result.Append(c);
-						else {
-							result.Append("\\u")
-								.Append(((int)c).ToString("X4", CultureInfo.InvariantCulture));
-						}
+						else
+							result.Append("\\u").Append(((int)c).ToString("X4", CultureInfo.InvariantCulture));
 						break;
 				}
 			}
@@ -53,8 +51,33 @@ namespace YaJS.Compiler.AST.Expressions {
 			return (result.ToString());
 		}
 
-		public override bool CanHaveMembers { get { return (true); } }
-		public override bool IsConstant { get { return (true); } }
-		public override bool CanBeUsedInCaseClause { get { return (true); } }
+		public override bool Equals(object obj) {
+			var other = obj as StringLiteral;
+			return (other != null && Value == other.Value);
+		}
+
+		public override int GetHashCode() {
+			return (GetHashCode(Type.GetHashCode(), Value.GetHashCode()));
+		}
+
+		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
+			if (isLast)
+				return;
+			compiler.Emitter.Emit(OpCode.LdString, Value);
+		}
+
+		public override bool CanHaveMembers {
+			get { return (true); }
+		}
+
+		public override bool IsConstant {
+			get { return (true); }
+		}
+
+		public override bool CanBeUsedInCaseClause {
+			get { return (true); }
+		}
+
+		public string Value { get; private set; }
 	}
 }

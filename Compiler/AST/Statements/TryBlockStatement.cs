@@ -16,6 +16,8 @@ namespace YaJS.Compiler.AST.Statements {
 			_exitPoints.Add(exitPoint);
 		}
 
-		public IReadOnlyList<Statement> ExitPoints { get { return (_exitPoints); } }
+		public IReadOnlyList<Statement> ExitPoints {
+			get { return (_exitPoints); }
+		}
 	}
 }

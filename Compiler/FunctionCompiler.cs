@@ -20,23 +20,19 @@ namespace YaJS.Compiler {
 		private CompiledFunction Compile(CompiledFunction[] nestedFunctions) {
 			Function.Preprocess();
 			Function.CompileBy(this);
-			return (new CompiledFunction(
-				Function.Name,
-				Function.LineNo,
-				Function.ParameterNames.Count == 0
-					? CompiledFunction.EmptyParameterNames
-					: Function.ParameterNames.ToArray(),
-				Function.DeclaredVariables.Count == 0
-					? CompiledFunction.EmptyDeclaredVariables
-					: Function.DeclaredVariables.ToArray(),
-				nestedFunctions,
-				Function.FunctionDeclarationCount,
-				Function.FunctionBody.ToString(),
-				Emitter.ToCompiledCode(),
-				SwitchJumpTables.Count == 0
-					? CompiledFunction.EmptySwitchJumpTables
-					: SwitchJumpTables.ToArray()
-				));
+			return
+				(new CompiledFunction(
+					Function.Name,
+					Function.LineNo,
+					Function.ParameterNames.Count == 0 ? CompiledFunction.EmptyParameterNames : Function.ParameterNames.ToArray(),
+					Function.DeclaredVariables.Count == 0
+						? CompiledFunction.EmptyDeclaredVariables
+						: Function.DeclaredVariables.ToArray(),
+					nestedFunctions,
+					Function.FunctionDeclarationCount,
+					Function.FunctionBody.ToString(),
+					Emitter.ToCompiledCode(),
+					SwitchJumpTables.Count == 0 ? CompiledFunction.EmptySwitchJumpTables : SwitchJumpTables.ToArray()));
 		}
 
 		public static CompiledFunction Compile(Function function, CompiledFunction[] nestedFunctions) {

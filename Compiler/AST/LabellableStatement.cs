@@ -21,6 +21,8 @@ namespace YaJS.Compiler.AST {
 			return (_labelSet.Contains(targetLabel));
 		}
 
-		public ILabelSet LabelSet { get { return (_labelSet); } }
+		public ILabelSet LabelSet {
+			get { return (_labelSet); }
+		}
 	}
 }

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Linq;
+﻿using System.Diagnostics.Contracts;
 using YaJS.Compiler.AST;
 using YaJS.Compiler.AST.Statements;
 
@@ -20,9 +18,7 @@ namespace YaJS.Compiler {
 			string name,
 			int lineNo,
 			IKeyedVariableCollection parameterNames,
-			bool isDeclaration
-			) {
-			Contract.Requires(outer != null);
+			bool isDeclaration) {
 			Contract.Requires(!(isDeclaration && string.IsNullOrEmpty(name)));
 			Contract.Requires(parameterNames != null);
 
@@ -36,20 +32,21 @@ namespace YaJS.Compiler {
 		}
 
 		public Function ToFunction() {
-			return (new Function(
-				_name,
-				_lineNo,
-				_parameterNames.ToList(),
-				DeclaredKeyedVariables.ToList(),
-				NestedFunctions.ToList(),
-				FunctionBody,
-				_isDeclaration
-				));
+			return
+				(new Function(
+					_name,
+					_lineNo,
+					_parameterNames.ToList(),
+					DeclaredKeyedVariables.ToList(),
+					NestedFunctions.ToList(),
+					FunctionBody,
+					_isDeclaration));
 		}
 
 		public FunctionBuilder Outer { get; private set; }
 		public IKeyedVariableCollection DeclaredKeyedVariables { get; private set; }
 		public KeyedFunctionCollection NestedFunctions { get; private set; }
+
 		public FunctionBodyStatement FunctionBody {
 			get { return (_functionBody); }
 			set {

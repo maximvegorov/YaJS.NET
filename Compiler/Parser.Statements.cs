@@ -9,11 +9,7 @@ namespace YaJS.Compiler {
 		}
 
 		private IEnumerable<Statement> ParseStatementList() {
-			for (
-				var statement = ParseStatement(false);
-				statement != null;
-				statement = ParseStatement(false)
-				) {
+			for (var statement = ParseStatement(false); statement != null; statement = ParseStatement(false)) {
 				yield return statement;
 				if (Lookahead.Type == TokenType.RCurlyBrace)
 					break;
@@ -28,7 +24,7 @@ namespace YaJS.Compiler {
 			var result = new BlockStatement(Lookahead.StartPosition.LineNo);
 			Match(TokenType.LCurlyBrace);
 			foreach (var statement in ParseStatementList())
-				result.Append(statement);
+				result.Add(statement);
 			Match(TokenType.RCurlyBrace);
 			return (result);
 		}
@@ -110,22 +106,10 @@ namespace YaJS.Compiler {
 				if (!_currentFunction.DeclaredKeyedVariables.Contains(variableName))
 					_currentFunction.DeclaredKeyedVariables.Add(variableName);
 				ReadNextToken();
-				if (Lookahead.Type != TokenType.Assign) {
-					assignments.Add(
-						Expression.SimpleAssign(
-							Expression.Ident(variableName),
-							Expression.Undefined()
-							)
-						);
-				}
-				else {
-					assignments.Add(
-						Expression.SimpleAssign(
-							Expression.Ident(variableName),
-							ParseAssignmentExpression()
-							)
-						);
-				}
+				if (Lookahead.Type != TokenType.Assign)
+					assignments.Add(Expression.SimpleAssign(Expression.Ident(variableName), Expression.Undefined()));
+				else
+					assignments.Add(Expression.SimpleAssign(Expression.Ident(variableName), ParseAssignmentExpression()));
 				if (Lookahead.Type != TokenType.Comma)
 					hasMore = false;
 				else
@@ -152,12 +136,7 @@ namespace YaJS.Compiler {
 						if (!_currentFunction.DeclaredKeyedVariables.Contains(variableName))
 							_currentFunction.DeclaredKeyedVariables.Add(variableName);
 					}
-					result = new ForInStatement(
-						startPosition.LineNo,
-						variableName,
-						ParseExpression(),
-						labelSet
-						);
+					result = new ForInStatement(startPosition.LineNo, variableName, ParseExpression(), labelSet);
 				}
 			}
 			if (result == null) {
@@ -176,13 +155,7 @@ namespace YaJS.Compiler {
 				Expression increment = null;
 				if (Lookahead.Type != TokenType.RParenthesis)
 					increment = ParseExpression();
-				result = new ForStatement(
-					startPosition.LineNo,
-					initialization,
-					condition,
-					increment,
-					labelSet
-					);
+				result = new ForStatement(startPosition.LineNo, initialization, condition, increment, labelSet);
 			}
 			Match(TokenType.RParenthesis);
 			result.Statement = ParseStatement(true);
@@ -208,7 +181,7 @@ namespace YaJS.Compiler {
 			var result = new TryBlockStatement(Lookahead.StartPosition.LineNo);
 			Match(TokenType.LCurlyBrace);
 			foreach (var statement in ParseStatementList())
-				result.Append(statement);
+				result.Add(statement);
 			Match(TokenType.RCurlyBrace);
 			return (result);
 		}
@@ -241,7 +214,7 @@ namespace YaJS.Compiler {
 		private StatementListStatement ParseStatementListStatement() {
 			var result = new StatementListStatement(Lookahead.StartPosition.LineNo);
 			foreach (var statement in ParseStatementList())
-				result.Append(statement);
+				result.Add(statement);
 			return (result);
 		}
 
@@ -252,9 +225,7 @@ namespace YaJS.Compiler {
 			if (!expression.CanBeUsedInCaseClause)
 				Errors.ThrowUnsupportedCaseClauseExpression(startPosition);
 			Match(TokenType.Colon);
-			return (new CaseClauseStatement(startPosition.LineNo, expression) {
-				Statements = ParseStatementListStatement()
-			});
+			return (new CaseClauseStatement(startPosition.LineNo, expression) { Statements = ParseStatementListStatement() });
 		}
 
 		private CaseClauseBlockStatement ParseCaseClauseBlockStatement() {
@@ -310,9 +281,7 @@ namespace YaJS.Compiler {
 		}
 
 		private Statement ParseExpressionStatement() {
-			return (new ExpressionStatement(
-				Lookahead.StartPosition.LineNo, ParseExpression()
-				));
+			return (new ExpressionStatement(Lookahead.StartPosition.LineNo, ParseExpression()));
 		}
 
 		private Statement ParseStatement(bool isRequired) {
@@ -380,7 +349,7 @@ namespace YaJS.Compiler {
 					var statement = ParseStatement(false);
 					if (statement == null)
 						break;
-					result.Append(statement);
+					result.Add(statement);
 					if (Lookahead.Type == TokenType.Unknown)
 						break;
 					if (Lookahead.Type == TokenType.Semicolon)

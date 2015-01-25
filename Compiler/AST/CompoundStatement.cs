@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Text;
 
 namespace YaJS.Compiler.AST {
 	/// <summary>
@@ -14,8 +15,18 @@ namespace YaJS.Compiler.AST {
 			_statements = new List<Statement>();
 		}
 
-		public void Append(Statement statement) {
+		public override string ToString() {
+			var result = new StringBuilder();
+			result.AppendLine("{");
+			foreach (var statement in _statements)
+				result.Append(statement).Append(";");
+			result.AppendLine("}");
+			return (result.ToString());
+		}
+
+		public void Add(Statement statement) {
 			Contract.Requires(statement != null);
+			Contract.Requires(statement.Parent != this);
 			// Игнорируем пустые операторы
 			if (statement.Type == StatementType.Empty)
 				return;
@@ -47,6 +58,10 @@ namespace YaJS.Compiler.AST {
 		internal override void CompileBy(FunctionCompiler compiler) {
 			foreach (var statement in _statements)
 				statement.CompileBy(compiler);
+		}
+
+		public IReadOnlyList<Statement> Statements {
+			get { return (_statements); }
 		}
 
 		#region IEnumerable<Statement>

@@ -6,7 +6,7 @@ using YaJS.Compiler.Exceptions;
 
 namespace YaJS.Compiler.Tests {
 	[TestClass]
-	public class TokenizerTests {
+	public sealed class TokenizerTests {
 		private static Token RunTokenizer(string source) {
 			var tokenizer = new Tokenizer(new StringReader(source));
 			tokenizer.ReadToken();
@@ -78,53 +78,54 @@ namespace YaJS.Compiler.Tests {
 		}
 
 		private static Dictionary<string, TokenType> GetKeywords() {
-			return (new Dictionary<string, TokenType> {
-				{"break", TokenType.Break},
-				{"case", TokenType.Case},
-				{"catch", TokenType.Catch},
-				{"continue", TokenType.Continue},
-				{"debugger", TokenType.Debugger},
-				{"default", TokenType.Default},
-				{"delete", TokenType.Delete},
-				{"do", TokenType.Do},
-				{"else", TokenType.Else},
-				{"false", TokenType.False},
-				{"finally", TokenType.Finally},
-				{"for", TokenType.For},
-				{"function", TokenType.Function},
-				{"if", TokenType.If},
-				{"in", TokenType.In},
-				{"instanceof", TokenType.InstanceOf},
-				{"null", TokenType.Null},
-				{"new", TokenType.New},
-				{"return", TokenType.Return},
-				{"switch", TokenType.Switch},
-				{"this", TokenType.This},
-				{"throw", TokenType.Throw},
-				{"true", TokenType.True},
-				{"try", TokenType.Try},
-				{"typeof", TokenType.Typeof},
-				{"var", TokenType.Var},
-				{"void", TokenType.Void},
-				{"while", TokenType.While},
-				{"with", TokenType.With},
-				{"class", TokenType.Class},
-				{"enum", TokenType.Enum},
-				{"extends", TokenType.Extends},
-				{"super", TokenType.Super},
-				{"const", TokenType.Const},
-				{"export", TokenType.Export},
-				{"import", TokenType.Import},
-				{"implements", TokenType.Implements},
-				{"let", TokenType.Let},
-				{"private", TokenType.Private},
-				{"public", TokenType.Public},
-				{"yield", TokenType.Yield},
-				{"interface", TokenType.Interface},
-				{"package", TokenType.Package},
-				{"protected", TokenType.Protected},
-				{"static", TokenType.Static}
-			});
+			return
+				(new Dictionary<string, TokenType> {
+					{ "break", TokenType.Break },
+					{ "case", TokenType.Case },
+					{ "catch", TokenType.Catch },
+					{ "continue", TokenType.Continue },
+					{ "debugger", TokenType.Debugger },
+					{ "default", TokenType.Default },
+					{ "delete", TokenType.Delete },
+					{ "do", TokenType.Do },
+					{ "else", TokenType.Else },
+					{ "false", TokenType.False },
+					{ "finally", TokenType.Finally },
+					{ "for", TokenType.For },
+					{ "function", TokenType.Function },
+					{ "if", TokenType.If },
+					{ "in", TokenType.In },
+					{ "instanceof", TokenType.InstanceOf },
+					{ "null", TokenType.Null },
+					{ "new", TokenType.New },
+					{ "return", TokenType.Return },
+					{ "switch", TokenType.Switch },
+					{ "this", TokenType.This },
+					{ "throw", TokenType.Throw },
+					{ "true", TokenType.True },
+					{ "try", TokenType.Try },
+					{ "typeof", TokenType.Typeof },
+					{ "var", TokenType.Var },
+					{ "void", TokenType.Void },
+					{ "while", TokenType.While },
+					{ "with", TokenType.With },
+					{ "class", TokenType.Class },
+					{ "enum", TokenType.Enum },
+					{ "extends", TokenType.Extends },
+					{ "super", TokenType.Super },
+					{ "const", TokenType.Const },
+					{ "export", TokenType.Export },
+					{ "import", TokenType.Import },
+					{ "implements", TokenType.Implements },
+					{ "let", TokenType.Let },
+					{ "private", TokenType.Private },
+					{ "public", TokenType.Public },
+					{ "yield", TokenType.Yield },
+					{ "interface", TokenType.Interface },
+					{ "package", TokenType.Package },
+					{ "protected", TokenType.Protected },
+					{ "static", TokenType.Static }
+				});
 		}
 
 		[TestMethod]
@@ -134,56 +135,57 @@ namespace YaJS.Compiler.Tests {
 		}
 
 		private static Dictionary<string, TokenType> GetPunctuators() {
-			return (new Dictionary<string, TokenType> {
-				{"{", TokenType.LCurlyBrace},
-				{"}", TokenType.RCurlyBrace},
-				{"(", TokenType.LParenthesis},
-				{")", TokenType.RParenthesis},
-				{"[", TokenType.LBracket},
-				{"]", TokenType.RBracket},
-				{",", TokenType.Comma},
-				{".", TokenType.Dot},
-				{";", TokenType.Semicolon},
-				{"<", TokenType.Lt},
-				{">", TokenType.Gt},
-				{"<=", TokenType.Lte},
-				{">=", TokenType.Gte},
-				{"==", TokenType.Eq},
-				{"!=", TokenType.Neq},
-				{"===", TokenType.StrictEq},
-				{"!==", TokenType.StrictNeq},
-				{"+", TokenType.Plus},
-				{"-", TokenType.Minus},
-				{"*", TokenType.Star},
-				{"/", TokenType.Slash},
-				{"%", TokenType.Mod},
-				{"++", TokenType.Inc},
-				{"--", TokenType.Dec},
-				{"<<", TokenType.Shl},
-				{">>", TokenType.ShrS},
-				{">>>", TokenType.ShrU},
-				{"&", TokenType.BitAnd},
-				{"|", TokenType.BitOr},
-				{"^", TokenType.BitXor},
-				{"!", TokenType.Not},
-				{"~", TokenType.BitNot},
-				{"&&", TokenType.And},
-				{"||", TokenType.Or},
-				{"?", TokenType.QuestionMark},
-				{":", TokenType.Colon},
-				{"=", TokenType.Assign},
-				{"+=", TokenType.PlusAssign},
-				{"-=", TokenType.MinusAssign},
-				{"*=", TokenType.StarAssign},
-				{"/=", TokenType.SlashAssign},
-				{"%=", TokenType.ModAssign},
-				{"<<=", TokenType.ShlAssign},
-				{">>=", TokenType.ShrSAssign},
-				{">>>=", TokenType.ShrUAssign},
-				{"&=", TokenType.BitAndAssign},
-				{"|=", TokenType.BitOrAssign},
-				{"^=", TokenType.BitXorAssign}
-			});
+			return
+				(new Dictionary<string, TokenType> {
+					{ "{", TokenType.LCurlyBrace },
+					{ "}", TokenType.RCurlyBrace },
+					{ "(", TokenType.LParenthesis },
+					{ ")", TokenType.RParenthesis },
+					{ "[", TokenType.LBracket },
+					{ "]", TokenType.RBracket },
+					{ ",", TokenType.Comma },
+					{ ".", TokenType.Dot },
+					{ ";", TokenType.Semicolon },
+					{ "<", TokenType.Lt },
+					{ ">", TokenType.Gt },
+					{ "<=", TokenType.Lte },
+					{ ">=", TokenType.Gte },
+					{ "==", TokenType.Eq },
+					{ "!=", TokenType.Neq },
+					{ "===", TokenType.StrictEq },
+					{ "!==", TokenType.StrictNeq },
+					{ "+", TokenType.Plus },
+					{ "-", TokenType.Minus },
+					{ "*", TokenType.Star },
+					{ "/", TokenType.Slash },
+					{ "%", TokenType.Mod },
+					{ "++", TokenType.Inc },
+					{ "--", TokenType.Dec },
+					{ "<<", TokenType.Shl },
+					{ ">>", TokenType.ShrS },
+					{ ">>>", TokenType.ShrU },
+					{ "&", TokenType.BitAnd },
+					{ "|", TokenType.BitOr },
+					{ "^", TokenType.BitXor },
+					{ "!", TokenType.Not },
+					{ "~", TokenType.BitNot },
+					{ "&&", TokenType.And },
+					{ "||", TokenType.Or },
+					{ "?", TokenType.QuestionMark },
+					{ ":", TokenType.Colon },
+					{ "=", TokenType.Assign },
+					{ "+=", TokenType.PlusAssign },
+					{ "-=", TokenType.MinusAssign },
+					{ "*=", TokenType.StarAssign },
+					{ "/=", TokenType.SlashAssign },
+					{ "%=", TokenType.ModAssign },
+					{ "<<=", TokenType.ShlAssign },
+					{ ">>=", TokenType.ShrSAssign },
+					{ ">>>=", TokenType.ShrUAssign },
+					{ "&=", TokenType.BitAndAssign },
+					{ "|=", TokenType.BitOrAssign },
+					{ "^=", TokenType.BitXorAssign }
+				});
 		}
 
 		[TestMethod]
@@ -250,9 +252,8 @@ namespace YaJS.Compiler.Tests {
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof (UnexpectedCharException))]
-		public void Float_InvalidCharAfterDot() {
-			RunTokenizer("145.a");
+		public void Float_NoDigitAfterDot() {
+			RunTokenizer("145.", TokenType.Float, "145.0");
 		}
 
 		[TestMethod]
@@ -262,17 +263,18 @@ namespace YaJS.Compiler.Tests {
 		}
 
 		private static Dictionary<string, string> GetCharEscapeSequences() {
-			return (new Dictionary<string, string> {
-				{"'\\''", "\'"},
-				{"'\\\"'", "\""},
-				{"'\\\\'", "\\"},
-				{"'\\b'", "\b"},
-				{"'\\f'", "\f"},
-				{"'\\n'", "\n"},
-				{"'\\r'", "\r"},
-				{"'\\t'", "\t"},
-				{"'\\v'", "\v"}
-			});
+			return
+				(new Dictionary<string, string> {
+					{ "'\\''", "\'" },
+					{ "'\\\"'", "\"" },
+					{ "'\\\\'", "\\" },
+					{ "'\\b'", "\b" },
+					{ "'\\f'", "\f" },
+					{ "'\\n'", "\n" },
+					{ "'\\r'", "\r" },
+					{ "'\\t'", "\t" },
+					{ "'\\v'", "\v" }
+				});
 		}
 
 		[TestMethod]

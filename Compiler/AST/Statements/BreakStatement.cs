@@ -6,7 +6,6 @@ namespace YaJS.Compiler.AST.Statements {
 	/// </summary>
 	public sealed class BreakStatement : LanguageStatement {
 		private readonly string _targetLabel;
-		private LabellableStatement _target;
 
 		public BreakStatement(int lineNo, string targetLabel)
 			: base(StatementType.Break, lineNo) {
@@ -23,10 +22,13 @@ namespace YaJS.Compiler.AST.Statements {
 			var target = current as LabellableStatement;
 			if (target == null)
 				Errors.ThrowUnreachableLabel(LineNo, _targetLabel);
-			_target = target;
+			Target = target;
 		}
 
-		public string TargetLabel { get { return (_targetLabel); } }
-		public LabellableStatement Target { get { return (_target); } }
+		public string TargetLabel {
+			get { return (_targetLabel); }
+		}
+
+		public LabellableStatement Target { get; private set; }
 	}
 }

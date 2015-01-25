@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using YaJS.Compiler.AST;
-using YaJS.Compiler.Exceptions;
 
 namespace YaJS.Compiler {
 	/// <summary>
@@ -88,13 +87,7 @@ namespace YaJS.Compiler {
 			}
 			Match(TokenType.RParenthesis);
 
-			_currentFunction = new FunctionBuilder(
-				_currentFunction,
-				name,
-				startPosition.LineNo,
-				parameterNames,
-				isDeclaration
-				);
+			_currentFunction = new FunctionBuilder(_currentFunction, name, startPosition.LineNo, parameterNames, isDeclaration);
 			Match(TokenType.LCurlyBrace);
 			_currentFunction.FunctionBody = ParseFunctionBody();
 			Match(TokenType.RCurlyBrace);
@@ -118,13 +111,8 @@ namespace YaJS.Compiler {
 		public Function ParseFunction(string functionName, IEnumerable<string> parameterNames) {
 			Contract.Requires<ArgumentNullException>(!string.IsNullOrEmpty(functionName), "functionName");
 			Contract.Requires<ArgumentNullException>(parameterNames != null, "parameterNames");
-			_currentFunction = new FunctionBuilder(
-				null,
-				functionName,
-				1,
-				ToVariableCollection(parameterNames),
-				false
-				);
+			// ReSharper disable once UseObjectOrCollectionInitializer
+			_currentFunction = new FunctionBuilder(null, functionName, 1, ToVariableCollection(parameterNames), false);
 			_currentFunction.FunctionBody = ParseFunctionBody();
 			Contract.Assert(Lookahead.Type == TokenType.Unknown);
 			return (_currentFunction.ToFunction());

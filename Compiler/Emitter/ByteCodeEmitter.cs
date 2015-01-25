@@ -98,6 +98,8 @@ namespace YaJS.Compiler.Emitter {
 			return (result);
 		}
 
-		public byte[] RawBuffer { get { return (_buffer); } }
+		public byte[] RawBuffer {
+			get { return (_buffer); }
+		}
 	}
 }

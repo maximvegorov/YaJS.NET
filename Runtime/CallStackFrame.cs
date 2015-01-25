@@ -15,6 +15,7 @@ namespace YaJS.Runtime {
 		/// Стек вычислений
 		/// </summary>
 		private readonly Stack<JSValue> _evalStack;
+
 		/// <summary>
 		/// Текущий блок try
 		/// </summary>
@@ -27,8 +28,7 @@ namespace YaJS.Runtime {
 			JSObject context,
 			List<JSValue> parameterValues,
 			bool copyResult = false,
-			Action onCompleteCallback = null
-			) {
+			Action onCompleteCallback = null) {
 			Contract.Requires(vm != null);
 			Contract.Requires(function != null);
 			Contract.Requires(function.OuterScope != null);
@@ -37,8 +37,7 @@ namespace YaJS.Runtime {
 			Contract.Ensures(
 				LocalScope != null &&
 					LocalScope.Variables.Count ==
-						Math.Max(function.CompiledFunction.ParameterNames.Length, LocalScope.Variables.Count) + 1
-				);
+						Math.Max(function.CompiledFunction.ParameterNames.Length, LocalScope.Variables.Count) + 1);
 
 			Caller = caller;
 			CopyResult = copyResult;
@@ -67,12 +66,8 @@ namespace YaJS.Runtime {
 			// Создать привязки для объявленных функций
 			for (var i = 0; i < Function.CompiledFunction.DeclaredFunctionCount; i++) {
 				var declaredFunction = Function.CompiledFunction.NestedFunctions[i];
-				if (!LocalScope.Variables.ContainsKey(declaredFunction.Name)) {
-					LocalScope.Variables.Add(
-						declaredFunction.Name,
-						vm.NewFunction(LocalScope, declaredFunction)
-						);
-				}
+				if (!LocalScope.Variables.ContainsKey(declaredFunction.Name))
+					LocalScope.Variables.Add(declaredFunction.Name, vm.NewFunction(LocalScope, declaredFunction));
 			}
 
 			// Создать привязки для объявленных переменных
@@ -107,10 +102,7 @@ namespace YaJS.Runtime {
 		}
 
 		internal JSFunction GetFunction(VirtualMachine vm, int index) {
-			return (vm.NewFunction(
-				LocalScope,
-				Function.CompiledFunction.NestedFunctions[index]
-				));
+			return (vm.NewFunction(LocalScope, Function.CompiledFunction.NestedFunctions[index]));
 		}
 
 		internal void BeginScope() {
@@ -150,11 +142,7 @@ namespace YaJS.Runtime {
 		}
 
 		public CallStackFrameView[] ToStackTrace() {
-			return (
-				GetFrames().Select(f => new CallStackFrameView(f))
-					.Reverse()
-					.ToArray()
-				);
+			return (GetFrames().Select(f => new CallStackFrameView(f)).Reverse().ToArray());
 		}
 
 		/// <summary>

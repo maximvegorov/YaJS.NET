@@ -32,21 +32,15 @@ namespace YaJS.Runtime.Constructors {
 				parameterNames = args.Take(args.Count - 1).Select(arg => arg.CastToString());
 				functionBody = args[args.Count - 1].CastToString();
 			}
-			return (VM.NewFunction(
-				outerScope,
-				VM.Compiler.Compile("f", parameterNames, functionBody)
-				));
+			return (VM.NewFunction(outerScope, VM.Compiler.Compile("f", parameterNames, functionBody)));
 		}
 
-		public override JSValue Invoke(
-			ExecutionThread thread,
-			JSObject context,
-			LocalScope outerScope,
-			List<JSValue> args
-			) {
+		public override JSValue Invoke(ExecutionThread thread, JSObject context, LocalScope outerScope, List<JSValue> args) {
 			return (Construct(thread, outerScope, args));
 		}
 
-		public override int ParameterCount { get { return (1); } }
+		public override int ParameterCount {
+			get { return (1); }
+		}
 	}
 }
