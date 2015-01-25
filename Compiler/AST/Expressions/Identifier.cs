@@ -13,19 +13,49 @@ namespace YaJS.Compiler.AST.Expressions {
 			return (Value);
 		}
 
+		public override bool Equals(object obj) {
+			var other = obj as Identifier;
+			return (other != null && Value == other.Value);
+		}
+
+		public override int GetHashCode() {
+			return (GetHashCode(Type.GetHashCode(), Value.GetHashCode()));
+		}
+
 		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
 			if (isLast)
 				return;
 			compiler.Emitter.Emit(OpCode.LdLocal, Value);
 		}
 
-		public override bool IsReference { get { return (true); } }
-		public override bool CanHaveMembers { get { return (true); } }
-		public override bool CanHaveMutableMembers { get { return (true); } }
-		public override bool CanBeConstructor { get { return (true); } }
-		public override bool CanBeFunction { get { return (true); } }
-		public override bool CanBeDeleted { get { return (true); } }
-		public override bool CanBeObject { get { return (true); } }
+		public override bool IsReference {
+			get { return (true); }
+		}
+
+		public override bool CanHaveMembers {
+			get { return (true); }
+		}
+
+		public override bool CanHaveMutableMembers {
+			get { return (true); }
+		}
+
+		public override bool CanBeConstructor {
+			get { return (true); }
+		}
+
+		public override bool CanBeFunction {
+			get { return (true); }
+		}
+
+		public override bool CanBeDeleted {
+			get { return (true); }
+		}
+
+		public override bool CanBeObject {
+			get { return (true); }
+		}
+
 		public string Value { get; private set; }
 	}
 }

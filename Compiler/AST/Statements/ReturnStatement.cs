@@ -15,10 +15,8 @@ namespace YaJS.Compiler.AST.Statements {
 		public override string ToString() {
 			var result = new StringBuilder();
 			result.Append("return");
-			if (Expression.Type != ExpressionType.UndefinedLiteral) {
-				result.Append(" ")
-					.Append(Expression.ToString());
-			}
+			if (Expression.Type != ExpressionType.UndefinedLiteral)
+				result.Append(" ").Append(Expression);
 			return (result.ToString());
 		}
 

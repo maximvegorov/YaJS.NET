@@ -25,15 +25,12 @@ namespace YaJS.Runtime.Constructors {
 			return (VM.NewNumber(args.Count > 0 ? args[0].ToNumber() : 0));
 		}
 
-		public override JSValue Invoke(
-			ExecutionThread thread,
-			JSObject context,
-			LocalScope outerScope,
-			List<JSValue> args
-			) {
+		public override JSValue Invoke(ExecutionThread thread, JSObject context, LocalScope outerScope, List<JSValue> args) {
 			return (args.Count > 0 ? args[0].ToNumber() : 0);
 		}
 
-		public override int ParameterCount { get { return (1); } }
+		public override int ParameterCount {
+			get { return (1); }
+		}
 	}
 }

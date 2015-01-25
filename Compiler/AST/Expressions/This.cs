@@ -2,7 +2,8 @@
 
 namespace YaJS.Compiler.AST.Expressions {
 	public sealed class This : Expression {
-		internal This() : base(ExpressionType.This) {
+		internal This()
+			: base(ExpressionType.This) {
 		}
 
 		public override string ToString() {
@@ -15,8 +16,16 @@ namespace YaJS.Compiler.AST.Expressions {
 			compiler.Emitter.Emit(OpCode.LdThis);
 		}
 
-		public override bool CanHaveMembers { get { return (true); } }
-		public override bool CanHaveMutableMembers { get { return (true); } }
-		public override bool CanBeObject { get { return (true); } }
+		public override bool CanHaveMembers {
+			get { return (true); }
+		}
+
+		public override bool CanHaveMutableMembers {
+			get { return (true); }
+		}
+
+		public override bool CanBeObject {
+			get { return (true); }
+		}
 	}
 }

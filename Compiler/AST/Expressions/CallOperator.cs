@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Text;
 using YaJS.Runtime;
 
@@ -15,17 +16,26 @@ namespace YaJS.Compiler.AST.Expressions {
 
 		public override string ToString() {
 			var result = new StringBuilder();
-			result.Append(CallFunction)
-				.Append('(');
+			result.Append(CallFunction).Append('(');
 			if (ArgumentList.Count > 0) {
-				foreach (var argument in ArgumentList) {
-					result.Append(argument)
-						.Append(',');
-				}
+				foreach (var argument in ArgumentList)
+					result.Append(argument).Append(',');
 				result.Length -= 1;
 			}
 			result.Append(')');
 			return (result.ToString());
+		}
+
+		public override bool Equals(object obj) {
+			var other = obj as CallOperator;
+			return (other != null && CallFunction.Equals(other.CallFunction) == ArgumentList.SequenceEqual(other.ArgumentList));
+		}
+
+		public override int GetHashCode() {
+			return
+				(GetHashCode(
+					GetHashCode(Type.GetHashCode(), CallFunction.GetHashCode()),
+					GetHashCode(ArgumentList.Select(a => a.GetHashCode()))));
 		}
 
 		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
@@ -39,7 +49,7 @@ namespace YaJS.Compiler.AST.Expressions {
 				Contract.Assert(memberOperator != null);
 				memberOperator.BaseValue.CompileBy(compiler, false);
 				compiler.Emitter.Emit(OpCode.Dup);
-				memberOperator.MemberName.CompileBy(compiler, false);
+				memberOperator.Property.CompileBy(compiler, false);
 				compiler.Emitter.Emit(OpCode.LdMember);
 				callOpCode = OpCode.CallMember;
 			}
@@ -49,11 +59,26 @@ namespace YaJS.Compiler.AST.Expressions {
 			compiler.Emitter.Emit(callOpCode, !isLast);
 		}
 
-		public override bool CanHaveMembers { get { return (true); } }
-		public override bool CanHaveMutableMembers { get { return (true); } }
-		public override bool CanBeConstructor { get { return (true); } }
-		public override bool CanBeFunction { get { return (true); } }
-		public override bool CanBeObject { get { return (true); } }
+		public override bool CanHaveMembers {
+			get { return (true); }
+		}
+
+		public override bool CanHaveMutableMembers {
+			get { return (true); }
+		}
+
+		public override bool CanBeConstructor {
+			get { return (true); }
+		}
+
+		public override bool CanBeFunction {
+			get { return (true); }
+		}
+
+		public override bool CanBeObject {
+			get { return (true); }
+		}
+
 		public Expression CallFunction { get; private set; }
 		public List<Expression> ArgumentList { get; private set; }
 	}

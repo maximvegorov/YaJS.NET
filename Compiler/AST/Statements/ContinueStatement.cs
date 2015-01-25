@@ -25,7 +25,10 @@ namespace YaJS.Compiler.AST.Statements {
 			Target = target;
 		}
 
-		public string TargetLabel { get { return (_targetLabel); } }
+		public string TargetLabel {
+			get { return (_targetLabel); }
+		}
+
 		public IterationStatement Target { get; private set; }
 	}
 }

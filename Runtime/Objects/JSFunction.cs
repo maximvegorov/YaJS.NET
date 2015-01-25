@@ -47,12 +47,7 @@ namespace YaJS.Runtime.Objects {
 		/// <param name="outerScope">Внешняя область локальных переменных</param>
 		/// <param name="args">Список параметров</param>
 		/// <returns></returns>
-		public virtual JSValue Invoke(
-			ExecutionThread thread,
-			JSObject context,
-			LocalScope outerScope,
-			List<JSValue> args
-			) {
+		public virtual JSValue Invoke(ExecutionThread thread, JSObject context, LocalScope outerScope, List<JSValue> args) {
 			Contract.Requires(thread != null);
 			Contract.Requires(context != null);
 			Contract.Requires(outerScope != null);

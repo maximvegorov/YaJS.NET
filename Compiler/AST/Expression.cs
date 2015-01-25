@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
+using System.Linq;
 using YaJS.Compiler.AST.Expressions;
 
 namespace YaJS.Compiler.AST {
@@ -13,8 +14,10 @@ namespace YaJS.Compiler.AST {
 		private static readonly Expression FalseLiteral = new BooleanLiteral(false);
 		private static readonly Expression TrueLiteral = new BooleanLiteral(true);
 		private static readonly Expression EmptyStringLiteral = new StringLiteral(string.Empty);
+
 		private static readonly List<KeyValuePair<string, Expression>> EmptyObjectLiteral =
 			new List<KeyValuePair<string, Expression>>();
+
 		private static readonly List<Expression> EmptyArrayLiteral = new List<Expression>();
 		private static readonly Expression ThisLiteral = new This();
 		private static readonly Expression ArgumentsLiteral = new Arguments();
@@ -22,6 +25,23 @@ namespace YaJS.Compiler.AST {
 
 		protected Expression(ExpressionType type) {
 			Type = type;
+		}
+
+		public override bool Equals(object obj) {
+			var other = obj as Expression;
+			return (other != null && Type == other.Type);
+		}
+
+		public override int GetHashCode() {
+			return (Type.GetHashCode());
+		}
+
+		protected static int GetHashCode(int hash1, int hash2) {
+			return (unchecked(37 * hash1 + hash2));
+		}
+
+		protected static int GetHashCode(IEnumerable<int> hashes) {
+			return (hashes.Aggregate(0, GetHashCode));
 		}
 
 		/// <summary>
@@ -79,9 +99,9 @@ namespace YaJS.Compiler.AST {
 			if ('0' <= c && c <= '9')
 				return (c - '0');
 			if ('a' <= c && c <= 'f')
-				return (c - 'a');
+				return (c - 'a') + 10;
 			if ('A' <= c && c <= 'F')
-				return (c - 'A');
+				return (c - 'A') + 10;
 			Contract.Assert(false);
 			return (0);
 		}
@@ -371,46 +391,64 @@ namespace YaJS.Compiler.AST {
 		/// <summary>
 		/// Является ли выражение ссылкой (можно использовать в левой части оператора присваивания)
 		/// </summary>
-		public virtual bool IsReference { get { return (false); } }
+		public virtual bool IsReference {
+			get { return (false); }
+		}
 
 		/// <summary>
 		/// Применим ли к выражению MemberOperator
 		/// </summary>
-		public virtual bool CanHaveMembers { get { return (false); } }
+		public virtual bool CanHaveMembers {
+			get { return (false); }
+		}
 
 		/// <summary>
 		/// Будет ли выражение ссылкой после применения MemberOperator
 		/// </summary>
-		public virtual bool CanHaveMutableMembers { get { return (false); } }
+		public virtual bool CanHaveMutableMembers {
+			get { return (false); }
+		}
 
 		/// <summary>
 		/// Применим ли к выражению NewOperator
 		/// </summary>
-		public virtual bool CanBeConstructor { get { return (false); } }
+		public virtual bool CanBeConstructor {
+			get { return (false); }
+		}
 
 		/// <summary>
 		/// Применим ли к выражению CallOperator
 		/// </summary>
-		public virtual bool CanBeFunction { get { return (false); } }
+		public virtual bool CanBeFunction {
+			get { return (false); }
+		}
 
 		/// <summary>
 		/// Применим ли к выражению DeleteOperator
 		/// </summary>
-		public virtual bool CanBeDeleted { get { return (false); } }
+		public virtual bool CanBeDeleted {
+			get { return (false); }
+		}
 
 		/// <summary>
 		/// Может ли результат вычисления выражения быть объектом
 		/// </summary>
-		public virtual bool CanBeObject { get { return (false); } }
+		public virtual bool CanBeObject {
+			get { return (false); }
+		}
 
 		/// <summary>
 		/// Выражение является константным
 		/// </summary>
-		public virtual bool IsConstant { get { return (false); } }
+		public virtual bool IsConstant {
+			get { return (false); }
+		}
 
 		/// <summary>
 		/// Может ли использоваться в качестве Selector-а в CaseClause
 		/// </summary>
-		public virtual bool CanBeUsedInCaseClause { get { return (false); } }
+		public virtual bool CanBeUsedInCaseClause {
+			get { return (false); }
+		}
 	}
 }

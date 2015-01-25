@@ -19,7 +19,9 @@ namespace YaJS.Compiler.Emitter {
 			return (new SingletonUnresolvedOffsetSet(offset));
 		}
 
-		public IEnumerable<int> Offsets { get { return (Enumerable.Empty<int>()); } }
+		public IEnumerable<int> Offsets {
+			get { return (Enumerable.Empty<int>()); }
+		}
 	}
 
 	/// <summary>
@@ -37,7 +39,9 @@ namespace YaJS.Compiler.Emitter {
 			return (new TwoUnresolvedOffsetSet(_offset, offset));
 		}
 
-		public IEnumerable<int> Offsets { get { yield return _offset; } }
+		public IEnumerable<int> Offsets {
+			get { yield return _offset; }
+		}
 	}
 
 	/// <summary>
@@ -58,7 +62,9 @@ namespace YaJS.Compiler.Emitter {
 			return (new UnresolvedOffsetSet(_offset1, _offset2, offset));
 		}
 
-		public IEnumerable<int> Offsets { get { return (new[] {_offset1, _offset2}); } }
+		public IEnumerable<int> Offsets {
+			get { return (new[] { _offset1, _offset2 }); }
+		}
 	}
 
 	/// <summary>
@@ -71,7 +77,7 @@ namespace YaJS.Compiler.Emitter {
 			Contract.Requires(offset1 >= 0);
 			Contract.Requires(offset2 >= 0);
 			Contract.Requires(offset3 >= 0);
-			_list = new List<int> {offset1, offset2, offset3};
+			_list = new List<int> { offset1, offset2, offset3 };
 		}
 
 		public IUnresolvedOffsetSet Append(int offset) {
@@ -79,6 +85,8 @@ namespace YaJS.Compiler.Emitter {
 			return (this);
 		}
 
-		public IEnumerable<int> Offsets { get { return (_list); } }
+		public IEnumerable<int> Offsets {
+			get { return (_list); }
+		}
 	}
 }

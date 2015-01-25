@@ -7,10 +7,24 @@ namespace YaJS.Compiler.AST.Expressions {
 			Contract.Requires(leftOperand.IsReference);
 		}
 
-		public override bool CanHaveMembers { get { return (RightOperand.CanHaveMembers); } }
-		public override bool CanHaveMutableMembers { get { return (RightOperand.CanHaveMutableMembers); } }
-		public override bool CanBeConstructor { get { return (RightOperand.CanBeConstructor); } }
-		public override bool CanBeFunction { get { return (RightOperand.CanBeFunction); } }
-		public override bool IsConstant { get { return (false); } }
+		public override bool CanHaveMembers {
+			get { return (RightOperand.CanHaveMembers); }
+		}
+
+		public override bool CanHaveMutableMembers {
+			get { return (RightOperand.CanHaveMutableMembers); }
+		}
+
+		public override bool CanBeConstructor {
+			get { return (RightOperand.CanBeConstructor); }
+		}
+
+		public override bool CanBeFunction {
+			get { return (RightOperand.CanBeFunction); }
+		}
+
+		public override bool IsConstant {
+			get { return (false); }
+		}
 	}
 }

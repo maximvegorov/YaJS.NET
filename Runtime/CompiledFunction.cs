@@ -21,8 +21,7 @@ namespace YaJS.Runtime {
 			int declaredFunctionCount,
 			string source,
 			byte[] compiledCode,
-			SwitchJumpTable[] switchJumpTables
-			) {
+			SwitchJumpTable[] switchJumpTables) {
 			Contract.Requires(!string.IsNullOrEmpty(name));
 			Contract.Requires(lineNo >= 1);
 			Contract.Requires(parameterNames != null);

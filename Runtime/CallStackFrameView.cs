@@ -12,11 +12,7 @@ namespace YaJS.Runtime {
 		}
 
 		public override string ToString() {
-			return (string.Format(
-				"{0} at {1}",
-				FunctionName,
-				CodeOffset.ToString(CultureInfo.InvariantCulture)
-				));
+			return (string.Format("{0} at {1}", FunctionName, CodeOffset.ToString(CultureInfo.InvariantCulture)));
 		}
 
 		public string FunctionName { get; private set; }

@@ -9,8 +9,7 @@ namespace YaJS.Runtime.Objects {
 			VirtualMachine vm,
 			LocalScope outerScope,
 			CompiledFunction compiledFunction,
-			JSObject inherited
-			)
+			JSObject inherited)
 			: base(vm, inherited) {
 			Contract.Requires(compiledFunction != null);
 			Contract.Requires(inherited != null);
@@ -28,7 +27,12 @@ namespace YaJS.Runtime.Objects {
 		/// </summary>
 		public CompiledFunction CompiledFunction { get; private set; }
 
-		public override bool IsNative { get { return (false); } }
-		public override int ParameterCount { get { return (CompiledFunction.ParameterNames.Length); } }
+		public override bool IsNative {
+			get { return (false); }
+		}
+
+		public override int ParameterCount {
+			get { return (CompiledFunction.ParameterNames.Length); }
+		}
 	}
 }

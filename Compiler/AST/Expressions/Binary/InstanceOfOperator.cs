@@ -14,6 +14,8 @@ namespace YaJS.Compiler.AST.Expressions {
 			return (result.ToString());
 		}
 
-		public override bool CanHaveMembers { get { return (true); } }
+		public override bool CanHaveMembers {
+			get { return (true); }
+		}
 	}
 }

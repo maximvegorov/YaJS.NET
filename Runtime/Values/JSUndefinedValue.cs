@@ -8,7 +8,8 @@ namespace YaJS.Runtime.Values {
 	internal sealed class JSUndefinedValue : JSValue {
 		private const string UndefinedString = "undefined";
 
-		public JSUndefinedValue() : base(JSValueType.Undefined) {
+		public JSUndefinedValue()
+			: base(JSValueType.Undefined) {
 		}
 
 		public override string ToString() {

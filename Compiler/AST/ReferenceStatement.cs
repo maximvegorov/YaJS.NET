@@ -24,6 +24,8 @@ namespace YaJS.Compiler.AST {
 			}
 		}
 
-		public override int LineNo { get { return (_reference.LineNo); } }
+		public override int LineNo {
+			get { return (_reference.LineNo); }
+		}
 	}
 }

@@ -19,10 +19,8 @@ namespace YaJS.Runtime.Objects {
 		public override string ToString() {
 			var result = new StringBuilder();
 			result.Append('[');
-			for (var i = 0; i < Items.Count; i++) {
-				result.Append(Items[i] ?? Undefined)
-					.Append(", ");
-			}
+			for (var i = 0; i < Items.Count; i++)
+				result.Append(Items[i] ?? Undefined).Append(", ");
 			if (result.Length > 1)
 				result.Length -= 2;
 			result.Append(']');

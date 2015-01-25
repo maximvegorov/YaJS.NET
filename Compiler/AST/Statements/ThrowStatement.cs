@@ -13,6 +13,8 @@ namespace YaJS.Compiler.AST.Statements {
 			_expression = expression;
 		}
 
-		public Expression Expression { get { return (_expression); } }
+		public Expression Expression {
+			get { return (_expression); }
+		}
 	}
 }

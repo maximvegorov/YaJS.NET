@@ -18,8 +18,7 @@ namespace YaJS.Compiler {
 			string name,
 			int lineNo,
 			IKeyedVariableCollection parameterNames,
-			bool isDeclaration
-			) {
+			bool isDeclaration) {
 			Contract.Requires(!(isDeclaration && string.IsNullOrEmpty(name)));
 			Contract.Requires(parameterNames != null);
 
@@ -33,15 +32,15 @@ namespace YaJS.Compiler {
 		}
 
 		public Function ToFunction() {
-			return (new Function(
-				_name,
-				_lineNo,
-				_parameterNames.ToList(),
-				DeclaredKeyedVariables.ToList(),
-				NestedFunctions.ToList(),
-				FunctionBody,
-				_isDeclaration
-				));
+			return
+				(new Function(
+					_name,
+					_lineNo,
+					_parameterNames.ToList(),
+					DeclaredKeyedVariables.ToList(),
+					NestedFunctions.ToList(),
+					FunctionBody,
+					_isDeclaration));
 		}
 
 		public FunctionBuilder Outer { get; private set; }

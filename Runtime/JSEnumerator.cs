@@ -22,6 +22,8 @@ namespace YaJS.Runtime {
 			return (this);
 		}
 
-		public JSValue Current { get { return (_enumerator.Current); } }
+		public JSValue Current {
+			get { return (_enumerator.Current); }
+		}
 	}
 }

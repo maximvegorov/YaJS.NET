@@ -17,6 +17,8 @@ namespace YaJS.Compiler.AST.Statements {
 			return (Expression.ToString());
 		}
 
-		public Expression Expression { get { return (_expression); } }
+		public Expression Expression {
+			get { return (_expression); }
+		}
 	}
 }

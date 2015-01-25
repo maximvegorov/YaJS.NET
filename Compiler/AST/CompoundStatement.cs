@@ -18,9 +18,8 @@ namespace YaJS.Compiler.AST {
 		public override string ToString() {
 			var result = new StringBuilder();
 			result.AppendLine("{");
-			foreach (var statement in _statements) {
-				result.Append(statement.ToString()).Append(";");
-			}
+			foreach (var statement in _statements)
+				result.Append(statement).Append(";");
 			result.AppendLine("}");
 			return (result.ToString());
 		}
@@ -61,6 +60,10 @@ namespace YaJS.Compiler.AST {
 				statement.CompileBy(compiler);
 		}
 
+		public IReadOnlyList<Statement> Statements {
+			get { return (_statements); }
+		}
+
 		#region IEnumerable<Statement>
 
 		public IEnumerator<Statement> GetEnumerator() {
@@ -72,7 +75,5 @@ namespace YaJS.Compiler.AST {
 		}
 
 		#endregion
-
-		public IReadOnlyList<Statement> Statements { get { return (_statements); } } 
 	}
 }

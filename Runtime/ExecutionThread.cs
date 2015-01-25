@@ -42,10 +42,7 @@ namespace YaJS.Runtime {
 			if (CurrentException == null)
 				throw new IllegalOpCodeException(OpCode.EnterCatch.ToString());
 			CurrentFrame.BeginScope();
-			CurrentFrame.LocalScope.Variables.Add(
-				CurrentFrame.CodeReader.ReadString(),
-				CurrentException.ThrownValue
-				);
+			CurrentFrame.LocalScope.Variables.Add(CurrentFrame.CodeReader.ReadString(), CurrentException.ThrownValue);
 		}
 
 		private void LeaveCatch() {
@@ -108,8 +105,7 @@ namespace YaJS.Runtime {
 			JSObject context,
 			List<JSValue> args,
 			bool copyResult,
-			Action onCompleteCallback = null
-			) {
+			Action onCompleteCallback = null) {
 			if (function.IsNative)
 				CurrentFrame.Push(function.Invoke(this, context, CurrentFrame.LocalScope, args));
 			else {
@@ -120,8 +116,7 @@ namespace YaJS.Runtime {
 					context,
 					args,
 					copyResult,
-					onCompleteCallback
-					);
+					onCompleteCallback);
 			}
 		}
 
@@ -161,25 +156,16 @@ namespace YaJS.Runtime {
 						#region Локальные переменные
 
 					case OpCode.LdLocal:
-						currentFrame.Push(
-							currentFrame.LocalScope.GetVariable(currentFrame.CodeReader.ReadString())
-							);
+						currentFrame.Push(currentFrame.LocalScope.GetVariable(currentFrame.CodeReader.ReadString()));
 						break;
 					case OpCode.LdLocalFunc:
-						currentFrame.Push(
-							currentFrame.GetFunction(VM, currentFrame.CodeReader.ReadInteger())
-							);
+						currentFrame.Push(currentFrame.GetFunction(VM, currentFrame.CodeReader.ReadInteger()));
 						break;
 					case OpCode.StLocal:
-						currentFrame.LocalScope.SetVariable(
-							currentFrame.CodeReader.ReadString(),
-							currentFrame.Pop()
-							);
+						currentFrame.LocalScope.SetVariable(currentFrame.CodeReader.ReadString(), currentFrame.Pop());
 						break;
 					case OpCode.DelLocal:
-						currentFrame.Push(
-							currentFrame.LocalScope.DeleteVariable(currentFrame.CodeReader.ReadString())
-							);
+						currentFrame.Push(currentFrame.LocalScope.DeleteVariable(currentFrame.CodeReader.ReadString()));
 						break;
 
 						#endregion
@@ -239,10 +225,7 @@ namespace YaJS.Runtime {
 					}
 
 					case OpCode.Switch:
-						Switch(
-							currentFrame.CodeReader.ReadInteger(),
-							currentFrame.Pop()
-							);
+						Switch(currentFrame.CodeReader.ReadInteger(), currentFrame.Pop());
 						break;
 
 					case OpCode.BeginScope:
@@ -300,12 +283,7 @@ namespace YaJS.Runtime {
 					case OpCode.Call: {
 						var arguments = currentFrame.PopArguments();
 						var function = currentFrame.Pop().RequireFunction();
-						CallFunction(
-							function,
-							VM.Global,
-							arguments,
-							currentFrame.CodeReader.ReadBoolean()
-							);
+						CallFunction(function, VM.Global, arguments, currentFrame.CodeReader.ReadBoolean());
 						break;
 					}
 
@@ -313,12 +291,7 @@ namespace YaJS.Runtime {
 						var arguments = currentFrame.PopArguments();
 						var context = currentFrame.Pop().ToObject(VM);
 						var function = currentFrame.Pop().RequireFunction();
-						CallFunction(
-							function,
-							context,
-							arguments,
-							currentFrame.CodeReader.ReadBoolean()
-							);
+						CallFunction(function, context, arguments, currentFrame.CodeReader.ReadBoolean());
 						break;
 					}
 
@@ -344,8 +317,7 @@ namespace YaJS.Runtime {
 						var hasMoreValue = enumerator.MoveNext();
 						currentFrame.LocalScope.SetVariable(
 							currentFrame.CodeReader.ReadString(),
-							hasMoreValue ? enumerator.Current : JSValue.Undefined
-							);
+							hasMoreValue ? enumerator.Current : JSValue.Undefined);
 						currentFrame.Push(hasMoreValue);
 						break;
 					}
@@ -566,22 +538,12 @@ namespace YaJS.Runtime {
 		/// <param name="function">Функция</param>
 		/// <param name="context">Контекст</param>
 		/// <param name="args">Параметры</param>
-		public JSValue Invoke(
-			JSFunction function,
-			JSObject context,
-			List<JSValue> args
-			) {
+		public JSValue Invoke(JSFunction function, JSObject context, List<JSValue> args) {
 			Contract.Requires<ArgumentNullException>(function != null, "function");
 			Contract.Requires<ArgumentNullException>(context != null, "context");
 			Contract.Requires<ArgumentNullException>(args != null, "args");
 			var isCompleted = false;
-			CallFunction(
-				function,
-				context,
-				args,
-				true,
-				() => isCompleted = true
-				);
+			CallFunction(function, context, args, true, () => isCompleted = true);
 			while (!isCompleted)
 				ExecuteStep(CurrentFrame);
 			return (CurrentFrame.Pop());
@@ -605,11 +567,7 @@ namespace YaJS.Runtime {
 				// Произошла серьезная ошибка связанная с внутренним состоянием потока.
 				// Поток должен быть завершен. Дальнейшее его использование невозможно
 				IsTerminated = true;
-				throw new UnrecoverableErrorException(
-					ex.Message,
-					currentFrame.ToStackTrace(),
-					ex
-					);
+				throw new UnrecoverableErrorException(ex.Message, currentFrame.ToStackTrace(), ex);
 			}
 
 			return (IsTerminated);

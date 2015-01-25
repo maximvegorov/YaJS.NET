@@ -43,7 +43,7 @@ namespace YaJS.Compiler {
 				ReadNextToken();
 				return (EmptyArgumentList);
 			}
-			var result = new List<Expression> {ParseExpression()};
+			var result = new List<Expression> { ParseExpression() };
 			while (Lookahead.Type == TokenType.Comma) {
 				ReadNextToken();
 				result.Add(ParseExpression());
@@ -107,9 +107,7 @@ namespace YaJS.Compiler {
 
 		private Expression ParseGrouping() {
 			Match(TokenType.LParenthesis);
-			var result = Expression.Grouping(
-				ParseExpression()
-				);
+			var result = Expression.Grouping(ParseExpression());
 			Match(TokenType.RParenthesis);
 			return (result);
 		}
@@ -264,7 +262,7 @@ namespace YaJS.Compiler {
 				if (!result.CanBeConstructor)
 					Errors.ThrowExpectedConstructor(newOperatorStack.Pop());
 				var arguments = ParseArguments();
-				result = EatMemberOperators(Expression.New(result, arguments));
+				result = EatCallOrMemberOperators(Expression.New(result, arguments));
 				newOperatorStack.Pop();
 			}
 
@@ -622,7 +620,7 @@ namespace YaJS.Compiler {
 			var assignment = ParseAssignmentExpression();
 			if (Lookahead.Type != TokenType.Comma)
 				return (assignment);
-			var sequence = new List<Expression> {assignment};
+			var sequence = new List<Expression> { assignment };
 			do {
 				ReadNextToken();
 				sequence.Add(ParseAssignmentExpression());

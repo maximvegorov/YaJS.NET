@@ -4,7 +4,8 @@ namespace YaJS.Compiler.AST.Expressions {
 	public sealed class Eval : Expression {
 		public const string EvalLiteral = "eval";
 
-		internal Eval() : base(ExpressionType.Eval) {
+		internal Eval()
+			: base(ExpressionType.Eval) {
 		}
 
 		public override string ToString() {
@@ -17,8 +18,16 @@ namespace YaJS.Compiler.AST.Expressions {
 			compiler.Emitter.Emit(OpCode.LdLocal, EvalLiteral);
 		}
 
-		public override bool CanHaveMembers { get { return (true); } }
-		public override bool CanBeFunction { get { return (true); } }
-		public override bool CanBeObject { get { return (true); } }
+		public override bool CanHaveMembers {
+			get { return (true); }
+		}
+
+		public override bool CanBeFunction {
+			get { return (true); }
+		}
+
+		public override bool CanBeObject {
+			get { return (true); }
+		}
 	}
 }

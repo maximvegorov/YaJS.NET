@@ -4,7 +4,8 @@ using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
 	public sealed class StringLiteral : Expression {
-		internal StringLiteral(string value) : base(ExpressionType.StringLiteral) {
+		internal StringLiteral(string value)
+			: base(ExpressionType.StringLiteral) {
 			Value = value ?? string.Empty;
 		}
 
@@ -41,15 +42,22 @@ namespace YaJS.Compiler.AST.Expressions {
 					default:
 						if (!char.IsControl(c))
 							result.Append(c);
-						else {
-							result.Append("\\u")
-								.Append(((int)c).ToString("X4", CultureInfo.InvariantCulture));
-						}
+						else
+							result.Append("\\u").Append(((int)c).ToString("X4", CultureInfo.InvariantCulture));
 						break;
 				}
 			}
 			result.Append('"');
 			return (result.ToString());
+		}
+
+		public override bool Equals(object obj) {
+			var other = obj as StringLiteral;
+			return (other != null && Value == other.Value);
+		}
+
+		public override int GetHashCode() {
+			return (GetHashCode(Type.GetHashCode(), Value.GetHashCode()));
 		}
 
 		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
@@ -58,9 +66,18 @@ namespace YaJS.Compiler.AST.Expressions {
 			compiler.Emitter.Emit(OpCode.LdString, Value);
 		}
 
-		public override bool CanHaveMembers { get { return (true); } }
-		public override bool IsConstant { get { return (true); } }
-		public override bool CanBeUsedInCaseClause { get { return (true); } }
+		public override bool CanHaveMembers {
+			get { return (true); }
+		}
+
+		public override bool IsConstant {
+			get { return (true); }
+		}
+
+		public override bool CanBeUsedInCaseClause {
+			get { return (true); }
+		}
+
 		public string Value { get; private set; }
 	}
 }

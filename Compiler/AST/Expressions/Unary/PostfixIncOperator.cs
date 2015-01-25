@@ -11,6 +11,8 @@ namespace YaJS.Compiler.AST.Expressions {
 			return (Operand + "++");
 		}
 
-		public override bool CanHaveMembers { get { return (true); } }
+		public override bool CanHaveMembers {
+			get { return (true); }
+		}
 	}
 }

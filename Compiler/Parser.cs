@@ -87,13 +87,7 @@ namespace YaJS.Compiler {
 			}
 			Match(TokenType.RParenthesis);
 
-			_currentFunction = new FunctionBuilder(
-				_currentFunction,
-				name,
-				startPosition.LineNo,
-				parameterNames,
-				isDeclaration
-				);
+			_currentFunction = new FunctionBuilder(_currentFunction, name, startPosition.LineNo, parameterNames, isDeclaration);
 			Match(TokenType.LCurlyBrace);
 			_currentFunction.FunctionBody = ParseFunctionBody();
 			Match(TokenType.RCurlyBrace);
@@ -118,13 +112,7 @@ namespace YaJS.Compiler {
 			Contract.Requires<ArgumentNullException>(!string.IsNullOrEmpty(functionName), "functionName");
 			Contract.Requires<ArgumentNullException>(parameterNames != null, "parameterNames");
 			// ReSharper disable once UseObjectOrCollectionInitializer
-			_currentFunction = new FunctionBuilder(
-				null,
-				functionName,
-				1,
-				ToVariableCollection(parameterNames),
-				false
-				);
+			_currentFunction = new FunctionBuilder(null, functionName, 1, ToVariableCollection(parameterNames), false);
 			_currentFunction.FunctionBody = ParseFunctionBody();
 			Contract.Assert(Lookahead.Type == TokenType.Unknown);
 			return (_currentFunction.ToFunction());

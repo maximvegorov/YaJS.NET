@@ -8,11 +8,7 @@ namespace YaJS.Runtime {
 	/// </summary>
 	[ContractClass(typeof (ContractClassForICompilerServices))]
 	public interface ICompilerServices {
-		CompiledFunction Compile(
-			string functionName,
-			IEnumerable<string> parameterNames,
-			string functionBody
-			);
+		CompiledFunction Compile(string functionName, IEnumerable<string> parameterNames, string functionBody);
 	}
 
 	[ContractClassFor(typeof (ICompilerServices))]
