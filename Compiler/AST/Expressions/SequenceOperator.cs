@@ -19,15 +19,6 @@ namespace YaJS.Compiler.AST.Expressions {
 			return (result.ToString());
 		}
 
-		public override bool Equals(object obj) {
-			var other = obj as SequenceOperator;
-			return (other != null && Operands.SequenceEqual(other.Operands));
-		}
-
-		public override int GetHashCode() {
-			return (GetHashCode(Type.GetHashCode(), GetHashCode(Operands.Select(o => o.GetHashCode()))));
-		}
-
 		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
 			for (var i = 0; i < Operands.Count - 1; i++)
 				Operands[i].CompileBy(compiler, true);

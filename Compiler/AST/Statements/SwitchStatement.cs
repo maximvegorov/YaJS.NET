@@ -14,15 +14,15 @@ namespace YaJS.Compiler.AST.Statements {
 			: base(StatementType.Switch, lineNo, labelSet) {
 		}
 
-		internal override void Preprocess(Function function) {
+		internal override void Preprocess(FunctionCompiler compiler) {
 			if (_beforeDefault == null)
 				Errors.ThrowInternalError();
 			else
-				_beforeDefault.Preprocess(function);
+				_beforeDefault.Preprocess(compiler);
 			if (_defaultClause != null)
-				_defaultClause.Preprocess(function);
+				_defaultClause.Preprocess(compiler);
 			if (_afterDefault != null)
-				_afterDefault.Preprocess(function);
+				_afterDefault.Preprocess(compiler);
 		}
 
 		public Expression Expression {

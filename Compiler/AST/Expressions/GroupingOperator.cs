@@ -15,15 +15,6 @@ namespace YaJS.Compiler.AST.Expressions {
 			return (result.ToString());
 		}
 
-		public override bool Equals(object obj) {
-			var other = obj as GroupingOperator;
-			return (other != null && Operand.Equals(other.Operand));
-		}
-
-		public override int GetHashCode() {
-			return (GetHashCode(Type.GetHashCode(), Operand.GetHashCode()));
-		}
-
 		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
 			Operand.CompileBy(compiler, isLast);
 		}

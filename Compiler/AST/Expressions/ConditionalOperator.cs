@@ -20,19 +20,6 @@ namespace YaJS.Compiler.AST.Expressions {
 			return (result.ToString());
 		}
 
-		public override bool Equals(object obj) {
-			var other = obj as ConditionalOperator;
-			return (other != null && Condition.Equals(other.Condition) && TrueOperand.Equals(other.TrueOperand) &&
-				FalseOperand.Equals(other.FalseOperand));
-		}
-
-		public override int GetHashCode() {
-			return
-				(GetHashCode(
-					GetHashCode(GetHashCode(Type.GetHashCode(), Condition.GetHashCode()), TrueOperand.GetHashCode()),
-					FalseOperand.GetHashCode()));
-		}
-
 		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
 			var endLabel = compiler.Emitter.DefineLabel();
 			var falseLabel = compiler.Emitter.DefineLabel();

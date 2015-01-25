@@ -14,9 +14,8 @@ namespace YaJS.Compiler.AST.Statements {
 			: base(StatementType.Try, lineNo) {
 		}
 
-		internal override void Preprocess(Function function) {
-			Contract.Assert(function.FunctionBody != null);
-			function.FunctionBody.RegisterTryStatement(this);
+		internal override void Preprocess(FunctionCompiler compiler) {
+			compiler.TryStatements.Add(this);
 		}
 
 		public TryBlockStatement TryBlock {

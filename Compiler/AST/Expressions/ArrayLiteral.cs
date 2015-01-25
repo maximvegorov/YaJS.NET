@@ -24,15 +24,6 @@ namespace YaJS.Compiler.AST.Expressions {
 			return (result.ToString());
 		}
 
-		public override bool Equals(object obj) {
-			var other = obj as ArrayLiteral;
-			return (other != null && Items.SequenceEqual(other.Items));
-		}
-
-		public override int GetHashCode() {
-			return (GetHashCode(Type.GetHashCode(), GetHashCode(Items.Select(i => i.GetHashCode()))));
-		}
-
 		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
 			// Надо учесть возможность побочных эффектов вызова выражений
 			foreach (var item in Items)

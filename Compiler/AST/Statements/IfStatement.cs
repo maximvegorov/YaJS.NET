@@ -38,13 +38,13 @@ namespace YaJS.Compiler.AST.Statements {
 			}
 		}
 
-		internal override void Preprocess(Function function) {
+		internal override void Preprocess(FunctionCompiler compiler) {
 			if (_thenStatement == null)
 				Errors.ThrowInternalError();
 			else
-				_thenStatement.Preprocess(function);
+				_thenStatement.Preprocess(compiler);
 			if (_elseStatement != null)
-				_elseStatement.Preprocess(function);
+				_elseStatement.Preprocess(compiler);
 		}
 
 		public Expression Condition {
