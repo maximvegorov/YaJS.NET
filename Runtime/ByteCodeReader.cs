@@ -26,8 +26,8 @@ namespace YaJS.Runtime {
 		public bool ReadBoolean() {
 			if (_offset >= _compiledCode.Length)
 				throw new UnexpectedEndOfCodeException();
-			var result = BitConverter.ToBoolean(_compiledCode, _offset);
-			_offset += sizeof (bool);
+			var result = _compiledCode[_offset] != 0;
+			_offset += sizeof (byte);
 			return (result);
 		}
 

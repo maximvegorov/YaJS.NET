@@ -20,7 +20,7 @@ namespace YaJS.Compiler.AST.Expressions {
 			return (result.ToString());
 		}
 
-		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
+		internal override void CompileBy(FunctionCompiler compiler, bool isLastOperator) {
 			var endLabel = compiler.Emitter.DefineLabel();
 			var falseLabel = compiler.Emitter.DefineLabel();
 			Condition.CompileBy(compiler, false);

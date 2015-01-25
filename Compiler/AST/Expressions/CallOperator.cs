@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Linq;
 using System.Text;
 using YaJS.Runtime;
 
@@ -26,25 +25,24 @@ namespace YaJS.Compiler.AST.Expressions {
 			return (result.ToString());
 		}
 
-		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
+		internal override void CompileBy(FunctionCompiler compiler, bool isLastOperator) {
 			OpCode callOpCode;
 			if (CallFunction.Type != ExpressionType.Member) {
 				CallFunction.CompileBy(compiler, false);
 				callOpCode = OpCode.Call;
 			}
 			else {
-				var memberOperator = CallFunction as MemberOperator;
-				Contract.Assert(memberOperator != null);
+				var memberOperator = (MemberOperator)CallFunction;
 				memberOperator.BaseValue.CompileBy(compiler, false);
 				compiler.Emitter.Emit(OpCode.Dup);
-				memberOperator.Property.CompileBy(compiler, false);
+				memberOperator.CompilePropertyBy(compiler);
 				compiler.Emitter.Emit(OpCode.LdMember);
 				callOpCode = OpCode.CallMember;
 			}
 			foreach (var argument in ArgumentList)
 				argument.CompileBy(compiler, false);
 			compiler.Emitter.Emit(OpCode.LdInteger, ArgumentList.Count);
-			compiler.Emitter.Emit(callOpCode, !isLast);
+			compiler.Emitter.Emit(callOpCode, !isLastOperator);
 		}
 
 		public override bool CanHaveMembers {

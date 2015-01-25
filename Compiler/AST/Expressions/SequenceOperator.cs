@@ -19,10 +19,10 @@ namespace YaJS.Compiler.AST.Expressions {
 			return (result.ToString());
 		}
 
-		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
+		internal override void CompileBy(FunctionCompiler compiler, bool isLastOperator) {
 			for (var i = 0; i < Operands.Count - 1; i++)
 				Operands[i].CompileBy(compiler, true);
-			Operands[Operands.Count - 1].CompileBy(compiler, isLast);
+			Operands[Operands.Count - 1].CompileBy(compiler, isLastOperator);
 		}
 
 		public override bool CanHaveMembers {

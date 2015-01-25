@@ -22,11 +22,18 @@ namespace YaJS.Compiler.AST.Expressions {
 			return (result.ToString());
 		}
 
-		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
-			if (isLast)
+		internal void CompilePropertyBy(FunctionCompiler compiler) {
+			if (Property.Type == ExpressionType.Ident)
+				compiler.Emitter.Emit(OpCode.LdString, ((Identifier)Property).Value);
+			else
+				Property.CompileBy(compiler, false);
+		}
+
+		internal override void CompileBy(FunctionCompiler compiler, bool isLastOperator) {
+			if (isLastOperator)
 				return;
 			BaseValue.CompileBy(compiler, false);
-			Property.CompileBy(compiler, false);
+			CompilePropertyBy(compiler);
 			compiler.Emitter.Emit(OpCode.LdMember);
 		}
 

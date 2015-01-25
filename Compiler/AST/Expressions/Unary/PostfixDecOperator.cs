@@ -11,6 +11,10 @@ namespace YaJS.Compiler.AST.Expressions {
 			return (Operand + "--");
 		}
 
+		internal override void CompileBy(FunctionCompiler compiler, bool isLastOperator) {
+			compiler.CompileIncDecExpression(Operand, false, true, isLastOperator);
+		}
+
 		public override bool CanHaveMembers {
 			get { return (true); }
 		}
