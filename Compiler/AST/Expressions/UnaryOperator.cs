@@ -11,15 +11,6 @@ namespace YaJS.Compiler.AST.Expressions {
 			Operand = operand;
 		}
 
-		public override bool Equals(object obj) {
-			var other = obj as UnaryOperator;
-			return (other != null && Type == other.Type && Operand.Equals(other.Operand));
-		}
-
-		public override int GetHashCode() {
-			return (GetHashCode(Type.GetHashCode(), Operand.GetHashCode()));
-		}
-
 		public override bool IsConstant {
 			get { return (Operand.IsConstant); }
 		}

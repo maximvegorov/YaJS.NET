@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using YaJS.Compiler.AST;
+using YaJS.Compiler.AST.Statements;
 using YaJS.Compiler.Emitter;
 using YaJS.Runtime;
 
@@ -15,10 +16,23 @@ namespace YaJS.Compiler {
 			SwitchJumpTables = new List<SwitchJumpTable>();
 			StatementStarts = new Dictionary<Statement, Label>();
 			StatementEnds = new Dictionary<Statement, Label>();
+			TryStatements = new List<TryStatement>();
+		}
+
+		private void ProcessTryStatements() {
+			/// Копируем операторы блока finally перед каждой точкой выхода из блока try
+			foreach (var tryStatement in TryStatements) {
+				if (tryStatement.FinallyBlock == null || tryStatement.TryBlock.ExitPoints.Count == 0)
+					continue;
+				var finallyBlock = tryStatement.FinallyBlock;
+				foreach (var exitPoint in tryStatement.TryBlock.ExitPoints)
+					exitPoint.InsertBefore(new ReferenceStatement(finallyBlock));
+			}
 		}
 
 		private CompiledFunction Compile(CompiledFunction[] nestedFunctions) {
-			Function.Preprocess();
+			Function.Preprocess(this);
+			ProcessTryStatements();
 			Function.CompileBy(this);
 			return
 				(new CompiledFunction(
@@ -47,5 +61,6 @@ namespace YaJS.Compiler {
 		public List<SwitchJumpTable> SwitchJumpTables { get; private set; }
 		public Dictionary<Statement, Label> StatementStarts { get; private set; }
 		public Dictionary<Statement, Label> StatementEnds { get; private set; }
+		public List<TryStatement> TryStatements { get; private set; } 
 	}
 }

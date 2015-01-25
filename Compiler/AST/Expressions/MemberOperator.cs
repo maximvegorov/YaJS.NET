@@ -22,15 +22,6 @@ namespace YaJS.Compiler.AST.Expressions {
 			return (result.ToString());
 		}
 
-		public override bool Equals(object obj) {
-			var other = obj as MemberOperator;
-			return (other != null && BaseValue.Equals(other.BaseValue) && Property.Equals(other.Property));
-		}
-
-		public override int GetHashCode() {
-			return (GetHashCode(GetHashCode(Type.GetHashCode(), BaseValue.GetHashCode()), Property.GetHashCode()));
-		}
-
 		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
 			if (isLast)
 				return;

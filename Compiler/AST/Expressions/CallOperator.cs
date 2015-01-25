@@ -26,18 +26,6 @@ namespace YaJS.Compiler.AST.Expressions {
 			return (result.ToString());
 		}
 
-		public override bool Equals(object obj) {
-			var other = obj as CallOperator;
-			return (other != null && CallFunction.Equals(other.CallFunction) == ArgumentList.SequenceEqual(other.ArgumentList));
-		}
-
-		public override int GetHashCode() {
-			return
-				(GetHashCode(
-					GetHashCode(Type.GetHashCode(), CallFunction.GetHashCode()),
-					GetHashCode(ArgumentList.Select(a => a.GetHashCode()))));
-		}
-
 		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
 			OpCode callOpCode;
 			if (CallFunction.Type != ExpressionType.Member) {

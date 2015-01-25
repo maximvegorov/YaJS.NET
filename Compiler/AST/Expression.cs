@@ -27,23 +27,6 @@ namespace YaJS.Compiler.AST {
 			Type = type;
 		}
 
-		public override bool Equals(object obj) {
-			var other = obj as Expression;
-			return (other != null && Type == other.Type);
-		}
-
-		public override int GetHashCode() {
-			return (Type.GetHashCode());
-		}
-
-		protected static int GetHashCode(int hash1, int hash2) {
-			return (unchecked(37 * hash1 + hash2));
-		}
-
-		protected static int GetHashCode(IEnumerable<int> hashes) {
-			return (hashes.Aggregate(0, GetHashCode));
-		}
-
 		/// <summary>
 		/// Компилировать выражение
 		/// </summary>

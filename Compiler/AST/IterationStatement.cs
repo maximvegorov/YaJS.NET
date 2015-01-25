@@ -22,11 +22,11 @@ namespace YaJS.Compiler.AST {
 				_statement = null;
 		}
 
-		internal override void Preprocess(Function function) {
+		internal override void Preprocess(FunctionCompiler compiler) {
 			if (_statement == null)
 				Errors.ThrowInternalError();
 			else
-				_statement.Preprocess(function);
+				_statement.Preprocess(compiler);
 		}
 
 		public Statement Statement {

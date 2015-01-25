@@ -15,8 +15,8 @@ namespace YaJS.Compiler.AST.Statements {
 			_expression = expression;
 		}
 
-		internal override void Preprocess(Function function) {
-			_statements.Preprocess(function);
+		internal override void Preprocess(FunctionCompiler compiler) {
+			_statements.Preprocess(compiler);
 		}
 
 		public Expression Expression {

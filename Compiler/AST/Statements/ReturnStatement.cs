@@ -20,7 +20,7 @@ namespace YaJS.Compiler.AST.Statements {
 			return (result.ToString());
 		}
 
-		internal override void Preprocess(Function function) {
+		internal override void Preprocess(FunctionCompiler compiler) {
 			for (var current = Parent; current != null; current = current.Parent)
 				current.RegisterExitPoint(this);
 		}

@@ -68,8 +68,9 @@ namespace YaJS.Compiler.AST {
 		/// <summary>
 		/// Подготовить функцию к компиляции
 		/// </summary>
-		internal void Preprocess() {
-			FunctionBody.Preprocess(this);
+		internal void Preprocess(FunctionCompiler compiler) {
+			Contract.Requires(compiler != null);
+			FunctionBody.Preprocess(compiler);
 		}
 
 		/// <summary>

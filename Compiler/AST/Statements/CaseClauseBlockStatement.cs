@@ -23,9 +23,9 @@ namespace YaJS.Compiler.AST.Statements {
 			_caseClauses.Add(caseClause);
 		}
 
-		internal override void Preprocess(Function function) {
+		internal override void Preprocess(FunctionCompiler compiler) {
 			foreach (var caseClause in _caseClauses)
-				caseClause.Preprocess(function);
+				caseClause.Preprocess(compiler);
 		}
 
 		public bool IsEmpty {

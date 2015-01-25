@@ -51,15 +51,6 @@ namespace YaJS.Compiler.AST.Expressions {
 			return (result.ToString());
 		}
 
-		public override bool Equals(object obj) {
-			var other = obj as StringLiteral;
-			return (other != null && Value == other.Value);
-		}
-
-		public override int GetHashCode() {
-			return (GetHashCode(Type.GetHashCode(), Value.GetHashCode()));
-		}
-
 		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
 			if (isLast)
 				return;

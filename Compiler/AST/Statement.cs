@@ -79,8 +79,8 @@ namespace YaJS.Compiler.AST {
 			Parent = null;
 		}
 
-		internal virtual void Preprocess(Function function) {
-			Contract.Requires(function != null);
+		internal virtual void Preprocess(FunctionCompiler compiler) {
+			Contract.Requires(compiler != null);
 		}
 
 		internal virtual void CompileBy(FunctionCompiler compiler) {

@@ -50,9 +50,9 @@ namespace YaJS.Compiler.AST {
 			_statements.Remove(child);
 		}
 
-		internal override void Preprocess(Function function) {
+		internal override void Preprocess(FunctionCompiler compiler) {
 			foreach (var statement in _statements)
-				statement.Preprocess(function);
+				statement.Preprocess(compiler);
 		}
 
 		internal override void CompileBy(FunctionCompiler compiler) {

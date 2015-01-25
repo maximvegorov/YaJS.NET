@@ -26,18 +26,6 @@ namespace YaJS.Compiler.AST.Expressions {
 			return (result.ToString());
 		}
 
-		public override bool Equals(object obj) {
-			var other = obj as NewOperator;
-			return (other != null && Constructor.Equals(other.Constructor) == ArgumentList.SequenceEqual(other.ArgumentList));
-		}
-
-		public override int GetHashCode() {
-			return
-				(GetHashCode(
-					GetHashCode(Type.GetHashCode(), Constructor.GetHashCode()),
-					GetHashCode(ArgumentList.Select(a => a.GetHashCode()))));
-		}
-
 		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
 			Constructor.CompileBy(compiler, false);
 			foreach (var argument in ArgumentList)

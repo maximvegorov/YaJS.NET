@@ -13,7 +13,7 @@ namespace YaJS.Compiler.AST.Statements {
 			_targetLabel = targetLabel;
 		}
 
-		internal override void Preprocess(Function function) {
+		internal override void Preprocess(FunctionCompiler compiler) {
 			var current = Parent;
 			while (current != null && !current.IsContinueTarget(_targetLabel)) {
 				current.RegisterExitPoint(this);
