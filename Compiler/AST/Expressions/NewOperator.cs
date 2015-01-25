@@ -31,6 +31,8 @@ namespace YaJS.Compiler.AST.Expressions {
 				argument.CompileBy(compiler, false);
 			compiler.Emitter.Emit(OpCode.LdInteger, ArgumentList.Count);
 			compiler.Emitter.Emit(OpCode.NewObj);
+			if (isLastOperator)
+				compiler.Emitter.Emit(OpCode.Pop);
 		}
 
 		public override bool CanHaveMembers {

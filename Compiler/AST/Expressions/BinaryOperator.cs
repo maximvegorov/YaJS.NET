@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
 	/// <summary>
@@ -11,6 +12,63 @@ namespace YaJS.Compiler.AST.Expressions {
 			Contract.Requires(rightOperand != null);
 			LeftOperand = leftOperand;
 			RightOperand = rightOperand;
+		}
+
+		protected void CompileBy(
+			FunctionCompiler compiler,
+			OpCode op,
+			bool isLeftAssociative,
+			bool needCastToPrimitive,
+			bool isLastOperator) {
+			if (isLeftAssociative) {
+				LeftOperand.CompileBy(compiler, false);
+				if (needCastToPrimitive && LeftOperand.CanBeObject)
+					compiler.Emitter.Emit(OpCode.CastToPrimitive);
+				RightOperand.CompileBy(compiler, false);
+				if (needCastToPrimitive && RightOperand.CanBeObject)
+					compiler.Emitter.Emit(OpCode.CastToPrimitive);
+			}
+			else {
+				RightOperand.CompileBy(compiler, false);
+				if (needCastToPrimitive && RightOperand.CanBeObject)
+					compiler.Emitter.Emit(OpCode.CastToPrimitive);
+				LeftOperand.CompileBy(compiler, false);
+				if (needCastToPrimitive && LeftOperand.CanBeObject)
+					compiler.Emitter.Emit(OpCode.CastToPrimitive);
+			}
+			if (isLastOperator)
+				compiler.Emitter.Emit(OpCode.Pop);
+		}
+
+		protected void CompileEqualityBy(FunctionCompiler compiler, OpCode strictOp, OpCode convOp, bool isLastOperator) {
+			if (!LeftOperand.CanBeObject && !RightOperand.CanBeObject) {
+				LeftOperand.CompileBy(compiler, false);
+				RightOperand.CompileBy(compiler, false);
+				compiler.Emitter.Emit(strictOp);
+			}
+			else {
+				var endLabel = compiler.Emitter.DefineLabel();
+				var falseLabel = compiler.Emitter.DefineLabel();
+				LeftOperand.CompileBy(compiler, false);
+				RightOperand.CompileBy(compiler, false);
+				compiler.Emitter.Emit(OpCode.Dup2);
+				compiler.Emitter.Emit(strictOp);
+				compiler.Emitter.Emit(OpCode.GotoIfFalse, falseLabel);
+				compiler.Emitter.Emit(OpCode.Pop2);
+				compiler.Emitter.Emit(OpCode.LdBoolean, true);
+				compiler.Emitter.Emit(OpCode.Goto, endLabel);
+				compiler.Emitter.MarkLabel(falseLabel);
+				// В вершине стека лежит правый операнд
+				if (RightOperand.CanBeObject)
+					compiler.Emitter.Emit(OpCode.CastToPrimitive);
+				compiler.Emitter.Emit(OpCode.Swap);
+				if (LeftOperand.CanBeObject)
+					compiler.Emitter.Emit(OpCode.CastToPrimitive);
+				compiler.Emitter.Emit(convOp);
+				compiler.Emitter.MarkLabel(endLabel);
+			}
+			if (isLastOperator)
+				compiler.Emitter.Emit(OpCode.Pop);
 		}
 
 		public override bool IsConstant {

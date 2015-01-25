@@ -24,13 +24,19 @@ namespace YaJS.Compiler.AST.Expressions {
 		}
 
 		internal override void CompileBy(FunctionCompiler compiler, bool isLastOperator) {
-			// Надо учесть возможность побочных эффектов вызова выражений
-			foreach (var item in Items)
-				item.CompileBy(compiler, isLastOperator);
-			if (isLastOperator)
-				return;
-			compiler.Emitter.Emit(OpCode.LdInteger, Items.Count);
-			compiler.Emitter.Emit(OpCode.MakeArray);
+			if (Items.Count == 0) {
+				if (isLastOperator)
+					return;
+				compiler.Emitter.Emit(OpCode.MakeEmptyArray);
+			}
+			else {
+				foreach (var item in Items)
+					item.CompileBy(compiler, false);
+				compiler.Emitter.Emit(OpCode.LdInteger, Items.Count);
+				compiler.Emitter.Emit(OpCode.MakeArray);
+				if (isLastOperator)
+					compiler.Emitter.Emit(OpCode.Pop);
+			}
 		}
 
 		public override bool CanHaveMembers {
