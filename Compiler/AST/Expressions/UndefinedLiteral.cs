@@ -10,8 +10,8 @@ namespace YaJS.Compiler.AST.Expressions {
 			return ("undefined");
 		}
 
-		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
-			if (isLast)
+		internal override void CompileBy(FunctionCompiler compiler, bool isLastOperator) {
+			if (isLastOperator)
 				return;
 			compiler.Emitter.Emit(OpCode.LdUndefined);
 		}

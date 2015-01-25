@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Linq;
 using System.Text;
 using YaJS.Runtime;
 
@@ -24,11 +23,11 @@ namespace YaJS.Compiler.AST.Expressions {
 			return (result.ToString());
 		}
 
-		internal override void CompileBy(FunctionCompiler compiler, bool isLast) {
+		internal override void CompileBy(FunctionCompiler compiler, bool isLastOperator) {
 			// Надо учесть возможность побочных эффектов вызова выражений
 			foreach (var item in Items)
-				item.CompileBy(compiler, isLast);
-			if (isLast)
+				item.CompileBy(compiler, isLastOperator);
+			if (isLastOperator)
 				return;
 			compiler.Emitter.Emit(OpCode.LdInteger, Items.Count);
 			compiler.Emitter.Emit(OpCode.MakeArray);

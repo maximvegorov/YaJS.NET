@@ -32,6 +32,13 @@ namespace YaJS.Compiler.Emitter {
 			_byteLength++;
 		}
 
+		private void Write(bool op) {
+			if (_buffer.Length == _byteLength)
+				Grow(sizeof (byte));
+			_buffer[_byteLength] = (byte)(op ? 1 : 0);
+			_byteLength++;
+		}
+
 		public void Emit(OpCode code) {
 			Write(code);
 		}
@@ -46,7 +53,7 @@ namespace YaJS.Compiler.Emitter {
 
 		public void Emit(OpCode code, bool op) {
 			Write(code);
-			Write(BitConverter.GetBytes(op));
+			Write(op);
 		}
 
 		public void Emit(OpCode code, int op) {
@@ -59,8 +66,7 @@ namespace YaJS.Compiler.Emitter {
 			Write(BitConverter.GetBytes(op));
 		}
 
-		public void Emit(OpCode code, string op) {
-			Write(code);
+		private void Write(string op) {
 			if (string.IsNullOrEmpty(op))
 				Write(BitConverter.GetBytes(0));
 			else {
@@ -68,6 +74,17 @@ namespace YaJS.Compiler.Emitter {
 				Write(BitConverter.GetBytes(bytes.Length));
 				Write(bytes);
 			}
+		}
+
+		public void Emit(OpCode code, string op) {
+			Write(code);
+			Write(op);
+		}
+
+		public void Emit(OpCode code, bool op1, string op2) {
+			Write(code);
+			Write(op1);
+			Write(op2);
 		}
 
 		public Label DefineLabel() {

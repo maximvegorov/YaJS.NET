@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using YaJS.Compiler.AST;
+using YaJS.Compiler.AST.Expressions;
 using YaJS.Compiler.AST.Statements;
 using YaJS.Compiler.Emitter;
 using YaJS.Runtime;
@@ -20,7 +21,7 @@ namespace YaJS.Compiler {
 		}
 
 		private void ProcessTryStatements() {
-			/// Копируем операторы блока finally перед каждой точкой выхода из блока try
+			// Копируем операторы блока finally перед каждой точкой выхода из блока try
 			foreach (var tryStatement in TryStatements) {
 				if (tryStatement.FinallyBlock == null || tryStatement.TryBlock.ExitPoints.Count == 0)
 					continue;
@@ -28,6 +29,27 @@ namespace YaJS.Compiler {
 				foreach (var exitPoint in tryStatement.TryBlock.ExitPoints)
 					exitPoint.InsertBefore(new ReferenceStatement(finallyBlock));
 			}
+		}
+
+		internal void CompileIncDecExpression(Expression target, bool isInc, bool isPostfix, bool isLastOperator) {
+			if (target.Type == ExpressionType.Ident) {
+				var operand = (Identifier)target;
+				Emitter.Emit(OpCode.LdLocal, operand.Value);
+				Emitter.Emit(OpCode.CastToPrimitive);
+				Emitter.Emit(isInc ? OpCode.IncLocal : OpCode.DecLocal, isPostfix, operand.Value);
+			}
+			else {
+				Contract.Assert(target.Type == ExpressionType.Member);
+				var operand = (MemberOperator)target;
+				operand.BaseValue.CompileBy(this, false);
+				operand.CompilePropertyBy(this);
+				Emitter.Emit(OpCode.Dup2);
+				Emitter.Emit(OpCode.LdMember);
+				Emitter.Emit(OpCode.CastToPrimitive);
+				Emitter.Emit(isInc ? OpCode.IncMember : OpCode.DecMember, isPostfix);
+			}
+			if (isLastOperator)
+				Emitter.Emit(OpCode.Pop);
 		}
 
 		private CompiledFunction Compile(CompiledFunction[] nestedFunctions) {
@@ -61,6 +83,6 @@ namespace YaJS.Compiler {
 		public List<SwitchJumpTable> SwitchJumpTables { get; private set; }
 		public Dictionary<Statement, Label> StatementStarts { get; private set; }
 		public Dictionary<Statement, Label> StatementEnds { get; private set; }
-		public List<TryStatement> TryStatements { get; private set; } 
+		public List<TryStatement> TryStatements { get; private set; }
 	}
 }

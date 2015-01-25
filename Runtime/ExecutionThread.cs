@@ -168,6 +168,24 @@ namespace YaJS.Runtime {
 						currentFrame.Push(currentFrame.LocalScope.DeleteVariable(currentFrame.CodeReader.ReadString()));
 						break;
 
+					case OpCode.IncLocal: {
+						var isPostfix = currentFrame.CodeReader.ReadBoolean();
+						var oldValue = currentFrame.Pop().ToNumber();
+						var newValue = oldValue.Inc();
+						currentFrame.LocalScope.SetVariable(currentFrame.CodeReader.ReadString(), newValue);
+						currentFrame.Push(isPostfix ? oldValue : newValue);
+						break;
+					}
+
+					case OpCode.DecLocal: {
+						var isPostfix = currentFrame.CodeReader.ReadBoolean();
+						var oldValue = currentFrame.Pop().ToNumber();
+						var newValue = oldValue.Dec();
+						currentFrame.LocalScope.SetVariable(currentFrame.CodeReader.ReadString(), newValue);
+						currentFrame.Push(isPostfix ? oldValue : newValue);
+						break;
+					}
+
 						#endregion
 
 						#region Свойства объектов
@@ -185,15 +203,38 @@ namespace YaJS.Runtime {
 						break;
 					}
 					case OpCode.StMember: {
+						var value = currentFrame.Pop();
 						var member = currentFrame.Pop();
 						var obj = currentFrame.Pop().RequireObject();
-						obj.SetMember(member, currentFrame.Pop());
+						obj.SetMember(member, value);
 						break;
 					}
 					case OpCode.DelMember: {
 						var member = currentFrame.Pop();
 						var obj = currentFrame.Pop().RequireObject();
 						currentFrame.Push(obj.DeleteMember(member));
+						break;
+					}
+
+					case OpCode.IncMember: {
+						var isPostfix = currentFrame.CodeReader.ReadBoolean();
+						var oldValue = currentFrame.Pop().ToNumber();
+						var member = currentFrame.Pop();
+						var obj = currentFrame.Pop().RequireObject();
+						var newValue = oldValue.Inc();
+						obj.SetMember(member, newValue);
+						currentFrame.Push(isPostfix ? oldValue : newValue);
+						break;
+					}
+
+					case OpCode.DecMember: {
+						var isPostfix = currentFrame.CodeReader.ReadBoolean();
+						var oldValue = currentFrame.Pop().ToNumber();
+						var member = currentFrame.Pop();
+						var obj = currentFrame.Pop().RequireObject();
+						var newValue = oldValue.Dec();
+						obj.SetMember(member, newValue);
+						currentFrame.Push(isPostfix ? oldValue : newValue);
 						break;
 					}
 
@@ -204,9 +245,23 @@ namespace YaJS.Runtime {
 					case OpCode.Dup:
 						currentFrame.Push(currentFrame.Peek());
 						break;
+					case OpCode.Dup2: {
+						var top = currentFrame.Pop();
+						var top1 = currentFrame.Peek();
+						currentFrame.Push(top1);
+						currentFrame.Push(top);
+						break;
+					}
 					case OpCode.Pop:
 						currentFrame.Pop();
 						break;
+					case OpCode.Swap: {
+						var top = currentFrame.Pop();
+						var top1 = currentFrame.Pop();
+						currentFrame.Push(top1);
+						currentFrame.Push(top);
+						break;
+					}
 
 					case OpCode.Goto:
 						currentFrame.CodeReader.Seek(currentFrame.CodeReader.ReadInteger());

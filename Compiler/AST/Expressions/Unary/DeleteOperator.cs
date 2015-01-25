@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
 	internal sealed class DeleteOperator : UnaryOperator {
@@ -9,6 +10,25 @@ namespace YaJS.Compiler.AST.Expressions {
 
 		public override string ToString() {
 			return ("delete " + Operand);
+		}
+
+		internal override void CompileBy(FunctionCompiler compiler, bool isLastOperator) {
+			var target = Operand;
+			while (target.Type == ExpressionType.Grouping)
+				target = ((GroupingOperator)target).Operand;
+			if (target.Type == ExpressionType.Ident) {
+				var operand = (Identifier)target;
+				compiler.Emitter.Emit(OpCode.DelLocal, operand.Value);
+			}
+			else {
+				Contract.Assert(target.Type == ExpressionType.Member);
+				var operand = (MemberOperator)target;
+				operand.BaseValue.CompileBy(compiler, false);
+				operand.CompilePropertyBy(compiler);
+				compiler.Emitter.Emit(OpCode.DelMember);
+			}
+			if (isLastOperator)
+				compiler.Emitter.Emit(OpCode.Pop);
 		}
 	}
 }
