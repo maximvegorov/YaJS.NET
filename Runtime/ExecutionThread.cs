@@ -191,8 +191,8 @@ namespace YaJS.Runtime {
 						#region Свойства объектов
 
 					case OpCode.IsMember: {
-						var member = currentFrame.Pop();
 						var obj = currentFrame.Pop().ToObject(VM);
+						var member = currentFrame.Pop();
 						currentFrame.Push(obj.ContainsMember(member));
 						break;
 					}
@@ -253,6 +253,10 @@ namespace YaJS.Runtime {
 						break;
 					}
 					case OpCode.Pop:
+						currentFrame.Pop();
+						break;
+					case OpCode.Pop2:
+						currentFrame.Pop();
 						currentFrame.Pop();
 						break;
 					case OpCode.Swap: {
@@ -407,38 +411,38 @@ namespace YaJS.Runtime {
 						break;
 
 					case OpCode.Plus: {
-						var op1 = currentFrame.Pop();
 						var op2 = currentFrame.Pop();
+						var op1 = currentFrame.Pop();
 						currentFrame.Push(op1.Plus(op2));
 						break;
 					}
 					case OpCode.Minus: {
-						var op1 = currentFrame.Pop().ToNumber();
 						var op2 = currentFrame.Pop().ToNumber();
+						var op1 = currentFrame.Pop().ToNumber();
 						currentFrame.Push(op1.Minus(op2));
 						break;
 					}
 					case OpCode.Mul: {
-						var op1 = currentFrame.Pop().ToNumber();
 						var op2 = currentFrame.Pop().ToNumber();
+						var op1 = currentFrame.Pop().ToNumber();
 						currentFrame.Push(op1.Mul(op2));
 						break;
 					}
 					case OpCode.IntDiv: {
-						var op1 = currentFrame.Pop().ToNumber();
 						var op2 = currentFrame.Pop().ToNumber();
+						var op1 = currentFrame.Pop().ToNumber();
 						currentFrame.Push(op1.IntDiv(op2));
 						break;
 					}
 					case OpCode.FltDiv: {
-						var op1 = currentFrame.Pop().ToNumber();
 						var op2 = currentFrame.Pop().ToNumber();
+						var op1 = currentFrame.Pop().ToNumber();
 						currentFrame.Push(op1.FltDiv(op2));
 						break;
 					}
 					case OpCode.Mod: {
-						var op1 = currentFrame.Pop().ToNumber();
 						var op2 = currentFrame.Pop().ToNumber();
+						var op1 = currentFrame.Pop().ToNumber();
 						currentFrame.Push(op1.Mod(op2));
 						break;
 					}
@@ -447,39 +451,39 @@ namespace YaJS.Runtime {
 						currentFrame.Push(currentFrame.Pop().ToNumber().BitNot());
 						break;
 					case OpCode.BitAnd: {
-						var op1 = currentFrame.Pop().ToNumber();
 						var op2 = currentFrame.Pop().ToNumber();
+						var op1 = currentFrame.Pop().ToNumber();
 						currentFrame.Push(op1.BitAnd(op2));
 						break;
 					}
 					case OpCode.BitOr: {
-						var op1 = currentFrame.Pop().ToNumber();
 						var op2 = currentFrame.Pop().ToNumber();
+						var op1 = currentFrame.Pop().ToNumber();
 						currentFrame.Push(op1.BitOr(op2));
 						break;
 					}
 					case OpCode.BitXor: {
-						var op1 = currentFrame.Pop().ToNumber();
 						var op2 = currentFrame.Pop().ToNumber();
+						var op1 = currentFrame.Pop().ToNumber();
 						currentFrame.Push(op1.BitXor(op2));
 						break;
 					}
 
 					case OpCode.Shl: {
-						var op1 = currentFrame.Pop().ToNumber();
 						var op2 = currentFrame.Pop().ToNumber();
+						var op1 = currentFrame.Pop().ToNumber();
 						currentFrame.Push(op1.BitShl(op2));
 						break;
 					}
 					case OpCode.ShrS: {
-						var op1 = currentFrame.Pop().ToNumber();
 						var op2 = currentFrame.Pop().ToNumber();
+						var op1 = currentFrame.Pop().ToNumber();
 						currentFrame.Push(op1.BitShrS(op2));
 						break;
 					}
 					case OpCode.ShrU: {
-						var op1 = currentFrame.Pop().ToNumber();
 						var op2 = currentFrame.Pop().ToNumber();
+						var op1 = currentFrame.Pop().ToNumber();
 						currentFrame.Push(op1.BitShrU(op2));
 						break;
 					}
@@ -492,14 +496,14 @@ namespace YaJS.Runtime {
 						currentFrame.Push(currentFrame.Pop().Not());
 						break;
 					case OpCode.And: {
-						var op1 = currentFrame.Pop();
 						var op2 = currentFrame.Pop();
+						var op1 = currentFrame.Pop();
 						currentFrame.Push(op1.And(op2));
 						break;
 					}
 					case OpCode.Or: {
-						var op1 = currentFrame.Pop();
 						var op2 = currentFrame.Pop();
+						var op1 = currentFrame.Pop();
 						currentFrame.Push(op1.Or(op2));
 						break;
 					}
@@ -509,26 +513,26 @@ namespace YaJS.Runtime {
 						#region Равенства
 
 					case OpCode.ConvEq: {
-						var op1 = currentFrame.Pop();
 						var op2 = currentFrame.Pop();
+						var op1 = currentFrame.Pop();
 						currentFrame.Push(op1.ConvEqualsTo(op2));
 						break;
 					}
 					case OpCode.StrictEq: {
-						var op1 = currentFrame.Pop();
 						var op2 = currentFrame.Pop();
+						var op1 = currentFrame.Pop();
 						currentFrame.Push(op1.StrictEqualsTo(op2));
 						break;
 					}
 					case OpCode.ConvNeq: {
-						var op1 = currentFrame.Pop();
 						var op2 = currentFrame.Pop();
+						var op1 = currentFrame.Pop();
 						currentFrame.Push(!op1.ConvEqualsTo(op2));
 						break;
 					}
 					case OpCode.StrictNeq: {
-						var op1 = currentFrame.Pop();
 						var op2 = currentFrame.Pop();
+						var op1 = currentFrame.Pop();
 						currentFrame.Push(!op1.StrictEqualsTo(op2));
 						break;
 					}
@@ -538,33 +542,33 @@ namespace YaJS.Runtime {
 						#region Отношения
 
 					case OpCode.Lt: {
-						var op1 = currentFrame.Pop();
 						var op2 = currentFrame.Pop();
+						var op1 = currentFrame.Pop();
 						currentFrame.Push(op1.Lt(op2));
 						break;
 					}
 					case OpCode.Lte: {
-						var op1 = currentFrame.Pop();
 						var op2 = currentFrame.Pop();
+						var op1 = currentFrame.Pop();
 						currentFrame.Push(op1.Lte(op2));
 						break;
 					}
 					case OpCode.Gt: {
-						var op1 = currentFrame.Pop();
 						var op2 = currentFrame.Pop();
+						var op1 = currentFrame.Pop();
 						currentFrame.Push(op2.Lt(op1));
 						break;
 					}
 					case OpCode.Gte: {
-						var op1 = currentFrame.Pop();
 						var op2 = currentFrame.Pop();
+						var op1 = currentFrame.Pop();
 						currentFrame.Push(op2.Lte(op1));
 						break;
 					}
 
 					case OpCode.InstanceOf: {
-						var op1 = currentFrame.Pop();
 						var op2 = currentFrame.Pop().RequireFunction();
+						var op1 = currentFrame.Pop();
 						currentFrame.Push(op1.IsInstanceOf(op2));
 						break;
 					}

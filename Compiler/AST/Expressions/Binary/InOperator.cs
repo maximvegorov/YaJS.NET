@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.Contracts;
 using System.Text;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
 	internal sealed class InOperator : BinaryOperator {
@@ -12,6 +13,10 @@ namespace YaJS.Compiler.AST.Expressions {
 			var result = new StringBuilder();
 			result.Append(LeftOperand).Append(" in ").Append(RightOperand);
 			return (result.ToString());
+		}
+
+		internal override void CompileBy(FunctionCompiler compiler, bool isLastOperator) {
+			CompileBy(compiler, OpCode.IsMember, true, false, isLastOperator);
 		}
 
 		public override bool CanHaveMembers {

@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
 	internal sealed class BitXorOperator : BinaryOperator {
@@ -10,6 +11,10 @@ namespace YaJS.Compiler.AST.Expressions {
 			var result = new StringBuilder();
 			result.Append(LeftOperand).Append(" ^ ").Append(RightOperand);
 			return (result.ToString());
+		}
+
+		internal override void CompileBy(FunctionCompiler compiler, bool isLastOperator) {
+			CompileBy(compiler, OpCode.BitXor, true, true, isLastOperator);
 		}
 
 		public override bool CanHaveMembers {

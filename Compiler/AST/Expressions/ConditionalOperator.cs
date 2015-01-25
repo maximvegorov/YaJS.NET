@@ -30,6 +30,8 @@ namespace YaJS.Compiler.AST.Expressions {
 			compiler.Emitter.MarkLabel(falseLabel);
 			FalseOperand.CompileBy(compiler, false);
 			compiler.Emitter.MarkLabel(endLabel);
+			if (isLastOperator)
+				compiler.Emitter.Emit(OpCode.Pop);
 		}
 
 		public override bool CanHaveMembers {

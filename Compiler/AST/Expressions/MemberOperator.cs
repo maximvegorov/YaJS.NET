@@ -30,11 +30,11 @@ namespace YaJS.Compiler.AST.Expressions {
 		}
 
 		internal override void CompileBy(FunctionCompiler compiler, bool isLastOperator) {
-			if (isLastOperator)
-				return;
 			BaseValue.CompileBy(compiler, false);
 			CompilePropertyBy(compiler);
 			compiler.Emitter.Emit(OpCode.LdMember);
+			if (isLastOperator)
+				compiler.Emitter.Emit(OpCode.Pop);
 		}
 
 		public override bool IsReference {
