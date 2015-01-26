@@ -1,8 +1,8 @@
 ﻿using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
-	public sealed class BooleanLiteral : Expression {
-		internal BooleanLiteral(bool value)
+	internal sealed class BooleanLiteral : Expression {
+		public BooleanLiteral(bool value)
 			: base(ExpressionType.BooleanLiteral) {
 			Value = value;
 		}

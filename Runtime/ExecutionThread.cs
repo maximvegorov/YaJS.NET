@@ -164,27 +164,12 @@ namespace YaJS.Runtime {
 					case OpCode.StLocal:
 						currentFrame.LocalScope.SetVariable(currentFrame.CodeReader.ReadString(), currentFrame.Pop());
 						break;
+					case OpCode.StLocalDup:
+						currentFrame.LocalScope.SetVariable(currentFrame.CodeReader.ReadString(), currentFrame.Peek());
+						break;
 					case OpCode.DelLocal:
 						currentFrame.Push(currentFrame.LocalScope.DeleteVariable(currentFrame.CodeReader.ReadString()));
 						break;
-
-					case OpCode.IncLocal: {
-						var isPostfix = currentFrame.CodeReader.ReadBoolean();
-						var oldValue = currentFrame.Pop().ToNumber();
-						var newValue = oldValue.Inc();
-						currentFrame.LocalScope.SetVariable(currentFrame.CodeReader.ReadString(), newValue);
-						currentFrame.Push(isPostfix ? oldValue : newValue);
-						break;
-					}
-
-					case OpCode.DecLocal: {
-						var isPostfix = currentFrame.CodeReader.ReadBoolean();
-						var oldValue = currentFrame.Pop().ToNumber();
-						var newValue = oldValue.Dec();
-						currentFrame.LocalScope.SetVariable(currentFrame.CodeReader.ReadString(), newValue);
-						currentFrame.Push(isPostfix ? oldValue : newValue);
-						break;
-					}
 
 						#endregion
 
@@ -209,6 +194,14 @@ namespace YaJS.Runtime {
 						obj.SetMember(member, value);
 						break;
 					}
+					case OpCode.StMemberDup: {
+						var value = currentFrame.Pop();
+						var member = currentFrame.Pop();
+						var obj = currentFrame.Pop().RequireObject();
+						obj.SetMember(member, value);
+						currentFrame.Push(value);
+						break;
+					}
 					case OpCode.DelMember: {
 						var member = currentFrame.Pop();
 						var obj = currentFrame.Pop().RequireObject();
@@ -216,27 +209,23 @@ namespace YaJS.Runtime {
 						break;
 					}
 
-					case OpCode.IncMember: {
-						var isPostfix = currentFrame.CodeReader.ReadBoolean();
-						var oldValue = currentFrame.Pop().ToNumber();
+					case OpCode.PostfixIncMember: {
+						var value = currentFrame.Pop().ToNumber();
 						var member = currentFrame.Pop();
 						var obj = currentFrame.Pop().RequireObject();
-						var newValue = oldValue.Inc();
-						obj.SetMember(member, newValue);
-						currentFrame.Push(isPostfix ? oldValue : newValue);
+						obj.SetMember(member, value.Inc());
+						currentFrame.Push(value);
 						break;
 					}
 
-					case OpCode.DecMember: {
-						var isPostfix = currentFrame.CodeReader.ReadBoolean();
-						var oldValue = currentFrame.Pop().ToNumber();
-						var member = currentFrame.Pop();
-						var obj = currentFrame.Pop().RequireObject();
-						var newValue = oldValue.Dec();
-						obj.SetMember(member, newValue);
-						currentFrame.Push(isPostfix ? oldValue : newValue);
-						break;
-					}
+					case OpCode.PostfixDecMember: {
+							var value = currentFrame.Pop().ToNumber();
+							var member = currentFrame.Pop();
+							var obj = currentFrame.Pop().RequireObject();
+							obj.SetMember(member, value.Inc());
+							currentFrame.Push(value);
+							break;
+						}
 
 						#endregion
 

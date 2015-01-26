@@ -2,8 +2,8 @@
 using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
-	public sealed class FunctionLiteral : Expression {
-		internal FunctionLiteral(Function value)
+	internal sealed class FunctionLiteral : Expression {
+		public FunctionLiteral(Function value)
 			: base(ExpressionType.FunctionLiteral) {
 			Contract.Requires(value != null);
 			Value = value;

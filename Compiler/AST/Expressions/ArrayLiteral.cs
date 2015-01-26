@@ -4,8 +4,8 @@ using System.Text;
 using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
-	public sealed class ArrayLiteral : Expression {
-		internal ArrayLiteral(List<Expression> items)
+	internal sealed class ArrayLiteral : Expression {
+		public ArrayLiteral(List<Expression> items)
 			: base(ExpressionType.ArrayLiteral) {
 			Contract.Requires(items != null);
 			Items = items;

@@ -2,8 +2,8 @@
 using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
-	public sealed class Identifier : Expression {
-		internal Identifier(string value)
+	internal sealed class Identifier : Expression {
+		public Identifier(string value)
 			: base(ExpressionType.Ident) {
 			Contract.Requires(!string.IsNullOrEmpty(value));
 			Value = value;

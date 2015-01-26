@@ -2,8 +2,8 @@
 using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
-	public sealed class IntegerLiteral : Expression {
-		internal IntegerLiteral(int value)
+	internal sealed class IntegerLiteral : Expression {
+		public IntegerLiteral(int value)
 			: base(ExpressionType.IntegerLiteral) {
 			Value = value;
 		}

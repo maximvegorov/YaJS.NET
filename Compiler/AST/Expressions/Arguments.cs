@@ -1,10 +1,10 @@
 ﻿using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
-	public sealed class Arguments : Expression {
+	internal sealed class Arguments : Expression {
 		public const string ArgumentsLiteral = "arguments";
 
-		internal Arguments()
+		public Arguments()
 			: base(ExpressionType.Arguments) {
 		}
 

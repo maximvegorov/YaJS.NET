@@ -3,8 +3,8 @@ using System.Text;
 using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
-	public sealed class MemberOperator : Expression {
-		internal MemberOperator(Expression baseValue, Expression property)
+	internal sealed class MemberOperator : Expression {
+		public MemberOperator(Expression baseValue, Expression property)
 			: base(ExpressionType.Member) {
 			Contract.Requires(baseValue != null && baseValue.CanHaveMembers);
 			Contract.Requires(property != null);

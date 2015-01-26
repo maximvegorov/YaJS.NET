@@ -2,8 +2,8 @@
 using System.Text;
 
 namespace YaJS.Compiler.AST.Expressions {
-	public class GroupingOperator : Expression {
-		internal GroupingOperator(Expression operand)
+	internal class GroupingOperator : Expression {
+		public GroupingOperator(Expression operand)
 			: base(ExpressionType.Grouping) {
 			Contract.Requires(operand != null);
 			Operand = operand;

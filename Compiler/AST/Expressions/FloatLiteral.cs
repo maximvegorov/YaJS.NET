@@ -2,8 +2,8 @@
 using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
-	public sealed class FloatLiteral : Expression {
-		internal FloatLiteral(double value)
+	internal sealed class FloatLiteral : Expression {
+		public FloatLiteral(double value)
 			: base(ExpressionType.FloatLiteral) {
 			Value = value;
 		}

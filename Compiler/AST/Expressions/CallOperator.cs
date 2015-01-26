@@ -4,8 +4,8 @@ using System.Text;
 using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
-	public sealed class CallOperator : Expression {
-		internal CallOperator(Expression callFunction, List<Expression> argumentList)
+	internal sealed class CallOperator : Expression {
+		public CallOperator(Expression callFunction, List<Expression> argumentList)
 			: base(ExpressionType.Call) {
 			Contract.Requires(callFunction != null && callFunction.CanBeFunction);
 			Contract.Requires(argumentList != null);
