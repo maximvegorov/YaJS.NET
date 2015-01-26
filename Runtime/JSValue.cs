@@ -17,6 +17,7 @@ namespace YaJS.Runtime {
 		Float,
 		String,
 		Object,
+		Reference,
 		Enumerator
 	}
 
@@ -119,6 +120,10 @@ namespace YaJS.Runtime {
 		}
 
 		public virtual JSFunction RequireFunction() {
+			throw new TypeErrorException();
+		}
+
+		internal virtual JSReference RequireReference() {
 			throw new TypeErrorException();
 		}
 

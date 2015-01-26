@@ -23,9 +23,12 @@ namespace YaJS.Compiler.AST.Statements {
 
 		internal void EmitTryCatch(FunctionCompiler compiler) {
 			Contract.Assert(_catchBlock != null);
+
 			var catchLabel = compiler.Emitter.DefineLabel();
 			compiler.Emitter.Emit(OpCode.EnterTry, catchLabel);
+			_tryBlock.CompileBy(compiler);
 			compiler.Emitter.Emit(OpCode.LeaveTry);
+
 			compiler.Emitter.MarkLabel(catchLabel);
 			compiler.Emitter.Emit(OpCode.EnterCatch, _catchBlockVariable);
 			_catchBlock.CompileBy(compiler);
@@ -34,22 +37,53 @@ namespace YaJS.Compiler.AST.Statements {
 
 		internal void EmitTryFinally(FunctionCompiler compiler) {
 			Contract.Assert(_finallyBlock != null);
+
 			var finallyLabel = compiler.Emitter.DefineLabel();
 			compiler.Emitter.Emit(OpCode.EnterTry, finallyLabel);
+			_tryBlock.CompileBy(compiler);
 			compiler.Emitter.Emit(OpCode.LeaveTry);
+
+			compiler.Emitter.MarkLabel(finallyLabel);
+			_finallyBlock.CompileBy(compiler);
+			compiler.Emitter.Emit(OpCode.Rethrow);
+		}
+
+		internal void EmitTryCatchFinally(FunctionCompiler compiler) {
+			Contract.Assert(_catchBlock != null && _finallyBlock != null);
+
+			var finallyLabel = compiler.Emitter.DefineLabel();
+			compiler.Emitter.Emit(OpCode.EnterTry, finallyLabel);
+
+			var catchLabel = compiler.Emitter.DefineLabel();
+			compiler.Emitter.Emit(OpCode.EnterTry, catchLabel);
+			_tryBlock.CompileBy(compiler);
+			compiler.Emitter.Emit(OpCode.LeaveTry);
+
+			compiler.Emitter.MarkLabel(catchLabel);
+			compiler.Emitter.Emit(OpCode.EnterCatch, _catchBlockVariable);
+			_catchBlock.CompileBy(compiler);
+			compiler.Emitter.Emit(OpCode.LeaveCatch);
+
+			compiler.Emitter.Emit(OpCode.LeaveTry);
+
 			compiler.Emitter.MarkLabel(finallyLabel);
 			_finallyBlock.CompileBy(compiler);
 			compiler.Emitter.Emit(OpCode.Rethrow);
 		}
 
 		internal override void CompileBy(FunctionCompiler compiler) {
-			compiler.Emitter.Emit(OpCode.EnterTry);
-			_tryBlock.CompileBy(compiler);
-			compiler.Emitter.Emit(OpCode.LeaveTry);
+			if (_catchBlock == null && _finallyBlock == null)
+				Errors.ThrowInternalError();
+
 			if (_catchBlock != null) {
-				
+				if (_finallyBlock == null)
+					EmitTryCatch(compiler);
+				else
+					EmitTryCatchFinally(compiler);
 			}
-			compiler.Emitter.Emit(OpCode.);
+			else {
+				EmitTryFinally(compiler);
+			}
 		}
 
 		public TryBlockStatement TryBlock {

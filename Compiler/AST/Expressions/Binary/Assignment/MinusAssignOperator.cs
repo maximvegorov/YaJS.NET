@@ -2,8 +2,8 @@
 using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
-	public sealed class MinusAssignOperator : AssignOperator {
-		internal MinusAssignOperator(Expression leftOperand, Expression rightOperand)
+	internal sealed class MinusAssignOperator : AssignOperator {
+		public MinusAssignOperator(Expression leftOperand, Expression rightOperand)
 			: base(ExpressionType.MinusAssign, leftOperand, rightOperand) {
 		}
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using JetBrains.Annotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using YaJS.Compiler.Exceptions;
 

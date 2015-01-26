@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using YaJS.Compiler.AST.Expressions;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST {
 	/// <summary>
@@ -31,6 +33,10 @@ namespace YaJS.Compiler.AST {
 		/// <param name="isLastOperator">является ли оператор последним в выражении</param>
 		internal virtual void CompileBy(FunctionCompiler compiler, bool isLastOperator) {
 			Contract.Requires(compiler != null);
+		}
+
+		public virtual JSValue ToJSValue() {
+			throw new NotSupportedException();
 		}
 
 		public static Expression Undefined() {

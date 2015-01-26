@@ -21,8 +21,8 @@ namespace YaJS.Compiler.AST.Expressions {
 		}
 
 		internal override void CompileBy(FunctionCompiler compiler, bool isLastOperator) {
-			var falseLabel = compiler.Emitter.DefineLabel();
 			var endLabel = compiler.Emitter.DefineLabel();
+			var falseLabel = compiler.Emitter.DefineLabel();
 			Condition.CompileBy(compiler, false);
 			compiler.Emitter.Emit(OpCode.GotoIfFalse, falseLabel);
 			TrueOperand.CompileBy(compiler, false);

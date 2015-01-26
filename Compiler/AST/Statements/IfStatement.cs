@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.Contracts;
-using System.Runtime.Remoting.Contexts;
 using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Statements {
@@ -58,8 +57,8 @@ namespace YaJS.Compiler.AST.Statements {
 				compiler.Emitter.MarkLabel(endLabel);
 			}
 			else {
-				var falseLabel = compiler.Emitter.DefineLabel();
 				var endLabel = compiler.Emitter.DefineLabel();
+				var falseLabel = compiler.Emitter.DefineLabel();
 				compiler.Emitter.Emit(OpCode.GotoIfFalse, falseLabel);
 				_thenStatement.CompileBy(compiler);
 				compiler.Emitter.Emit(OpCode.Goto, endLabel);

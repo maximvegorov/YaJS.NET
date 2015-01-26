@@ -59,9 +59,8 @@ namespace YaJS.Runtime {
 		}
 
 		private void Rethrow() {
-			if (CurrentException == null)
-				throw new IllegalOpCodeException(OpCode.Rethrow.ToString());
-			Unwind();
+			if (CurrentException != null)
+				Unwind();
 		}
 
 		private void NewObject(JSFunction constructor, List<JSValue> args) {
@@ -164,9 +163,6 @@ namespace YaJS.Runtime {
 					case OpCode.StLocal:
 						currentFrame.LocalScope.SetVariable(currentFrame.CodeReader.ReadString(), currentFrame.Pop());
 						break;
-					case OpCode.StLocalDup:
-						currentFrame.LocalScope.SetVariable(currentFrame.CodeReader.ReadString(), currentFrame.Peek());
-						break;
 					case OpCode.DelLocal:
 						currentFrame.Push(currentFrame.LocalScope.DeleteVariable(currentFrame.CodeReader.ReadString()));
 						break;
@@ -181,6 +177,14 @@ namespace YaJS.Runtime {
 						currentFrame.Push(obj.ContainsMember(member));
 						break;
 					}
+
+					case OpCode.MakeRef: {
+						var member = currentFrame.Pop();
+						var obj = currentFrame.Pop().ToObject(VM);
+						currentFrame.Push(new JSReference(obj, member));
+						break;
+					}
+
 					case OpCode.LdMember: {
 						var member = currentFrame.Pop();
 						var obj = currentFrame.Pop().ToObject(VM);
@@ -202,28 +206,30 @@ namespace YaJS.Runtime {
 						currentFrame.Push(value);
 						break;
 					}
+
+					case OpCode.LdMemberByRef: {
+						var reference = currentFrame.Pop().RequireReference();
+						currentFrame.Push(reference.Value);
+						break;
+					}
+					case OpCode.StMemberByRef: {
+						var value = currentFrame.Pop();
+						var reference = currentFrame.Pop().RequireReference();
+						reference.Value = value;
+						break;
+					}
+					case OpCode.StMemberByRefDup: {
+						var value = currentFrame.Pop();
+						var reference = currentFrame.Pop().RequireReference();
+						reference.Value = value;
+						currentFrame.Push(value);
+						break;
+					}
+
 					case OpCode.DelMember: {
 						var member = currentFrame.Pop();
 						var obj = currentFrame.Pop().RequireObject();
 						currentFrame.Push(obj.DeleteMember(member));
-						break;
-					}
-
-					case OpCode.PostfixIncMember: {
-						var value = currentFrame.Pop().ToNumber();
-						var member = currentFrame.Pop();
-						var obj = currentFrame.Pop().RequireObject();
-						obj.SetMember(member, value.Inc());
-						currentFrame.Push(value);
-						break;
-					}
-
-					case OpCode.PostfixDecMember: {
-						var value = currentFrame.Pop().ToNumber();
-						var member = currentFrame.Pop();
-						var obj = currentFrame.Pop().RequireObject();
-						obj.SetMember(member, value.Inc());
-						currentFrame.Push(value);
 						break;
 					}
 
@@ -237,6 +243,7 @@ namespace YaJS.Runtime {
 					case OpCode.Dup2: {
 						var top = currentFrame.Pop();
 						var top1 = currentFrame.Peek();
+						currentFrame.Push(top);
 						currentFrame.Push(top1);
 						currentFrame.Push(top);
 						break;
@@ -251,6 +258,14 @@ namespace YaJS.Runtime {
 					case OpCode.Swap: {
 						var top = currentFrame.Pop();
 						var top1 = currentFrame.Pop();
+						currentFrame.Push(top);
+						currentFrame.Push(top1);
+						break;
+					}
+					case OpCode.SwapDup: {
+						var top = currentFrame.Pop();
+						var top1 = currentFrame.Pop();
+						currentFrame.Push(top);
 						currentFrame.Push(top1);
 						currentFrame.Push(top);
 						break;
