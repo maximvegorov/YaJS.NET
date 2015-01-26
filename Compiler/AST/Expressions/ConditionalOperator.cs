@@ -34,9 +34,7 @@ namespace YaJS.Compiler.AST.Expressions {
 				compiler.Emitter.Emit(OpCode.Pop);
 		}
 
-		public override bool CanHaveMembers {
-			get { return (TrueOperand.CanHaveMembers || FalseOperand.CanHaveMembers); }
-		}
+		public override bool CanHaveMembers { get { return (TrueOperand.CanHaveMembers || FalseOperand.CanHaveMembers); } }
 
 		public override bool CanHaveMutableMembers {
 			get { return (TrueOperand.CanHaveMutableMembers || FalseOperand.CanHaveMutableMembers); }
@@ -46,13 +44,8 @@ namespace YaJS.Compiler.AST.Expressions {
 			get { return (TrueOperand.CanBeConstructor || FalseOperand.CanBeConstructor); }
 		}
 
-		public override bool CanBeFunction {
-			get { return (TrueOperand.CanBeFunction || FalseOperand.CanBeFunction); }
-		}
-
-		public override bool CanBeObject {
-			get { return (TrueOperand.CanBeObject || FalseOperand.CanBeObject); }
-		}
+		public override bool CanBeFunction { get { return (TrueOperand.CanBeFunction || FalseOperand.CanBeFunction); } }
+		public override bool CanBeObject { get { return (TrueOperand.CanBeObject || FalseOperand.CanBeObject); } }
 
 		public override bool IsConstant {
 			get { return (Condition.IsConstant && TrueOperand.IsConstant && FalseOperand.IsConstant); }

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Statements {
 	/// <summary>
@@ -9,6 +10,12 @@ namespace YaJS.Compiler.AST.Statements {
 
 		public DoWhileStatement(int lineNo, ILabelSet labelSet)
 			: base(StatementType.DoWhile, lineNo, labelSet) {
+		}
+
+		internal override void DoEmit(CompilingContext context) {
+			Statement.CompileBy(context.Compiler);
+			_condition.CompileBy(context.Compiler, false);
+			context.Compiler.Emitter.Emit(OpCode.GotoIfTrue, context.StartLabel);
 		}
 
 		public Expression Condition {

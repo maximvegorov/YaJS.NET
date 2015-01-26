@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Statements {
 	/// <summary>
@@ -16,12 +17,23 @@ namespace YaJS.Compiler.AST.Statements {
 			_enumerable = enumerable;
 		}
 
-		public string VariableName {
-			get { return (_variableName); }
+		internal override void DoEmitProlog(FunctionCompiler compiler) {
+			_enumerable.CompileBy(compiler, false);
+			compiler.Emitter.Emit(OpCode.GetEnumerator);
 		}
 
-		public Expression Enumerable {
-			get { return (_enumerable); }
+		internal override void DoEmit(CompilingContext context) {
+			context.Compiler.Emitter.Emit(OpCode.MoveNext, _variableName);
+			context.Compiler.Emitter.Emit(OpCode.GotoIfFalse, context.EndLabel);
+			Statement.CompileBy(context.Compiler);
+			context.Compiler.Emitter.Emit(OpCode.Goto, context.StartLabel);
 		}
+
+		internal override void DoEmitEpilog(FunctionCompiler compiler) {
+			compiler.Emitter.Emit(OpCode.Pop);
+		}
+
+		public string VariableName { get { return (_variableName); } }
+		public Expression Enumerable { get { return (_enumerable); } }
 	}
 }

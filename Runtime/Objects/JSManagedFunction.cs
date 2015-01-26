@@ -27,12 +27,7 @@ namespace YaJS.Runtime.Objects {
 		/// </summary>
 		public CompiledFunction CompiledFunction { get; private set; }
 
-		public override bool IsNative {
-			get { return (false); }
-		}
-
-		public override int ParameterCount {
-			get { return (CompiledFunction.ParameterNames.Length); }
-		}
+		public override bool IsNative { get { return (false); } }
+		public override int ParameterCount { get { return (CompiledFunction.ParameterNames.Length); } }
 	}
 }

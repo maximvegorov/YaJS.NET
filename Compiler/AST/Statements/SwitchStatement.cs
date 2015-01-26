@@ -1,4 +1,6 @@
-﻿using System.Diagnostics.Contracts;
+﻿using System.Collections.Generic;
+using System.Diagnostics.Contracts;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Statements {
 	/// <summary>
@@ -23,6 +25,36 @@ namespace YaJS.Compiler.AST.Statements {
 				_defaultClause.Preprocess(compiler);
 			if (_afterDefault != null)
 				_afterDefault.Preprocess(compiler);
+		}
+
+		internal override void CompileBy(FunctionCompiler compiler) {
+			var endLabel = compiler.Emitter.DefineLabel();
+			compiler.StatementEnds.Add(this, endLabel);
+			try {
+				var jumps = new Dictionary<JSValue, int>();
+				foreach (var caseClause in _beforeDefault) {
+					caseClause.Statements.CompileBy(compiler);
+					jumps.Add(caseClause.Expression.ToJSValue(), compiler.Emitter.Offset);
+				}
+				int? defaultOffset = null;
+				if (_defaultClause != null) {
+					_defaultClause.CompileBy(compiler);
+					defaultOffset = compiler.Emitter.Offset;
+				}
+				foreach (var caseClause in _afterDefault) {
+					caseClause.Statements.CompileBy(compiler);
+					jumps.Add(caseClause.Expression.ToJSValue(), compiler.Emitter.Offset);
+				}
+				compiler.Emitter.MarkLabel(endLabel);
+				Contract.Assert(endLabel.Offset.HasValue);
+				if (!defaultOffset.HasValue)
+					defaultOffset = endLabel.Offset.Value;
+				Contract.Assert(defaultOffset.HasValue);
+				compiler.SwitchJumpTables.Add(new SwitchJumpTable(jumps, defaultOffset.Value));
+			}
+			finally {
+				compiler.StatementEnds.Remove(this);
+			}
 		}
 
 		public Expression Expression {

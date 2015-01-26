@@ -29,8 +29,6 @@ namespace YaJS.Runtime.Constructors {
 			return (Construct(thread, outerScope, args));
 		}
 
-		public override int ParameterCount {
-			get { return (0); }
-		}
+		public override int ParameterCount { get { return (0); } }
 	}
 }

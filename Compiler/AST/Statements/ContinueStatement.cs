@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics.Contracts;
+using YaJS.Compiler.Emitter;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Statements {
 	/// <summary>
@@ -25,10 +27,14 @@ namespace YaJS.Compiler.AST.Statements {
 			Target = target;
 		}
 
-		public string TargetLabel {
-			get { return (_targetLabel); }
+		internal override void CompileBy(FunctionCompiler compiler) {
+			Label targetStartLabel;
+			if (!compiler.StatementStarts.TryGetValue(Target, out targetStartLabel))
+				Errors.ThrowInternalError();
+			compiler.Emitter.Emit(OpCode.Goto, targetStartLabel);
 		}
 
+		public string TargetLabel { get { return (_targetLabel); } }
 		public IterationStatement Target { get; private set; }
 	}
 }

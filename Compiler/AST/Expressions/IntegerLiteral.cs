@@ -18,18 +18,9 @@ namespace YaJS.Compiler.AST.Expressions {
 			compiler.Emitter.Emit(OpCode.LdInteger, Value);
 		}
 
-		public override bool CanHaveMembers {
-			get { return (true); }
-		}
-
-		public override bool IsConstant {
-			get { return (true); }
-		}
-
-		public override bool CanBeUsedInCaseClause {
-			get { return (true); }
-		}
-
+		public override bool CanHaveMembers { get { return (true); } }
+		public override bool IsConstant { get { return (true); } }
+		public override bool CanBeUsedInCaseClause { get { return (true); } }
 		public int Value { get; private set; }
 	}
 }

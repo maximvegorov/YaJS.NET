@@ -120,6 +120,7 @@
     <Compile Include="Exceptions\UnknownOpCodeException.cs" />
     <Compile Include="ExecutionThread.cs" />
     <Compile Include="ICompilerServices.cs" />
+    <Compile Include="JSReference.cs" />
     <Compile Include="JSValue.cs" />
     <Compile Include="LocalScope.cs" />
     <Compile Include="Objects\Errors\JSInternalError.cs" />

@@ -39,18 +39,9 @@ namespace YaJS.Compiler.AST.Expressions {
 			}
 		}
 
-		public override bool CanHaveMembers {
-			get { return (true); }
-		}
-
-		public override bool CanHaveMutableMembers {
-			get { return (true); }
-		}
-
-		public override bool CanBeObject {
-			get { return (true); }
-		}
-
+		public override bool CanHaveMembers { get { return (true); } }
+		public override bool CanHaveMutableMembers { get { return (true); } }
+		public override bool CanBeObject { get { return (true); } }
 		public List<Expression> Items { get; private set; }
 	}
 }

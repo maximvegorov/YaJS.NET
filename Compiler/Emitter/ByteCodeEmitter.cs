@@ -11,7 +11,7 @@ namespace YaJS.Compiler.Emitter {
 		private const int DefaultCapacity = 16;
 		private static readonly byte[] InvalidOffset = BitConverter.GetBytes(-1);
 		private byte[] _buffer = new byte[DefaultCapacity];
-		private int _byteLength;
+		private int _offset;
 
 		private void Grow(int minDelta) {
 			Contract.Requires(minDelta > 0);
@@ -26,17 +26,17 @@ namespace YaJS.Compiler.Emitter {
 		}
 
 		private void Write(OpCode code) {
-			if (_buffer.Length == _byteLength)
+			if (_buffer.Length == _offset)
 				Grow(sizeof (byte));
-			_buffer[_byteLength] = (byte)code;
-			_byteLength++;
+			_buffer[_offset] = (byte)code;
+			_offset++;
 		}
 
 		private void Write(bool op) {
-			if (_buffer.Length == _byteLength)
+			if (_buffer.Length == _offset)
 				Grow(sizeof (byte));
-			_buffer[_byteLength] = (byte)(op ? 1 : 0);
-			_byteLength++;
+			_buffer[_offset] = (byte)(op ? 1 : 0);
+			_offset++;
 		}
 
 		public void Emit(OpCode code) {
@@ -45,10 +45,10 @@ namespace YaJS.Compiler.Emitter {
 
 		private void Write(byte[] bytes) {
 			Contract.Requires(bytes != null && bytes.Length > 0);
-			if (_buffer.Length < _byteLength + bytes.Length)
+			if (_buffer.Length < _offset + bytes.Length)
 				Grow(bytes.Length);
-			Buffer.BlockCopy(bytes, 0, _buffer, _byteLength, bytes.Length);
-			_byteLength += bytes.Length;
+			Buffer.BlockCopy(bytes, 0, _buffer, _offset, bytes.Length);
+			_offset += bytes.Length;
 		}
 
 		public void Emit(OpCode code, bool op) {
@@ -81,12 +81,6 @@ namespace YaJS.Compiler.Emitter {
 			Write(op);
 		}
 
-		public void Emit(OpCode code, bool op1, string op2) {
-			Write(code);
-			Write(op1);
-			Write(op2);
-		}
-
 		public Label DefineLabel() {
 			return (new Label(this));
 		}
@@ -97,26 +91,25 @@ namespace YaJS.Compiler.Emitter {
 				Emit(op, label.Offset.Value);
 			else {
 				Emit(op);
-				label.AppendUnresolved(_byteLength);
+				label.AppendUnresolved(_offset);
 				Write(InvalidOffset);
 			}
 		}
 
 		public void MarkLabel(Label label) {
 			Contract.Requires(label != null);
-			label.Resolve(_byteLength);
+			label.Resolve(_offset);
 		}
 
 		public byte[] ToCompiledCode() {
-			if (_buffer.Length == _byteLength)
+			if (_buffer.Length == _offset)
 				return (_buffer);
-			var result = new byte[_byteLength];
-			Buffer.BlockCopy(_buffer, 0, result, 0, _byteLength);
+			var result = new byte[_offset];
+			Buffer.BlockCopy(_buffer, 0, result, 0, _offset);
 			return (result);
 		}
 
-		public byte[] RawBuffer {
-			get { return (_buffer); }
-		}
+		public byte[] RawBuffer { get { return (_buffer); } }
+		public int Offset { get { return (_offset); } }
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Statements {
 	/// <summary>
@@ -9,6 +10,13 @@ namespace YaJS.Compiler.AST.Statements {
 
 		public WhileStatement(int lineNo, ILabelSet labelSet)
 			: base(StatementType.While, lineNo, labelSet) {
+		}
+
+		internal override void DoEmit(CompilingContext context) {
+			_condition.CompileBy(context.Compiler, false);
+			context.Compiler.Emitter.Emit(OpCode.GotoIfFalse, context.EndLabel);
+			Statement.CompileBy(context.Compiler);
+			context.Compiler.Emitter.Emit(OpCode.Goto, context.StartLabel);
 		}
 
 		public Expression Condition {

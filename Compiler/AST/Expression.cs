@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using YaJS.Compiler.AST.Expressions;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST {
 	/// <summary>
@@ -13,10 +15,8 @@ namespace YaJS.Compiler.AST {
 		private static readonly Expression FalseLiteral = new BooleanLiteral(false);
 		private static readonly Expression TrueLiteral = new BooleanLiteral(true);
 		private static readonly Expression EmptyStringLiteral = new StringLiteral(string.Empty);
-
 		private static readonly List<KeyValuePair<string, Expression>> EmptyObjectLiteral =
 			new List<KeyValuePair<string, Expression>>();
-
 		private static readonly List<Expression> EmptyArrayLiteral = new List<Expression>();
 		private static readonly Expression ThisLiteral = new This();
 		private static readonly Expression ArgumentsLiteral = new Arguments();
@@ -33,6 +33,10 @@ namespace YaJS.Compiler.AST {
 		/// <param name="isLastOperator">является ли оператор последним в выражении</param>
 		internal virtual void CompileBy(FunctionCompiler compiler, bool isLastOperator) {
 			Contract.Requires(compiler != null);
+		}
+
+		public virtual JSValue ToJSValue() {
+			throw new NotSupportedException();
 		}
 
 		public static Expression Undefined() {
@@ -373,64 +377,46 @@ namespace YaJS.Compiler.AST {
 		/// <summary>
 		/// Является ли выражение ссылкой (можно использовать в левой части оператора присваивания)
 		/// </summary>
-		public virtual bool IsReference {
-			get { return (false); }
-		}
+		public virtual bool IsReference { get { return (false); } }
 
 		/// <summary>
 		/// Применим ли к выражению MemberOperator
 		/// </summary>
-		public virtual bool CanHaveMembers {
-			get { return (false); }
-		}
+		public virtual bool CanHaveMembers { get { return (false); } }
 
 		/// <summary>
 		/// Будет ли выражение ссылкой после применения MemberOperator
 		/// </summary>
-		public virtual bool CanHaveMutableMembers {
-			get { return (false); }
-		}
+		public virtual bool CanHaveMutableMembers { get { return (false); } }
 
 		/// <summary>
 		/// Применим ли к выражению NewOperator
 		/// </summary>
-		public virtual bool CanBeConstructor {
-			get { return (false); }
-		}
+		public virtual bool CanBeConstructor { get { return (false); } }
 
 		/// <summary>
 		/// Применим ли к выражению CallOperator
 		/// </summary>
-		public virtual bool CanBeFunction {
-			get { return (false); }
-		}
+		public virtual bool CanBeFunction { get { return (false); } }
 
 		/// <summary>
 		/// Применим ли к выражению DeleteOperator
 		/// </summary>
-		public virtual bool CanBeDeleted {
-			get { return (false); }
-		}
+		public virtual bool CanBeDeleted { get { return (false); } }
 
 		/// <summary>
 		/// Может ли результат вычисления выражения быть объектом
 		/// </summary>
-		public virtual bool CanBeObject {
-			get { return (false); }
-		}
+		public virtual bool CanBeObject { get { return (false); } }
 
 		/// <summary>
 		/// Выражение является константным
 		/// </summary>
-		public virtual bool IsConstant {
-			get { return (false); }
-		}
+		public virtual bool IsConstant { get { return (false); } }
 
 		/// <summary>
 		/// Может ли использоваться в качестве Selector-а в CaseClause
 		/// </summary>
-		public virtual bool CanBeUsedInCaseClause {
-			get { return (false); }
-		}
+		public virtual bool CanBeUsedInCaseClause { get { return (false); } }
 	}
 }

@@ -13,12 +13,14 @@ namespace YaJS.Compiler.AST.Statements {
 			_expression = expression;
 		}
 
+		internal override void CompileBy(FunctionCompiler compiler) {
+			_expression.CompileBy(compiler, true);
+		}
+
 		public override string ToString() {
 			return (Expression.ToString());
 		}
 
-		public Expression Expression {
-			get { return (_expression); }
-		}
+		public Expression Expression { get { return (_expression); } }
 	}
 }

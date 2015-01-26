@@ -128,13 +128,8 @@ namespace YaJS.Compiler {
 			_columnNo = columnNo;
 		}
 
-		public int LineNo {
-			get { return (_lineNo); }
-		}
-
-		public int ColumnNo {
-			get { return (_columnNo); }
-		}
+		public int LineNo { get { return (_lineNo); } }
+		public int ColumnNo { get { return (_columnNo); } }
 	}
 
 	public sealed class Token {

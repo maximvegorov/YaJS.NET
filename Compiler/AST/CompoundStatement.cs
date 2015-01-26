@@ -60,9 +60,7 @@ namespace YaJS.Compiler.AST {
 				statement.CompileBy(compiler);
 		}
 
-		public IReadOnlyList<Statement> Statements {
-			get { return (_statements); }
-		}
+		public IReadOnlyList<Statement> Statements { get { return (_statements); } }
 
 		#region IEnumerable<Statement>
 

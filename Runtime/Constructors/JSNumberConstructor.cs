@@ -29,8 +29,6 @@ namespace YaJS.Runtime.Constructors {
 			return (args.Count > 0 ? args[0].ToNumber() : 0);
 		}
 
-		public override int ParameterCount {
-			get { return (1); }
-		}
+		public override int ParameterCount { get { return (1); } }
 	}
 }

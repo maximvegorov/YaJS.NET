@@ -19,22 +19,26 @@
 		StLocal, // Извлечь из стека значение и сохранить в локальной переменной
 		DelLocal, // Удалить локальную переменную
 
-		IncLocal, // Увеличить значение локальной переменной на 1
-		DecLocal, // Уменьшить значение локальной переменной на 1
-
 		IsMember, // Проверить содержит ли объект S[top - 1] свойство S[top]
-		LdMember, // Загрузить в стек значение свойства объекта S[top - 1].S[top]
-		StMember, // Извлечь из стека значение и сохранить в свойстве объекта S[top - 1].S[top]
-		DelMember, // Удалить из объекта S[top] свойство S[top - 1]
 
-		IncMember, // Увеличить значение свойства объекта на 1
-		DecMember, // Уменьшить значение свойства объекта на 1
+		MakeRef, // Создать ссылку на свойство S[top] объекта S[top - 1]
 
-		Dup, // Продублировать S[top]
-		Dup2, // Продублировать S[top] и S[top - 1]
-		Pop, // Вытолкнуть из стека значение S[top]
-		Pop2, // Вытолкнуть из стека значения S[top] и S[top - 1]
-		Swap, // Переставляет местами S[top] и S[top - 1]
+		LdMember, // Загрузить в стек значение свойства S[top] объекта S[top - 1]
+		StMember, // Извлечь из стека значение S[top] и сохранить в свойстве S[top - 1] объекта S[top - 2]
+		StMemberDup, // Извлечь из стека значение S[top] и сохранить в свойстве S[top - 1] объекта S[top - 2], сохранив в стеке исходное значение S[top]
+
+		LdMemberByRef, // Загрузить в стек значение по ссылке S[top]
+		StMemberByRef, // Извлечь из стека значение S[top] по ссылке S[top - 1]
+		StMemberByRefDup, // Извлечь из стека значение S[top] по ссылке S[top - 1], сохранив в стеке исходное значение S[top]
+
+		DelMember, // Удалить из объекта S[top - 1] свойство S[top]
+
+		Dup, // Дублировать S[top]
+		Dup2, // Дублировать S[top] и S[top - 1]
+		Pop, // Вытолкнуть S[top]
+		Pop2, // Вытолкнуть S[top] и S[top - 1]
+		Swap, // Переставить местами S[top] и S[top - 1]
+		SwapDup, // Переставить местами S[top] и S[top - 1] и дублировать исходный S[top]
 
 		Goto, // Безусловный переход
 		GotoIfTrue, // Перейти если S[top] истинно
@@ -66,7 +70,7 @@
 		Return, // Вернуться из функции
 
 		GetEnumerator, // Вернуть перечислитель
-		EnumMoveNext, // Перейти к следующему элементу перечислителя
+		MoveNext, // Перейти к следующему элементу перечислителя
 
 		CastToPrimitive, // Преобразовать объект в примитивное значение
 
@@ -75,37 +79,37 @@
 
 		Inc, // S[top] + 1
 		Dec, // S[top] - 1
-		Plus, // S[top] + S[top - 1]
-		Minus, // S[top] - S[top - 1]
-		Mul, // S[top] * S[top - 1]
-		IntDiv, // S[top]  S[top - 1] (Целочисленное)
-		FltDiv, // S[top] / S[top - 1] (Вещественное)
-		Mod, // S[top] % S[top - 1]
+		Plus, // S[top - 1] + S[top]
+		Minus, // S[top - 1] - S[top] 
+		Mul, // S[top - 1] * S[top] 
+		IntDiv, // S[top - 1] / S[top] (Целочисленное)
+		FltDiv, // S[top - 1] / S[top] (Вещественное)
+		Mod, // S[top - 1] % S[top] 
 
 		BitNot, // ~S[top]
-		BitAnd, // S[top] & S[top - 1]
-		BitOr, // S[top] | S[top - 1]
-		BitXor, // S[top] ^ S[top - 1]
+		BitAnd, // S[top - 1] & S[top] 
+		BitOr, // S[top - 1] | S[top]
+		BitXor, // S[top - 1] ^ S[top] 
 
-		Shl, // S[top] << S[top - 1]
-		ShrS, // S[top] >> S[top - 1]
-		ShrU, // S[top] >>> S[top - 1]
+		Shl, // S[top - 1] << S[top]
+		ShrS, // S[top - 1] >> S[top]
+		ShrU, // S[top - 1] >>> S[top]
 
 		Not, // !S[top]
-		And, // S[top] && S[top - 1]
-		Or, // S[top] || S[top - 1]
+		And, // S[top - 1] && S[top]
+		Or, // S[top - 1] || S[top]
 
-		ConvEq, // S[top] == S[top - 1] (Только для примитивных типов)
-		StrictEq, // S[top] === S[top - 1]
-		ConvNeq, // S[top] != S[top - 1]
-		StrictNeq, // S[top] !== S[top - 1] (Только для примитивных типов)
+		ConvEq, // S[top - 1] == S[top] (Только для примитивных типов)
+		StrictEq, // S[top - 1] === S[top]
+		ConvNeq, // S[top - 1] != S[top] (Только для примитивных типов)
+		StrictNeq, // S[top - 1] !== S[top]
 
-		Lt, // S[top] < S[top - 1]
-		Lte, // S[top] <= S[top - 1]
-		Gt, // S[top] > S[top - 1]
-		Gte, // S[top] >= S[top - 1]
+		Lt, // S[top - 1] < S[top]
+		Lte, // S[top - 1] <= S[top]
+		Gt, // S[top - 1] > S[top]
+		Gte, // S[top - 1] >= S[top]
 
-		InstanceOf, // S[top] instanceof S[top - 1]
+		InstanceOf, // S[top - 1] instanceof S[top]
 		TypeOf // typeof S[top]
 	}
 }

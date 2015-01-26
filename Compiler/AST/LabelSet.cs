@@ -99,7 +99,7 @@ namespace YaJS.Compiler.AST {
 			Contract.Requires(label1 != null);
 			Contract.Requires(label2 != null);
 			Contract.Requires(label3 != null);
-			_set = new HashSet<string> { label1, label2, label3 };
+			_set = new HashSet<string> {label1, label2, label3};
 		}
 
 		[Pure]

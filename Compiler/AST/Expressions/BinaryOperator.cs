@@ -5,7 +5,7 @@ namespace YaJS.Compiler.AST.Expressions {
 	/// <summary>
 	/// Базовый класс для всех бинарных операторов
 	/// </summary>
-	internal abstract class BinaryOperator : Expression {
+	public abstract class BinaryOperator : Expression {
 		protected BinaryOperator(ExpressionType type, Expression leftOperand, Expression rightOperand)
 			: base(type) {
 			Contract.Requires(leftOperand != null);
@@ -14,7 +14,7 @@ namespace YaJS.Compiler.AST.Expressions {
 			RightOperand = rightOperand;
 		}
 
-		protected void CompileBy(
+		internal void CompileBy(
 			FunctionCompiler compiler,
 			OpCode op,
 			bool isLeftAssociative,
@@ -40,7 +40,7 @@ namespace YaJS.Compiler.AST.Expressions {
 				compiler.Emitter.Emit(OpCode.Pop);
 		}
 
-		protected void CompileEqualityBy(FunctionCompiler compiler, OpCode strictOp, OpCode convOp, bool isLastOperator) {
+		internal void CompileEqualityBy(FunctionCompiler compiler, OpCode strictOp, OpCode convOp, bool isLastOperator) {
 			if (!LeftOperand.CanBeObject && !RightOperand.CanBeObject) {
 				LeftOperand.CompileBy(compiler, false);
 				RightOperand.CompileBy(compiler, false);
@@ -71,10 +71,7 @@ namespace YaJS.Compiler.AST.Expressions {
 				compiler.Emitter.Emit(OpCode.Pop);
 		}
 
-		public override bool IsConstant {
-			get { return (LeftOperand.IsConstant && RightOperand.IsConstant); }
-		}
-
+		public override bool IsConstant { get { return (LeftOperand.IsConstant && RightOperand.IsConstant); } }
 		public Expression LeftOperand { get; private set; }
 		public Expression RightOperand { get; private set; }
 	}

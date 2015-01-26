@@ -10,8 +10,6 @@
 		/// <summary>
 		/// Native-функция?
 		/// </summary>
-		public override bool IsNative {
-			get { return (true); }
-		}
+		public override bool IsNative { get { return (true); } }
 	}
 }

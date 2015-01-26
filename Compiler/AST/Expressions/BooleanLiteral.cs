@@ -17,14 +17,8 @@ namespace YaJS.Compiler.AST.Expressions {
 			compiler.Emitter.Emit(OpCode.LdBoolean, Value);
 		}
 
-		public override bool CanHaveMembers {
-			get { return (true); }
-		}
-
-		public override bool IsConstant {
-			get { return (true); }
-		}
-
+		public override bool CanHaveMembers { get { return (true); } }
+		public override bool IsConstant { get { return (true); } }
 		public bool Value { get; private set; }
 	}
 }
