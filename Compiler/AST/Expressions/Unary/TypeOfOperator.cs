@@ -15,8 +15,6 @@ namespace YaJS.Compiler.AST.Expressions {
 			compiler.Emitter.Emit(isLastOperator ? OpCode.Pop : OpCode.TypeOf);
 		}
 
-		public override bool CanHaveMembers {
-			get { return (true); }
-		}
+		public override bool CanHaveMembers { get { return (true); } }
 	}
 }

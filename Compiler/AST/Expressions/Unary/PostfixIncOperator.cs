@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
 	internal sealed class PostfixIncOperator : UnaryOperator {
@@ -12,11 +13,9 @@ namespace YaJS.Compiler.AST.Expressions {
 		}
 
 		internal override void CompileBy(FunctionCompiler compiler, bool isLastOperator) {
-			compiler.CompileIncDecExpression(Operand, true, true, isLastOperator);
+			CompileIncDecBy(compiler, OpCode.Inc, true, isLastOperator);
 		}
 
-		public override bool CanHaveMembers {
-			get { return (true); }
-		}
+		public override bool CanHaveMembers { get { return (true); } }
 	}
 }

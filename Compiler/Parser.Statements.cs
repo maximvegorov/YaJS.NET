@@ -225,7 +225,7 @@ namespace YaJS.Compiler {
 			if (!expression.CanBeUsedInCaseClause)
 				Errors.ThrowUnsupportedCaseClauseExpression(startPosition);
 			Match(TokenType.Colon);
-			return (new CaseClauseStatement(startPosition.LineNo, expression) { Statements = ParseStatementListStatement() });
+			return (new CaseClauseStatement(startPosition.LineNo, expression) {Statements = ParseStatementListStatement()});
 		}
 
 		private CaseClauseBlockStatement ParseCaseClauseBlockStatement() {

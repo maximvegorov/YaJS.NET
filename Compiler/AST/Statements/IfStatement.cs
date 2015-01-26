@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics.Contracts;
+using System.Runtime.Remoting.Contexts;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Statements {
 	/// <summary>
@@ -45,6 +47,26 @@ namespace YaJS.Compiler.AST.Statements {
 				_thenStatement.Preprocess(compiler);
 			if (_elseStatement != null)
 				_elseStatement.Preprocess(compiler);
+		}
+
+		internal override void CompileBy(FunctionCompiler compiler) {
+			Condition.CompileBy(compiler, false);
+			if (_elseStatement == null) {
+				var endLabel = compiler.Emitter.DefineLabel();
+				compiler.Emitter.Emit(OpCode.GotoIfFalse, endLabel);
+				ThenStatement.CompileBy(compiler);
+				compiler.Emitter.MarkLabel(endLabel);
+			}
+			else {
+				var falseLabel = compiler.Emitter.DefineLabel();
+				var endLabel = compiler.Emitter.DefineLabel();
+				compiler.Emitter.Emit(OpCode.GotoIfFalse, falseLabel);
+				_thenStatement.CompileBy(compiler);
+				compiler.Emitter.Emit(OpCode.Goto, endLabel);
+				compiler.Emitter.MarkLabel(falseLabel);
+				_elseStatement.CompileBy(compiler);
+				compiler.Emitter.MarkLabel(endLabel);
+			}
 		}
 
 		public Expression Condition {

@@ -4,8 +4,8 @@ using System.Text;
 using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
-	internal sealed class NewOperator : Expression {
-		public NewOperator(Expression constructor, List<Expression> argumentList)
+	public sealed class NewOperator : Expression {
+		internal NewOperator(Expression constructor, List<Expression> argumentList)
 			: base(ExpressionType.New) {
 			Contract.Requires(constructor != null && constructor.CanBeConstructor);
 			Contract.Requires(argumentList != null);
@@ -35,26 +35,11 @@ namespace YaJS.Compiler.AST.Expressions {
 				compiler.Emitter.Emit(OpCode.Pop);
 		}
 
-		public override bool CanHaveMembers {
-			get { return (true); }
-		}
-
-		public override bool CanHaveMutableMembers {
-			get { return (true); }
-		}
-
-		public override bool CanBeConstructor {
-			get { return (true); }
-		}
-
-		public override bool CanBeFunction {
-			get { return (true); }
-		}
-
-		public override bool CanBeObject {
-			get { return (true); }
-		}
-
+		public override bool CanHaveMembers { get { return (true); } }
+		public override bool CanHaveMutableMembers { get { return (true); } }
+		public override bool CanBeConstructor { get { return (true); } }
+		public override bool CanBeFunction { get { return (true); } }
+		public override bool CanBeObject { get { return (true); } }
 		public Expression Constructor { get; private set; }
 		public List<Expression> ArgumentList { get; private set; }
 	}

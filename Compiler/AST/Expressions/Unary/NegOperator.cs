@@ -21,8 +21,6 @@ namespace YaJS.Compiler.AST.Expressions {
 			}
 		}
 
-		public override bool CanHaveMembers {
-			get { return (true); }
-		}
+		public override bool CanHaveMembers { get { return (true); } }
 	}
 }

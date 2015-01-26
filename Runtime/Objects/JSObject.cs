@@ -124,6 +124,10 @@ namespace YaJS.Runtime.Objects {
 			return (this);
 		}
 
+		IEnumerator IEnumerable.GetEnumerator() {
+			return (GetEnumerator());
+		}
+
 		public override IEnumerator<JSValue> GetEnumerator() {
 			if (_ownMembers == null)
 				yield break;
@@ -138,10 +142,6 @@ namespace YaJS.Runtime.Objects {
 			}
 		}
 
-		IEnumerator IEnumerable.GetEnumerator() {
-			return (GetEnumerator());
-		}
-
 		/// <summary>
 		/// Виртуальная машина к которой относится объект
 		/// </summary>
@@ -150,9 +150,7 @@ namespace YaJS.Runtime.Objects {
 		/// <summary>
 		/// Прототип объекта
 		/// </summary>
-		public JSObject Inherited {
-			get { return (_inherited); }
-		}
+		public JSObject Inherited { get { return (_inherited); } }
 
 		/// <summary>
 		/// Коллекция собственных свойств

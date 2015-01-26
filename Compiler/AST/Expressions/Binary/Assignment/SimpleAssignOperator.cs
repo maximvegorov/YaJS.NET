@@ -32,8 +32,6 @@ namespace YaJS.Compiler.AST.Expressions {
 			}
 		}
 
-		public override bool CanBeObject {
-			get { return (RightOperand.CanBeObject); }
-		}
+		public override bool CanBeObject { get { return (RightOperand.CanBeObject); } }
 	}
 }

@@ -1,10 +1,10 @@
 ﻿using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
-	internal sealed class Eval : Expression {
-		public const string EvalLiteral = "eval";
+	public sealed class Eval : Expression {
+		private const string EvalLiteral = "eval";
 
-		public Eval()
+		internal Eval()
 			: base(ExpressionType.Eval) {
 		}
 
@@ -18,16 +18,8 @@ namespace YaJS.Compiler.AST.Expressions {
 			compiler.Emitter.Emit(OpCode.LdLocal, EvalLiteral);
 		}
 
-		public override bool CanHaveMembers {
-			get { return (true); }
-		}
-
-		public override bool CanBeFunction {
-			get { return (true); }
-		}
-
-		public override bool CanBeObject {
-			get { return (true); }
-		}
+		public override bool CanHaveMembers { get { return (true); } }
+		public override bool CanBeFunction { get { return (true); } }
+		public override bool CanBeObject { get { return (true); } }
 	}
 }

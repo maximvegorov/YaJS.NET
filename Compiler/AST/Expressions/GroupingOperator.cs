@@ -2,8 +2,8 @@
 using System.Text;
 
 namespace YaJS.Compiler.AST.Expressions {
-	internal class GroupingOperator : Expression {
-		public GroupingOperator(Expression operand)
+	public class GroupingOperator : Expression {
+		internal GroupingOperator(Expression operand)
 			: base(ExpressionType.Grouping) {
 			Contract.Requires(operand != null);
 			Operand = operand;
@@ -19,34 +19,13 @@ namespace YaJS.Compiler.AST.Expressions {
 			Operand.CompileBy(compiler, isLastOperator);
 		}
 
-		public override bool CanHaveMembers {
-			get { return (Operand.CanHaveMembers); }
-		}
-
-		public override bool CanHaveMutableMembers {
-			get { return (Operand.CanHaveMutableMembers); }
-		}
-
-		public override bool CanBeConstructor {
-			get { return (Operand.CanBeConstructor); }
-		}
-
-		public override bool CanBeFunction {
-			get { return (Operand.CanBeFunction); }
-		}
-
-		public override bool CanBeDeleted {
-			get { return (Operand.CanBeDeleted); }
-		}
-
-		public override bool CanBeObject {
-			get { return (Operand.CanBeObject); }
-		}
-
-		public override bool IsConstant {
-			get { return (Operand.IsConstant); }
-		}
-
+		public override bool CanHaveMembers { get { return (Operand.CanHaveMembers); } }
+		public override bool CanHaveMutableMembers { get { return (Operand.CanHaveMutableMembers); } }
+		public override bool CanBeConstructor { get { return (Operand.CanBeConstructor); } }
+		public override bool CanBeFunction { get { return (Operand.CanBeFunction); } }
+		public override bool CanBeDeleted { get { return (Operand.CanBeDeleted); } }
+		public override bool CanBeObject { get { return (Operand.CanBeObject); } }
+		public override bool IsConstant { get { return (Operand.IsConstant); } }
 		public Expression Operand { get; private set; }
 	}
 }

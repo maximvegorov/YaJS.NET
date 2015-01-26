@@ -16,8 +16,6 @@ namespace YaJS.Compiler.AST.Expressions {
 			compiler.Emitter.Emit(OpCode.LdNull);
 		}
 
-		public override bool IsConstant {
-			get { return (true); }
-		}
+		public override bool IsConstant { get { return (true); } }
 	}
 }

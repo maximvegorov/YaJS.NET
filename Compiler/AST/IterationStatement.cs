@@ -1,10 +1,23 @@
 ﻿using System.Diagnostics.Contracts;
+using YaJS.Compiler.Emitter;
 
 namespace YaJS.Compiler.AST {
 	/// <summary>
 	/// Цикл (См. http://www.ecma-international.org/ecma-262/5.1/#sec-12.6)
 	/// </summary>
 	public abstract class IterationStatement : LabellableStatement {
+		internal class CompilingContext {
+			public CompilingContext(FunctionCompiler compiler) {
+				Compiler = compiler;
+				StartLabel = compiler.Emitter.DefineLabel();
+				EndLabel = compiler.Emitter.DefineLabel();
+			}
+
+			public FunctionCompiler Compiler { get; private set; }
+			public Label StartLabel { get; private set; }
+			public Label EndLabel { get; private set; }
+		}
+
 		private Statement _statement;
 
 		protected IterationStatement(StatementType type, int lineNo, ILabelSet labelSet)
@@ -27,6 +40,31 @@ namespace YaJS.Compiler.AST {
 				Errors.ThrowInternalError();
 			else
 				_statement.Preprocess(compiler);
+		}
+
+		internal virtual void DoEmitProlog(FunctionCompiler compiler) {
+		}
+
+		internal abstract void DoEmit(CompilingContext context);
+
+		internal virtual void DoEmitEpilog(FunctionCompiler compiler) {
+		}
+
+		internal override sealed void CompileBy(FunctionCompiler compiler) {
+			DoEmitProlog(compiler);
+			var context = new CompilingContext(compiler);
+			try {
+				compiler.StatementStarts.Add(this, context.StartLabel);
+				compiler.StatementStarts.Add(this, context.EndLabel);
+				compiler.Emitter.MarkLabel(context.StartLabel);
+				DoEmit(context);
+				compiler.Emitter.MarkLabel(context.EndLabel);
+			}
+			finally {
+				compiler.StatementEnds.Remove(this);
+				compiler.StatementStarts.Remove(this);
+			}
+			DoEmitEpilog(compiler);
 		}
 
 		public Statement Statement {

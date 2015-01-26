@@ -81,12 +81,6 @@ namespace YaJS.Compiler.Emitter {
 			Write(op);
 		}
 
-		public void Emit(OpCode code, bool op1, string op2) {
-			Write(code);
-			Write(op1);
-			Write(op2);
-		}
-
 		public Label DefineLabel() {
 			return (new Label(this));
 		}
@@ -115,8 +109,6 @@ namespace YaJS.Compiler.Emitter {
 			return (result);
 		}
 
-		public byte[] RawBuffer {
-			get { return (_buffer); }
-		}
+		public byte[] RawBuffer { get { return (_buffer); } }
 	}
 }

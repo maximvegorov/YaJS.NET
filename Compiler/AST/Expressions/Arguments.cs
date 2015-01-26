@@ -1,10 +1,10 @@
 ﻿using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
-	internal sealed class Arguments : Expression {
-		public const string ArgumentsLiteral = "arguments";
+	public sealed class Arguments : Expression {
+		private const string ArgumentsLiteral = "arguments";
 
-		public Arguments()
+		internal Arguments()
 			: base(ExpressionType.Arguments) {
 		}
 
@@ -18,12 +18,7 @@ namespace YaJS.Compiler.AST.Expressions {
 			compiler.Emitter.Emit(OpCode.LdLocal, ArgumentsLiteral);
 		}
 
-		public override bool CanHaveMembers {
-			get { return (true); }
-		}
-
-		public override bool CanBeObject {
-			get { return (true); }
-		}
+		public override bool CanHaveMembers { get { return (true); } }
+		public override bool CanBeObject { get { return (true); } }
 	}
 }

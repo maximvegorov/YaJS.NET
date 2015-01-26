@@ -2,8 +2,8 @@
 using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
-	internal sealed class FloatLiteral : Expression {
-		public FloatLiteral(double value)
+	public sealed class FloatLiteral : Expression {
+		internal FloatLiteral(double value)
 			: base(ExpressionType.FloatLiteral) {
 			Value = value;
 		}
@@ -18,14 +18,8 @@ namespace YaJS.Compiler.AST.Expressions {
 			compiler.Emitter.Emit(OpCode.LdFloat, Value);
 		}
 
-		public override bool CanHaveMembers {
-			get { return (true); }
-		}
-
-		public override bool IsConstant {
-			get { return (true); }
-		}
-
+		public override bool CanHaveMembers { get { return (true); } }
+		public override bool IsConstant { get { return (true); } }
 		public double Value { get; private set; }
 	}
 }

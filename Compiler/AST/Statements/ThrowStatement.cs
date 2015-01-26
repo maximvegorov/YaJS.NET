@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Statements {
 	/// <summary>
@@ -13,8 +14,11 @@ namespace YaJS.Compiler.AST.Statements {
 			_expression = expression;
 		}
 
-		public Expression Expression {
-			get { return (_expression); }
+		internal override void CompileBy(FunctionCompiler compiler) {
+			_expression.CompileBy(compiler, false);
+			compiler.Emitter.Emit(OpCode.Throw);
 		}
+
+		public Expression Expression { get { return (_expression); } }
 	}
 }

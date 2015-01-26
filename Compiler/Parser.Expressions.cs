@@ -43,7 +43,7 @@ namespace YaJS.Compiler {
 				ReadNextToken();
 				return (EmptyArgumentList);
 			}
-			var result = new List<Expression> { ParseExpression() };
+			var result = new List<Expression> {ParseExpression()};
 			while (Lookahead.Type == TokenType.Comma) {
 				ReadNextToken();
 				result.Add(ParseExpression());
@@ -620,7 +620,7 @@ namespace YaJS.Compiler {
 			var assignment = ParseAssignmentExpression();
 			if (Lookahead.Type != TokenType.Comma)
 				return (assignment);
-			var sequence = new List<Expression> { assignment };
+			var sequence = new List<Expression> {assignment};
 			do {
 				ReadNextToken();
 				sequence.Add(ParseAssignmentExpression());

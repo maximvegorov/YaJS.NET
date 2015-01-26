@@ -17,8 +17,6 @@ namespace YaJS.Compiler.AST.Expressions {
 			CompileBy(compiler, OpCode.StrictEq, true, false, isLastOperator);
 		}
 
-		public override bool CanHaveMembers {
-			get { return (true); }
-		}
+		public override bool CanHaveMembers { get { return (true); } }
 	}
 }

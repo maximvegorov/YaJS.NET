@@ -219,13 +219,13 @@ namespace YaJS.Runtime {
 					}
 
 					case OpCode.PostfixDecMember: {
-							var value = currentFrame.Pop().ToNumber();
-							var member = currentFrame.Pop();
-							var obj = currentFrame.Pop().RequireObject();
-							obj.SetMember(member, value.Inc());
-							currentFrame.Push(value);
-							break;
-						}
+						var value = currentFrame.Pop().ToNumber();
+						var member = currentFrame.Pop();
+						var obj = currentFrame.Pop().RequireObject();
+						obj.SetMember(member, value.Inc());
+						currentFrame.Push(value);
+						break;
+					}
 
 						#endregion
 
@@ -360,7 +360,7 @@ namespace YaJS.Runtime {
 					case OpCode.GetEnumerator:
 						currentFrame.Push(currentFrame.Pop().GetJSEnumerator());
 						break;
-					case OpCode.EnumMoveNext: {
+					case OpCode.MoveNext: {
 						var enumerator = currentFrame.Peek().RequireEnumerator();
 						var hasMoreValue = enumerator.MoveNext();
 						currentFrame.LocalScope.SetVariable(

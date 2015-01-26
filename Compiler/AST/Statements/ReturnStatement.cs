@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.Contracts;
 using System.Text;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Statements {
 	/// <summary>
@@ -23,6 +24,11 @@ namespace YaJS.Compiler.AST.Statements {
 		internal override void Preprocess(FunctionCompiler compiler) {
 			for (var current = Parent; current != null; current = current.Parent)
 				current.RegisterExitPoint(this);
+		}
+
+		internal override void CompileBy(FunctionCompiler compiler) {
+			Expression.CompileBy(compiler, false);
+			compiler.Emitter.Emit(OpCode.Return);
 		}
 
 		public Expression Expression { get; private set; }

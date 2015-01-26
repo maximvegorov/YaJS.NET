@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Statements {
 	/// <summary>
@@ -15,7 +16,40 @@ namespace YaJS.Compiler.AST.Statements {
 		}
 
 		internal override void Preprocess(FunctionCompiler compiler) {
+			if (_catchBlock == null && _finallyBlock == null)
+				Errors.ThrowInternalError();
 			compiler.TryStatements.Add(this);
+		}
+
+		internal void EmitTryCatch(FunctionCompiler compiler) {
+			Contract.Assert(_catchBlock != null);
+			var catchLabel = compiler.Emitter.DefineLabel();
+			compiler.Emitter.Emit(OpCode.EnterTry, catchLabel);
+			compiler.Emitter.Emit(OpCode.LeaveTry);
+			compiler.Emitter.MarkLabel(catchLabel);
+			compiler.Emitter.Emit(OpCode.EnterCatch, _catchBlockVariable);
+			_catchBlock.CompileBy(compiler);
+			compiler.Emitter.Emit(OpCode.LeaveCatch);
+		}
+
+		internal void EmitTryFinally(FunctionCompiler compiler) {
+			Contract.Assert(_finallyBlock != null);
+			var finallyLabel = compiler.Emitter.DefineLabel();
+			compiler.Emitter.Emit(OpCode.EnterTry, finallyLabel);
+			compiler.Emitter.Emit(OpCode.LeaveTry);
+			compiler.Emitter.MarkLabel(finallyLabel);
+			_finallyBlock.CompileBy(compiler);
+			compiler.Emitter.Emit(OpCode.Rethrow);
+		}
+
+		internal override void CompileBy(FunctionCompiler compiler) {
+			compiler.Emitter.Emit(OpCode.EnterTry);
+			_tryBlock.CompileBy(compiler);
+			compiler.Emitter.Emit(OpCode.LeaveTry);
+			if (_catchBlock != null) {
+				
+			}
+			compiler.Emitter.Emit(OpCode.);
 		}
 
 		public TryBlockStatement TryBlock {

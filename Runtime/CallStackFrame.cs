@@ -15,7 +15,6 @@ namespace YaJS.Runtime {
 		/// Стек вычислений
 		/// </summary>
 		private readonly Stack<JSValue> _evalStack;
-
 		/// <summary>
 		/// Текущий блок try
 		/// </summary>

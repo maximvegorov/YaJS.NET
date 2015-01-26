@@ -19,9 +19,7 @@ namespace YaJS.Compiler.AST.Statements {
 			_statements.Preprocess(compiler);
 		}
 
-		public Expression Expression {
-			get { return (_expression); }
-		}
+		public Expression Expression { get { return (_expression); } }
 
 		public StatementListStatement Statements {
 			get { return (_statements); }

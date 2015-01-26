@@ -3,8 +3,8 @@ using System.Text;
 using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
-	internal sealed class ConditionalOperator : Expression {
-		public ConditionalOperator(Expression condition, Expression trueOperand, Expression falseOperand)
+	public sealed class ConditionalOperator : Expression {
+		internal ConditionalOperator(Expression condition, Expression trueOperand, Expression falseOperand)
 			: base(ExpressionType.Conditional) {
 			Contract.Requires(condition != null);
 			Contract.Requires(trueOperand != null);
@@ -21,8 +21,8 @@ namespace YaJS.Compiler.AST.Expressions {
 		}
 
 		internal override void CompileBy(FunctionCompiler compiler, bool isLastOperator) {
-			var endLabel = compiler.Emitter.DefineLabel();
 			var falseLabel = compiler.Emitter.DefineLabel();
+			var endLabel = compiler.Emitter.DefineLabel();
 			Condition.CompileBy(compiler, false);
 			compiler.Emitter.Emit(OpCode.GotoIfFalse, falseLabel);
 			TrueOperand.CompileBy(compiler, false);
@@ -34,9 +34,7 @@ namespace YaJS.Compiler.AST.Expressions {
 				compiler.Emitter.Emit(OpCode.Pop);
 		}
 
-		public override bool CanHaveMembers {
-			get { return (TrueOperand.CanHaveMembers || FalseOperand.CanHaveMembers); }
-		}
+		public override bool CanHaveMembers { get { return (TrueOperand.CanHaveMembers || FalseOperand.CanHaveMembers); } }
 
 		public override bool CanHaveMutableMembers {
 			get { return (TrueOperand.CanHaveMutableMembers || FalseOperand.CanHaveMutableMembers); }
@@ -46,13 +44,8 @@ namespace YaJS.Compiler.AST.Expressions {
 			get { return (TrueOperand.CanBeConstructor || FalseOperand.CanBeConstructor); }
 		}
 
-		public override bool CanBeFunction {
-			get { return (TrueOperand.CanBeFunction || FalseOperand.CanBeFunction); }
-		}
-
-		public override bool CanBeObject {
-			get { return (TrueOperand.CanBeObject || FalseOperand.CanBeObject); }
-		}
+		public override bool CanBeFunction { get { return (TrueOperand.CanBeFunction || FalseOperand.CanBeFunction); } }
+		public override bool CanBeObject { get { return (TrueOperand.CanBeObject || FalseOperand.CanBeObject); } }
 
 		public override bool IsConstant {
 			get { return (Condition.IsConstant && TrueOperand.IsConstant && FalseOperand.IsConstant); }

@@ -1,8 +1,8 @@
 ﻿using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
-	internal sealed class BooleanLiteral : Expression {
-		public BooleanLiteral(bool value)
+	public sealed class BooleanLiteral : Expression {
+		internal BooleanLiteral(bool value)
 			: base(ExpressionType.BooleanLiteral) {
 			Value = value;
 		}
@@ -17,14 +17,8 @@ namespace YaJS.Compiler.AST.Expressions {
 			compiler.Emitter.Emit(OpCode.LdBoolean, Value);
 		}
 
-		public override bool CanHaveMembers {
-			get { return (true); }
-		}
-
-		public override bool IsConstant {
-			get { return (true); }
-		}
-
+		public override bool CanHaveMembers { get { return (true); } }
+		public override bool IsConstant { get { return (true); } }
 		public bool Value { get; private set; }
 	}
 }
