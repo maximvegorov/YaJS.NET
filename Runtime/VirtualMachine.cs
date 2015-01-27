@@ -18,7 +18,7 @@ namespace YaJS.Runtime {
 			Compiler = compiler;
 
 			// Создать глобальный объект
-			Global = new JSObject(this);
+			GlobalObject = new JSObject(this);
 
 			// Так как существуют циклические зависимости между прототипами встроенных объектов и встроенными методами
 			// создание и инициализация разделены между собой
@@ -48,19 +48,19 @@ namespace YaJS.Runtime {
 			JSErrorConstructor.InitPrototype(Error, Function);
 
 			// Инициализировать глобальный объект
-			Global.OwnMembers.Add("Object", new JSObjectConstructor(this, Function));
-			Global.OwnMembers.Add("Boolean", new JSBooleanConstructor(this, Function));
-			Global.OwnMembers.Add("Number", new JSNumberConstructor(this, Function));
-			Global.OwnMembers.Add("String", new JSStringConstructor(this, Function));
-			Global.OwnMembers.Add("Array", new JSArrayConstructor(this, Function));
-			Global.OwnMembers.Add("Function", new JSFunctionConstructor(this, Function));
+			GlobalObject.OwnMembers.Add("Object", new JSObjectConstructor(this, Function));
+			GlobalObject.OwnMembers.Add("Boolean", new JSBooleanConstructor(this, Function));
+			GlobalObject.OwnMembers.Add("Number", new JSNumberConstructor(this, Function));
+			GlobalObject.OwnMembers.Add("String", new JSStringConstructor(this, Function));
+			GlobalObject.OwnMembers.Add("Array", new JSArrayConstructor(this, Function));
+			GlobalObject.OwnMembers.Add("Function", new JSFunctionConstructor(this, Function));
 
-			Global.OwnMembers.Add("Error", new JSErrorConstructor(this, Function));
-			Global.OwnMembers.Add("InternalError", new JSInternalErrorConstructor(this, Function));
-			Global.OwnMembers.Add("ReferenceError", new JSReferenceErrorConstructor(this, Function));
-			Global.OwnMembers.Add("SyntaxError", new JSSyntaxErrorConstructor(this, Function));
-			Global.OwnMembers.Add("TypeError", new JSTypeErrorConstructor(this, Function));
-			Global.OwnMembers.Add("RangeError", new JSRangeErrorConstructor(this, Function));
+			GlobalObject.OwnMembers.Add("Error", new JSErrorConstructor(this, Function));
+			GlobalObject.OwnMembers.Add("InternalError", new JSInternalErrorConstructor(this, Function));
+			GlobalObject.OwnMembers.Add("ReferenceError", new JSReferenceErrorConstructor(this, Function));
+			GlobalObject.OwnMembers.Add("SyntaxError", new JSSyntaxErrorConstructor(this, Function));
+			GlobalObject.OwnMembers.Add("TypeError", new JSTypeErrorConstructor(this, Function));
+			GlobalObject.OwnMembers.Add("RangeError", new JSRangeErrorConstructor(this, Function));
 		}
 
 		public ExecutionThread NewThread(CompiledFunction globalFunction) {
@@ -134,7 +134,7 @@ namespace YaJS.Runtime {
 		/// <summary>
 		/// Глобальный объект
 		/// </summary>
-		public JSObject Global { get; private set; }
+		public JSObject GlobalObject { get; private set; }
 
 		/// <summary>
 		/// Прототипы встроенных объектов

@@ -13,9 +13,9 @@ namespace YaJS.Runtime {
 			Contract.Requires(vm != null);
 			Contract.Requires(globalFunction != null);
 			VM = vm;
-			GlobalScope = new LocalScope(vm.Global.OwnMembers);
+			GlobalScope = new LocalScope(vm.GlobalObject.OwnMembers);
 			GlobalFunction = new JSManagedFunction(VM, GlobalScope, globalFunction, VM.Function);
-			CurrentFrame = new CallStackFrame(null, VM, GlobalFunction, vm.Global, new List<JSValue>());
+			CurrentFrame = new CallStackFrame(null, VM, GlobalFunction, vm.GlobalObject, new List<JSValue>());
 		}
 
 		private void Switch(int tableIndex, JSValue selector) {
@@ -346,7 +346,7 @@ namespace YaJS.Runtime {
 					case OpCode.Call: {
 						var arguments = currentFrame.PopArguments();
 						var function = currentFrame.Pop().RequireFunction();
-						CallFunction(function, VM.Global, arguments, currentFrame.CodeReader.ReadBoolean());
+						CallFunction(function, VM.GlobalObject, arguments, currentFrame.CodeReader.ReadBoolean());
 						break;
 					}
 
