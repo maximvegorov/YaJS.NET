@@ -33,17 +33,19 @@ namespace YaJS.Compiler.AST.Statements {
 			try {
 				var jumps = new Dictionary<JSValue, int>();
 				foreach (var caseClause in _beforeDefault) {
+					var offset = compiler.Emitter.Offset;
 					caseClause.Statements.CompileBy(compiler);
-					jumps.Add(caseClause.Expression.ToJSValue(), compiler.Emitter.Offset);
+					jumps.Add(caseClause.Expression.ToJSValue(), offset);
 				}
 				int? defaultOffset = null;
 				if (_defaultClause != null) {
-					_defaultClause.CompileBy(compiler);
 					defaultOffset = compiler.Emitter.Offset;
+					_defaultClause.CompileBy(compiler);
 				}
 				foreach (var caseClause in _afterDefault) {
+					var offset = compiler.Emitter.Offset;
 					caseClause.Statements.CompileBy(compiler);
-					jumps.Add(caseClause.Expression.ToJSValue(), compiler.Emitter.Offset);
+					jumps.Add(caseClause.Expression.ToJSValue(), offset);
 				}
 				compiler.Emitter.MarkLabel(endLabel);
 				Contract.Assert(endLabel.Offset.HasValue);
