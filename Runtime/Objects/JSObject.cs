@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -92,6 +93,16 @@ namespace YaJS.Runtime.Objects {
 
 		public override bool StrictEqualsTo(JSValue value) {
 			return (ReferenceEquals(this, value));
+		}
+
+		public override bool IsInstanceOf(JSFunction constructor) {
+			var prototype = constructor.GetPrototype();
+			Contract.Assert(prototype != null);
+			for (var current = _inherited; current != null; current = current._inherited) {
+				if (ReferenceEquals(current, prototype))
+					return (true);
+			}
+			return (false);
 		}
 
 		public override string TypeOf() {
