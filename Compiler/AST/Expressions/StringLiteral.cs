@@ -57,6 +57,10 @@ namespace YaJS.Compiler.AST.Expressions {
 			compiler.Emitter.Emit(OpCode.LdString, Value);
 		}
 
+		public override JSValue ToJSValue() {
+			return (Value);
+		}
+
 		public override bool CanHaveMembers { get { return (true); } }
 		public override bool IsConstant { get { return (true); } }
 		public override bool CanBeUsedInCaseClause { get { return (true); } }

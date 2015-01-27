@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using YaJS.Runtime;
+using YaJS.Runtime.Values;
 
 namespace YaJS.Compiler.AST.Expressions {
 	public sealed class IntegerLiteral : Expression {
@@ -16,6 +17,10 @@ namespace YaJS.Compiler.AST.Expressions {
 			if (isLastOperator)
 				return;
 			compiler.Emitter.Emit(OpCode.LdInteger, Value);
+		}
+
+		public override JSValue ToJSValue() {
+			return ((JSNumberValue)Value);
 		}
 
 		public override bool CanHaveMembers { get { return (true); } }
