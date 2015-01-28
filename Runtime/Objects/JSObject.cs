@@ -52,7 +52,7 @@ namespace YaJS.Runtime.Objects {
 			return (ContainsMember(member.CastToString()));
 		}
 
-		protected JSValue GetMember(string member) {
+		protected internal JSValue GetMember(string member) {
 			Contract.Requires(member != null);
 			for (var current = this; current != null; current = current._inherited) {
 				JSValue result;
@@ -67,7 +67,7 @@ namespace YaJS.Runtime.Objects {
 			return (GetMember(member.CastToString()) ?? Undefined);
 		}
 
-		protected void SetMember(string member, JSValue value) {
+		protected internal void SetMember(string member, JSValue value) {
 			Contract.Requires(member != null);
 			Contract.Requires(value != null);
 			OwnMembers[member] = value;
@@ -79,7 +79,7 @@ namespace YaJS.Runtime.Objects {
 			SetMember(member.CastToString(), value);
 		}
 
-		protected bool DeleteMember(string member) {
+		protected internal bool DeleteMember(string member) {
 			Contract.Requires(member != null);
 			if (_ownMembers != null)
 				_ownMembers.Remove(member);
