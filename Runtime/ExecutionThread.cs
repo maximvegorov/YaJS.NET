@@ -13,9 +13,11 @@ namespace YaJS.Runtime {
 			Contract.Requires(vm != null);
 			Contract.Requires(globalFunction != null);
 			VM = vm;
-			GlobalScope = new LocalScope(vm.GlobalObject.OwnMembers);
+			GlobalScope = new GlobalVariableScope(vm.GlobalObject);
 			GlobalFunction = new JSManagedFunction(VM, GlobalScope, globalFunction, VM.Function);
-			CurrentFrame = new CallStackFrame(null, VM, GlobalFunction, vm.GlobalObject, new List<JSValue>());
+			CurrentFrame = new CallStackFrame(
+				null, VM, GlobalFunction, vm.GlobalObject, GlobalScope, new List<JSValue>()
+				);
 		}
 
 		private void Switch(int tableIndex, JSValue selector) {
@@ -42,7 +44,9 @@ namespace YaJS.Runtime {
 			if (CurrentException == null)
 				throw new IllegalOpCodeException(OpCode.EnterCatch.ToString());
 			CurrentFrame.BeginScope();
-			CurrentFrame.LocalScope.Variables.Add(CurrentFrame.CodeReader.ReadString(), CurrentException.ThrownValue);
+			CurrentFrame.LocalScope.DeclareVariable(
+				CurrentFrame.CodeReader.ReadString(), CurrentException.ThrownValue
+				);
 		}
 
 		private void LeaveCatch() {
@@ -67,8 +71,16 @@ namespace YaJS.Runtime {
 			if (constructor.IsNative)
 				CurrentFrame.Push(constructor.Construct(this, CurrentFrame.LocalScope, args));
 			else {
-				var newObject = new JSObject(VM, constructor.GetPrototype());
-				CurrentFrame = new CallStackFrame(CurrentFrame, VM, constructor as JSManagedFunction, newObject, args, true);
+				var managedConstructor = (JSManagedFunction)constructor;
+				var newObject = new JSObject(VM, managedConstructor.GetPrototype());
+				CurrentFrame = new CallStackFrame(
+					CurrentFrame,
+					VM,
+					managedConstructor,
+					newObject,
+					new LocalVariableScope(managedConstructor.OuterScope),
+					args,
+					true);
 				CurrentFrame.Push(newObject);
 			}
 		}
@@ -108,11 +120,13 @@ namespace YaJS.Runtime {
 			if (function.IsNative)
 				CurrentFrame.Push(function.Invoke(this, context, CurrentFrame.LocalScope, args));
 			else {
+				var managedFunction = (JSManagedFunction)function;
 				CurrentFrame = new CallStackFrame(
 					CurrentFrame,
 					VM,
-					function as JSManagedFunction,
+					managedFunction,
 					context,
+					new LocalVariableScope(managedFunction.OuterScope),
 					args,
 					copyResult,
 					onCompleteCallback);
@@ -152,19 +166,17 @@ namespace YaJS.Runtime {
 
 						#endregion
 
-						#region Локальные переменные
+						#region Локальные переменные и функции
+
+					case OpCode.LdLocalFunc:
+						currentFrame.Push(currentFrame.GetFunction(VM, currentFrame.CodeReader.ReadInteger()));
+						break;
 
 					case OpCode.LdLocal:
 						currentFrame.Push(currentFrame.LocalScope.GetVariable(currentFrame.CodeReader.ReadString()));
 						break;
-					case OpCode.LdLocalFunc:
-						currentFrame.Push(currentFrame.GetFunction(VM, currentFrame.CodeReader.ReadInteger()));
-						break;
 					case OpCode.StLocal:
 						currentFrame.LocalScope.SetVariable(currentFrame.CodeReader.ReadString(), currentFrame.Pop());
-						break;
-					case OpCode.DelLocal:
-						currentFrame.Push(currentFrame.LocalScope.DeleteVariable(currentFrame.CodeReader.ReadString()));
 						break;
 
 						#endregion
@@ -644,7 +656,7 @@ namespace YaJS.Runtime {
 		/// <summary>
 		/// Область глобальных переменных
 		/// </summary>
-		public LocalScope GlobalScope { get; private set; }
+		public VariableScope GlobalScope { get; private set; }
 
 		/// <summary>
 		/// Исполняемая функция

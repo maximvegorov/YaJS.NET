@@ -296,7 +296,7 @@ namespace YaJS.Compiler {
 					var startPos = Lookahead.StartPosition;
 					var operand = ParsePostfixExpression();
 					if (!operand.CanBeDeleted)
-						Errors.ThrowExpectedReference(startPos);
+						Errors.ThrowInvalidOperandType(startPos);
 					result = Expression.Delete(operand);
 					break;
 				}

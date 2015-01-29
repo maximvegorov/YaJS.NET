@@ -113,6 +113,7 @@
     <Compile Include="Exceptions\FunctionAlreadyDeclaredException.cs" />
     <Compile Include="Exceptions\DuplicatedLabelException.cs" />
     <Compile Include="Exceptions\InternalErrorException.cs" />
+    <Compile Include="Exceptions\InvalidOperandTypeException.cs" />
     <Compile Include="Exceptions\TokenizerException.cs" />
     <Compile Include="Exceptions\UnsupportedCaseClauseExpressionException.cs" />
     <Compile Include="Exceptions\InvalidStatementException.cs" />

@@ -25,25 +25,21 @@ namespace YaJS.Runtime {
 			VirtualMachine vm,
 			JSManagedFunction function,
 			JSObject context,
+			VariableScope localScope,
 			List<JSValue> parameterValues,
 			bool copyResult = false,
 			Action onCompleteCallback = null) {
 			Contract.Requires(vm != null);
 			Contract.Requires(function != null);
-			Contract.Requires(function.OuterScope != null);
 			Contract.Requires(context != null);
+			Contract.Requires(localScope != null);
 			Contract.Requires(parameterValues != null);
-			Contract.Ensures(
-				LocalScope != null &&
-					LocalScope.Variables.Count ==
-						Math.Max(function.CompiledFunction.ParameterNames.Length, LocalScope.Variables.Count) + 1);
 
 			Caller = caller;
 			CopyResult = copyResult;
 			Function = function;
 			Context = context;
-
-			LocalScope = new LocalScope(function.OuterScope);
+			LocalScope = localScope;
 
 			_evalStack = new Stack<JSValue>(4);
 
@@ -55,25 +51,24 @@ namespace YaJS.Runtime {
 			var parameterNames = function.CompiledFunction.ParameterNames;
 			var n = Math.Min(parameterNames.Length, parameterValues.Count);
 			for (var i = 0; i < n; i++)
-				LocalScope.Variables.Add(parameterNames[i], parameterValues[i]);
+				LocalScope.DeclareVariable(parameterNames[i], parameterValues[i]);
 			for (var i = n; i < parameterNames.Length; i++)
-				LocalScope.Variables.Add(parameterNames[i], JSValue.Undefined);
+				LocalScope.DeclareVariable(parameterNames[i], JSValue.Undefined);
 
 			// Создать привязку для arguments
-			LocalScope.Variables.Add("arguments", vm.NewArray(parameterValues));
+			LocalScope.DeclareVariable("arguments", vm.NewArray(parameterValues));
 
 			// Создать привязки для объявленных функций
 			for (var i = 0; i < Function.CompiledFunction.DeclaredFunctionCount; i++) {
 				var declaredFunction = Function.CompiledFunction.NestedFunctions[i];
-				if (!LocalScope.Variables.ContainsKey(declaredFunction.Name))
-					LocalScope.Variables.Add(declaredFunction.Name, vm.NewFunction(LocalScope, declaredFunction));
+				if (!LocalScope.ContainsVariable(declaredFunction.Name))
+					LocalScope.DeclareVariable(declaredFunction.Name, vm.NewFunction(LocalScope, declaredFunction));
 			}
 
 			// Создать привязки для объявленных переменных
 			for (var i = 0; i < Function.CompiledFunction.DeclaredVariables.Length; i++) {
 				var variableName = Function.CompiledFunction.DeclaredVariables[i];
-				if (!LocalScope.Variables.ContainsKey(variableName))
-					LocalScope.Variables.Add(variableName, JSValue.Undefined);
+				LocalScope.DeclareVariableIfNotExists(variableName, JSValue.Undefined);
 			}
 		}
 
@@ -105,7 +100,7 @@ namespace YaJS.Runtime {
 		}
 
 		internal void BeginScope() {
-			LocalScope = new LocalScope(LocalScope);
+			LocalScope = new LocalVariableScope(LocalScope);
 		}
 
 		internal void EndScope() {
@@ -167,7 +162,7 @@ namespace YaJS.Runtime {
 		/// <summary>
 		/// Область хранения локальных переменных
 		/// </summary>
-		public LocalScope LocalScope { get; private set; }
+		public VariableScope LocalScope { get; private set; }
 
 		/// <summary>
 		/// Byte-код reader

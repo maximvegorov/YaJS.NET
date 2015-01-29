@@ -5,7 +5,7 @@ namespace YaJS.Runtime {
 	/// Блок try
 	/// </summary>
 	internal sealed class TryBlockInfo {
-		public TryBlockInfo(int handlerOffset, LocalScope scope, TryBlockInfo outerBlock) {
+		public TryBlockInfo(int handlerOffset, VariableScope scope, TryBlockInfo outerBlock) {
 			Contract.Requires(handlerOffset > 0);
 			Contract.Requires(scope != null);
 			HandlerOffset = handlerOffset;
@@ -26,6 +26,6 @@ namespace YaJS.Runtime {
 		/// <summary>
 		/// Область локальных переменных на момент входа в блок try
 		/// </summary>
-		public LocalScope Scope { get; private set; }
+		public VariableScope Scope { get; private set; }
 	}
 }
