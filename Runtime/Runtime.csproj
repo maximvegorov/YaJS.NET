@@ -121,6 +121,7 @@
     <Compile Include="ExecutionThread.cs" />
     <Compile Include="GlobalVariableScope.cs" />
     <Compile Include="ICompilerServices.cs" />
+    <Compile Include="IJSModuleInitializer.cs" />
     <Compile Include="JSReference.cs" />
     <Compile Include="JSValue.cs" />
     <Compile Include="LocalVariableScope.cs" />
