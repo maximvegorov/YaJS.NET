@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compiler.Tests", "Compiler.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Runtime.Tests", "Runtime.Tests\Runtime.Tests.csproj", "{51AC9012-BF6C-4967-BF28-570B6219DD8C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "yajs", "yajs\yajs.csproj", "{C430FBFC-8C23-418B-A0FD-C8E1AA8EDF7D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{51AC9012-BF6C-4967-BF28-570B6219DD8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{51AC9012-BF6C-4967-BF28-570B6219DD8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{51AC9012-BF6C-4967-BF28-570B6219DD8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C430FBFC-8C23-418B-A0FD-C8E1AA8EDF7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C430FBFC-8C23-418B-A0FD-C8E1AA8EDF7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C430FBFC-8C23-418B-A0FD-C8E1AA8EDF7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C430FBFC-8C23-418B-A0FD-C8E1AA8EDF7D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

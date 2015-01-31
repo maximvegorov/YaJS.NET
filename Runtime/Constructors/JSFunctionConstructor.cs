@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using YaJS.Runtime.Objects;
 
@@ -10,11 +9,6 @@ namespace YaJS.Runtime.Constructors {
 	internal sealed class JSFunctionConstructor : JSNativeFunction {
 		public JSFunctionConstructor(VirtualMachine vm, JSObject inherited)
 			: base(vm, inherited) {
-		}
-
-		public static void InitPrototype(JSObject proto) {
-			Contract.Requires(proto != null);
-			// TODO
 		}
 
 		public override JSObject GetPrototype() {

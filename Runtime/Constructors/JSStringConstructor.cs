@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using YaJS.Runtime.Objects;
 
 namespace YaJS.Runtime.Constructors {
@@ -9,12 +8,6 @@ namespace YaJS.Runtime.Constructors {
 	internal sealed class JSStringConstructor : JSNativeFunction {
 		public JSStringConstructor(VirtualMachine vm, JSObject inherited)
 			: base(vm, inherited) {
-		}
-
-		public static void InitPrototype(JSObject proto, JSObject functionPrototype) {
-			Contract.Requires(proto != null);
-			Contract.Requires(functionPrototype != null);
-			// TODO
 		}
 
 		public override JSObject GetPrototype() {

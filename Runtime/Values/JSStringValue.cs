@@ -34,7 +34,7 @@ namespace YaJS.Runtime.Values {
 		}
 
 		public override bool StrictEqualsTo(JSValue value) {
-			return (value.Type == JSValueType.Integer && _value == value.CastToString());
+			return (value.Type == JSValueType.String && _value == value.CastToString());
 		}
 
 		public override string TypeOf() {

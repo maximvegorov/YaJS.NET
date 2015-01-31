@@ -1,5 +1,4 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -34,8 +33,8 @@ namespace YaJS.Runtime.Objects {
 			return (result.ToString());
 		}
 
-		protected virtual IEnumerable<KeyValuePair<string, JSValue>> GetEnumerableMembers() {
-			return (_ownMembers ?? Enumerable.Empty<KeyValuePair<string, JSValue>>());
+		protected virtual IEnumerable<string> GetEnumerableMembers() {
+			return (_ownMembers != null ? _ownMembers.Keys : Enumerable.Empty<string>());
 		}
 
 		protected bool ContainsMember(string member) {
@@ -145,10 +144,10 @@ namespace YaJS.Runtime.Objects {
 			var processed = new HashSet<string>();
 			for (var current = this; current != null; current = current.Inherited) {
 				foreach (var member in current.GetEnumerableMembers()) {
-					if (processed.Contains(member.Key))
+					if (processed.Contains(member))
 						continue;
-					yield return member.Value;
-					processed.Add(member.Key);
+					processed.Add(member);
+					yield return member;
 				}
 			}
 		}

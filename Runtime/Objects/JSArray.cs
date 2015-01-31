@@ -31,7 +31,7 @@ namespace YaJS.Runtime.Objects {
 			for (var i = 0; i < Items.Count; i++) {
 				var item = Items[i];
 				if (item != null)
-					yield return item;
+					yield return (JSNumberValue)i;
 			}
 			var remainMembers = base.GetEnumerator();
 			while (remainMembers.MoveNext())

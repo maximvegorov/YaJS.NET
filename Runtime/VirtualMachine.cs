@@ -5,6 +5,7 @@ using YaJS.Runtime.Constructors;
 using YaJS.Runtime.Constructors.Errors;
 using YaJS.Runtime.Objects;
 using YaJS.Runtime.Objects.Errors;
+using YaJS.Runtime.Objects.Prototypes;
 using YaJS.Runtime.Values;
 
 namespace YaJS.Runtime {
@@ -20,32 +21,20 @@ namespace YaJS.Runtime {
 			// Создать глобальный объект
 			GlobalObject = new JSObject(this);
 
-			// Так как существуют циклические зависимости между прототипами встроенных объектов и встроенными методами
-			// создание и инициализация разделены между собой
-
 			// Создать прототипы встроенных объектов
-			Object = new JSObject(this);
-			Boolean = new JSObject(this, Object);
-			Number = new JSObject(this, Object);
-			String = new JSObject(this, Object);
-			Array = new JSObject(this, Object);
-			Function = new JSObject(this, Object);
+			Object = new JSObjectPrototype(this);
+			Boolean = new JSBooleanPrototype(this, Object);
+			Number = new JSNumberPrototype(this, Object);
+			String = new JSStringPrototype(this, Object);
+			Array = new JSArrayPrototype(this, Object);
+			Function = new JSFunctionPrototype(this, Object);
 
-			Error = new JSObject(this, Object);
-			InternalError = new JSObject(this, Error);
-			ReferenceError = new JSObject(this, Error);
-			SyntaxError = new JSObject(this, Error);
-			TypeError = new JSObject(this, Error);
-			RangeError = new JSObject(this, Error);
-
-			// Инициализировать прототипы встроенных объектов (все конструкторы являются функциями в JS)
-			JSObjectConstructor.InitPrototype(Object, Function);
-			JSNumberConstructor.InitPrototype(Number, Function);
-			JSStringConstructor.InitPrototype(String, Function);
-			JSArrayConstructor.InitPrototype(Array, Function);
-			JSFunctionConstructor.InitPrototype(Function);
-
-			JSErrorConstructor.InitPrototype(Error, Function);
+			Error = new JSUnenumerablePrototype(this, Object);
+			InternalError = new JSUnenumerablePrototype(this, Error);
+			ReferenceError = new JSUnenumerablePrototype(this, Error);
+			SyntaxError = new JSUnenumerablePrototype(this, Error);
+			TypeError = new JSUnenumerablePrototype(this, Error);
+			RangeError = new JSUnenumerablePrototype(this, Error);
 
 			// Инициализировать глобальный объект
 			GlobalObject.OwnMembers.Add("Object", new JSObjectConstructor(this, Function));
@@ -77,6 +66,10 @@ namespace YaJS.Runtime {
 
 		public JSObject NewObject() {
 			return (new JSObject(this, Object));
+		}
+
+		public JSObject NewObject(JSObject inherited) {
+			return (new JSObject(this, inherited));
 		}
 
 		public JSObject NewBoolean(bool value) {

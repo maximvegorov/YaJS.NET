@@ -53,6 +53,8 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Objects\JSLazyInitPrototypeTests.cs" />
+    <Compile Include="Objects\JSUnenumerablePrototypeTests.cs" />
     <Compile Include="Objects\JSArrayTests.cs" />
     <Compile Include="Objects\JSObjectTests.cs" />
     <Compile Include="JSValueTests.cs" />
