@@ -16,12 +16,12 @@ namespace YaJS.Runtime.Values {
 			return (NullString);
 		}
 
-		public override bool ConvEqualsTo(JSValue value) {
-			return (value.Type == JSValueType.Undefined || value.Type == JSValueType.Null);
+		public override bool StrictEqualsTo(JSValue value) {
+			return (value.Type == JSValueType.Null);
 		}
 
-		public override bool StrictEqualsTo(JSValue value) {
-			return (value.Type == JSValueType.Undefined);
+		public override bool ConvEqualsTo(JSValue value) {
+			return (value.Type == JSValueType.Undefined || value.Type == JSValueType.Null);
 		}
 
 		public override string TypeOf() {

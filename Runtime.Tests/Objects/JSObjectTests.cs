@@ -1,10 +1,77 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using YaJS.Runtime.Exceptions;
 using YaJS.Runtime.Objects;
 
 namespace YaJS.Runtime.Tests.Objects {
 	[TestClass]
 	public sealed class JSObjectTests {
+		[TestMethod]
+		public void StrictEqualsTo() {
+			var compiler = new Mock<ICompilerServices>();
+			var vm = new VirtualMachine(compiler.Object);
+			var obj1 = vm.NewObject();
+			var obj2 = vm.NewObject();
+			Assert.IsTrue(obj1.StrictEqualsTo(obj1));
+			Assert.IsFalse(obj1.StrictEqualsTo(obj2));
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(TypeErrorException))]
+		public void ConvEqualsTo() {
+			var compiler = new Mock<ICompilerServices>();
+			var vm = new VirtualMachine(compiler.Object);
+			var obj = vm.NewObject();
+			obj.ConvEqualsTo(obj);
+		}
+
+		[TestMethod]
+		public void TypeOf() {
+			var compiler = new Mock<ICompilerServices>();
+			var vm = new VirtualMachine(compiler.Object);
+			var obj = vm.NewObject();
+			Assert.IsTrue(obj.TypeOf() == "object");
+		}
+
+		[TestMethod]
+		public void CastToBoolean() {
+			var compiler = new Mock<ICompilerServices>();
+			var vm = new VirtualMachine(compiler.Object);
+			Assert.IsTrue(vm.NewObject().CastToBoolean());
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(TypeErrorException))]
+		public void CastToInteger() {
+			var compiler = new Mock<ICompilerServices>();
+			var vm = new VirtualMachine(compiler.Object);
+			vm.NewObject().CastToInteger();
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(TypeErrorException))]
+		public void CastToFloat() {
+			var compiler = new Mock<ICompilerServices>();
+			var vm = new VirtualMachine(compiler.Object);
+			vm.NewObject().CastToFloat();
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(TypeErrorException))]
+		public void CastToString() {
+			var compiler = new Mock<ICompilerServices>();
+			var vm = new VirtualMachine(compiler.Object);
+			vm.NewObject().CastToString();
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(TypeErrorException))]
+		public void ToNumber() {
+			var compiler = new Mock<ICompilerServices>();
+			var vm = new VirtualMachine(compiler.Object);
+			vm.NewObject().ToNumber();
+		}
+
 		[TestMethod]
 		public void ContainsMember_OwnProperty() {
 			const string property1 = "a";

@@ -53,9 +53,14 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Objects\JSArrayTests.cs" />
     <Compile Include="Objects\JSObjectTests.cs" />
     <Compile Include="JSValueTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Values\JSFloatValueTests.cs" />
+    <Compile Include="Values\JSIntegerValueTests.cs" />
+    <Compile Include="Values\JSNullValueTests.cs" />
+    <Compile Include="Values\JSStringValueTests.cs" />
     <Compile Include="Values\JSUndefinedValueTests.cs" />
   </ItemGroup>
   <ItemGroup>
