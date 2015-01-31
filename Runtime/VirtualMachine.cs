@@ -96,7 +96,7 @@ namespace YaJS.Runtime {
 			return (new JSArray(this, items, Array));
 		}
 
-		public JSFunction NewFunction(LocalScope outerScope, CompiledFunction compiledFunction) {
+		public JSFunction NewFunction(VariableScope outerScope, CompiledFunction compiledFunction) {
 			Contract.Requires<ArgumentNullException>(outerScope != null, "outerScope");
 			Contract.Requires<ArgumentNullException>(compiledFunction != null, "compiledFunction");
 			return (new JSManagedFunction(this, outerScope, compiledFunction, Function));

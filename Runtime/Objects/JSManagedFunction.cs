@@ -7,7 +7,7 @@ namespace YaJS.Runtime.Objects {
 	public sealed class JSManagedFunction : JSFunction {
 		internal JSManagedFunction(
 			VirtualMachine vm,
-			LocalScope outerScope,
+			VariableScope outerScope,
 			CompiledFunction compiledFunction,
 			JSObject inherited)
 			: base(vm, inherited) {
@@ -20,13 +20,12 @@ namespace YaJS.Runtime.Objects {
 		/// <summary>
 		/// Область хранения внешних переменных
 		/// </summary>
-		public LocalScope OuterScope { get; private set; }
+		public VariableScope OuterScope { get; private set; }
 
 		/// <summary>
 		/// Откомпилированная функция
 		/// </summary>
 		public CompiledFunction CompiledFunction { get; private set; }
-
 		public override bool IsNative { get { return (false); } }
 		public override int ParameterCount { get { return (CompiledFunction.ParameterNames.Length); } }
 	}

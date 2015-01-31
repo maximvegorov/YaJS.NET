@@ -16,17 +16,11 @@ namespace YaJS.Compiler.AST.Expressions {
 			var target = Operand;
 			while (target.Type == ExpressionType.Grouping)
 				target = ((GroupingOperator)target).Operand;
-			if (target.Type == ExpressionType.Ident) {
-				var operand = (Identifier)target;
-				compiler.Emitter.Emit(OpCode.DelLocal, operand.Value);
-			}
-			else {
-				Contract.Assert(target.Type == ExpressionType.Member);
-				var operand = (MemberOperator)target;
-				operand.BaseValue.CompileBy(compiler, false);
-				operand.CompilePropertyBy(compiler);
-				compiler.Emitter.Emit(OpCode.DelMember);
-			}
+			Contract.Assert(target.Type == ExpressionType.Member);
+			var operand = (MemberOperator)target;
+			operand.BaseValue.CompileBy(compiler, false);
+			operand.CompilePropertyBy(compiler);
+			compiler.Emitter.Emit(OpCode.DelMember);
 			if (isLastOperator)
 				compiler.Emitter.Emit(OpCode.Pop);
 		}

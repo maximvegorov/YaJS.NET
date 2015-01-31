@@ -21,7 +21,7 @@ namespace YaJS.Runtime.Constructors {
 			return (VM.Function);
 		}
 
-		public override JSValue Construct(ExecutionThread thread, LocalScope outerScope, List<JSValue> args) {
+		public override JSValue Construct(ExecutionThread thread, VariableScope outerScope, List<JSValue> args) {
 			IEnumerable<string> parameterNames;
 			string functionBody;
 			if (args.Count == 0) {
@@ -35,7 +35,7 @@ namespace YaJS.Runtime.Constructors {
 			return (VM.NewFunction(outerScope, VM.Compiler.Compile("f", parameterNames, functionBody)));
 		}
 
-		public override JSValue Invoke(ExecutionThread thread, JSObject context, LocalScope outerScope, List<JSValue> args) {
+		public override JSValue Invoke(ExecutionThread thread, JSObject context, VariableScope outerScope, List<JSValue> args) {
 			return (Construct(thread, outerScope, args));
 		}
 

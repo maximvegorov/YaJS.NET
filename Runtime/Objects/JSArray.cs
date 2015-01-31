@@ -41,8 +41,11 @@ namespace YaJS.Runtime.Objects {
 		public override bool ContainsMember(JSValue member) {
 			if (member.Type == JSValueType.Integer) {
 				var index = member.CastToInteger();
-				if (0 <= index && index < Items.Count)
+				if (index >= 0) {
+					if (index >= Items.Count)
+						return (false);
 					return (Items[index] != null);
+				}
 			}
 			var name = member.CastToString();
 			return (name == "length" || base.ContainsMember(name));
@@ -51,13 +54,16 @@ namespace YaJS.Runtime.Objects {
 		public override JSValue GetMember(JSValue member) {
 			if (member.Type == JSValueType.Integer) {
 				var index = member.CastToInteger();
-				if (0 <= index && index < Items.Count)
+				if (index >= 0) {
+					if (index >= Items.Count)
+						return (JSValue.Undefined);
 					return (Items[index] ?? Undefined);
+				}
 			}
 			var name = member.CastToString();
 			if (name == "length")
 				return ((JSNumberValue)Items.Count);
-			return (base.GetMember(name));
+			return (base.GetMember(name) ?? Undefined);
 		}
 
 		public override void SetMember(JSValue member, JSValue value) {
@@ -68,7 +74,7 @@ namespace YaJS.Runtime.Objects {
 						Items[index] = value;
 					else {
 						Items.Capacity = index + 1;
-						for (var i = 0; i < index; i++)
+						for (var i = Items.Count; i < index; i++)
 							Items.Add(null);
 						Items.Add(value);
 					}

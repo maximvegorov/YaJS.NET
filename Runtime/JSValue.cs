@@ -62,12 +62,12 @@ namespace YaJS.Runtime {
 			return (CastToBoolean() ? this : value);
 		}
 
-		public virtual bool ConvEqualsTo(JSValue value) {
+		public virtual bool StrictEqualsTo(JSValue value) {
 			Contract.Requires(value != null);
 			throw new TypeErrorException();
 		}
 
-		public virtual bool StrictEqualsTo(JSValue value) {
+		public virtual bool ConvEqualsTo(JSValue value) {
 			Contract.Requires(value != null);
 			throw new TypeErrorException();
 		}

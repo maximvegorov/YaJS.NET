@@ -119,10 +119,11 @@
     <Compile Include="Exceptions\UnhandledExceptionException.cs" />
     <Compile Include="Exceptions\UnknownOpCodeException.cs" />
     <Compile Include="ExecutionThread.cs" />
+    <Compile Include="GlobalVariableScope.cs" />
     <Compile Include="ICompilerServices.cs" />
     <Compile Include="JSReference.cs" />
     <Compile Include="JSValue.cs" />
-    <Compile Include="LocalScope.cs" />
+    <Compile Include="LocalVariableScope.cs" />
     <Compile Include="Objects\Errors\JSInternalError.cs" />
     <Compile Include="Objects\Errors\JSRangeError.cs" />
     <Compile Include="Objects\Errors\JSReferenceError.cs" />
@@ -149,6 +150,7 @@
     <Compile Include="Values\JSNumberValue.cs" />
     <Compile Include="Values\JSStringValue.cs" />
     <Compile Include="Values\JSUndefinedValue.cs" />
+    <Compile Include="VariableScope.cs" />
     <Compile Include="VirtualMachine.cs" />
   </ItemGroup>
   <ItemGroup>
