@@ -36,6 +36,7 @@ namespace YaJS.Compiler.AST.Expressions {
 				if (needCastToPrimitive && LeftOperand.CanBeObject)
 					compiler.Emitter.Emit(OpCode.CastToPrimitive);
 			}
+			compiler.Emitter.Emit(op);
 			if (isLastOperator)
 				compiler.Emitter.Emit(OpCode.Pop);
 		}

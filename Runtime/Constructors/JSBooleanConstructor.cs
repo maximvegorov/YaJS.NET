@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using YaJS.Runtime.Objects;
+﻿using YaJS.Runtime.Objects;
 
 namespace YaJS.Runtime.Constructors {
 	/// <summary>
@@ -14,12 +13,12 @@ namespace YaJS.Runtime.Constructors {
 			return (VM.Boolean);
 		}
 
-		public override JSValue Construct(ExecutionThread thread, VariableScope outerScope, List<JSValue> args) {
-			return (VM.NewBoolean(args.Count > 0 && args[0].CastToBoolean()));
+		public override JSValue Construct(ExecutionThread thread, VariableScope outerScope, JSValue[] args) {
+			return (VM.NewBoolean(args.Length > 0 && args[0].CastToBoolean()));
 		}
 
-		public override JSValue Invoke(ExecutionThread thread, JSObject context, VariableScope outerScope, List<JSValue> args) {
-			return (args.Count > 0 && args[0].CastToBoolean());
+		public override JSValue Invoke(ExecutionThread thread, JSObject context, VariableScope outerScope, JSValue[] args) {
+			return (args.Length > 0 && args[0].CastToBoolean());
 		}
 
 		public override int ParameterCount { get { return (1); } }

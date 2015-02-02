@@ -4,12 +4,12 @@ using System.Linq;
 
 namespace YaJS.Runtime.Objects {
 	/// <summary>
-	/// Прототип объекта с отложенной инициализацией с неперечисляемыми свойствами
+	/// Объект с отложенной инициализацией с неперечисляемыми свойствами
 	/// </summary>
-	public abstract class JSUnenumerableLazyInitPrototype : JSLazyInitPrototype {
-		protected JSUnenumerableLazyInitPrototype(
+	public abstract class JSUnenumerableLazyInitObject : JSLazyInitObject {
+		protected JSUnenumerableLazyInitObject(
 			VirtualMachine vm,
-			Dictionary<string, Func<VirtualMachine, JSValue>> lazyMemberFactories,
+			Dictionary<string, Func<VirtualMachine, JSObject, JSValue>> lazyMemberFactories,
 			JSObject inherited)
 			: base(vm, lazyMemberFactories, inherited) {
 		}

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using YaJS.Runtime.Exceptions;
 using YaJS.Runtime.Values;
@@ -10,6 +9,8 @@ namespace YaJS.Runtime.Objects {
 	/// </summary>
 	public abstract class JSFunction : JSObject {
 		private const string PrototypeMemberName = "prototype";
+
+		public static readonly JSValue[] EmptyArgumentList = new JSValue[0];
 
 		protected JSFunction(VirtualMachine vm, JSObject inherited)
 			: base(vm, inherited) {
@@ -32,7 +33,7 @@ namespace YaJS.Runtime.Objects {
 		/// <param name="outerScope">Внешняя область локальных переменных</param>
 		/// <param name="args">Список параметров</param>
 		/// <returns></returns>
-		public virtual JSValue Construct(ExecutionThread thread, VariableScope outerScope, List<JSValue> args) {
+		public virtual JSValue Construct(ExecutionThread thread, VariableScope outerScope, JSValue[] args) {
 			Contract.Requires(thread != null);
 			Contract.Requires(outerScope != null);
 			Contract.Requires(args != null);
@@ -47,7 +48,7 @@ namespace YaJS.Runtime.Objects {
 		/// <param name="outerScope">Внешняя область локальных переменных</param>
 		/// <param name="args">Список параметров</param>
 		/// <returns></returns>
-		public virtual JSValue Invoke(ExecutionThread thread, JSObject context, VariableScope outerScope, List<JSValue> args) {
+		public virtual JSValue Invoke(ExecutionThread thread, JSObject context, VariableScope outerScope, JSValue[] args) {
 			Contract.Requires(thread != null);
 			Contract.Requires(context != null);
 			Contract.Requires(outerScope != null);
@@ -90,7 +91,7 @@ namespace YaJS.Runtime.Objects {
 			switch (name) {
 				case "prototype":
 				case "length":
-					return (true);
+					throw new TypeErrorException();
 				default:
 					return (base.DeleteMember(name));
 			}

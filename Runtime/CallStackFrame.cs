@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using YaJS.Runtime.Exceptions;
@@ -26,7 +27,7 @@ namespace YaJS.Runtime {
 			JSManagedFunction function,
 			JSObject context,
 			VariableScope localScope,
-			List<JSValue> parameterValues,
+			JSValue[] parameterValues,
 			bool copyResult = false,
 			Action onCompleteCallback = null) {
 			Contract.Requires(vm != null);
@@ -49,14 +50,14 @@ namespace YaJS.Runtime {
 
 			// Создать привязки для параметров
 			var parameterNames = function.CompiledFunction.ParameterNames;
-			var n = Math.Min(parameterNames.Length, parameterValues.Count);
+			var n = Math.Min(parameterNames.Length, parameterValues.Length);
 			for (var i = 0; i < n; i++)
 				LocalScope.DeclareVariable(parameterNames[i], parameterValues[i]);
 			for (var i = n; i < parameterNames.Length; i++)
 				LocalScope.DeclareVariable(parameterNames[i], JSValue.Undefined);
 
 			// Создать привязку для arguments
-			LocalScope.DeclareVariable("arguments", vm.NewArray(parameterValues));
+			LocalScope.DeclareVariable("arguments", vm.NewArguments(parameterValues));
 
 			// Создать привязки для объявленных функций
 			for (var i = 0; i < Function.CompiledFunction.DeclaredFunctionCount; i++) {
@@ -88,9 +89,11 @@ namespace YaJS.Runtime {
 			return (_evalStack.Pop());
 		}
 
-		internal List<JSValue> PopArguments() {
-			var result = new List<JSValue>(_evalStack.Pop().RequireInteger());
-			for (var i = result.Count - 1; i >= 0; i--)
+		internal JSValue[] PopArguments() {
+			var argumentCount = _evalStack.Pop().RequireInteger();
+			Contract.Assert(argumentCount >= 0);
+			var result = new JSValue[argumentCount];
+			for (var i = argumentCount - 1; i >= 0; i--)
 				result[i] = _evalStack.Pop();
 			return (result);
 		}
@@ -137,6 +140,25 @@ namespace YaJS.Runtime {
 
 		public CallStackFrameView[] ToStackTrace() {
 			return (GetFrames().Select(f => new CallStackFrameView(f)).Reverse().ToArray());
+		}
+
+		[Conditional("DEBUG")]
+		internal void Dump() {
+			Console.WriteLine("Code offset: {0:X8}", CodeReader.Offset);
+			Console.WriteLine("EvalStack: {0}", _evalStack.Count);
+			if (_evalStack.Count > 0) {
+				var evalStackValues = new JSValue[_evalStack.Count];
+				_evalStack.CopyTo(evalStackValues, 0);
+				for (var i = evalStackValues.Length - 1; i >= 0; i--) {
+					Console.WriteLine("[{0:D3}] - {1}", i, evalStackValues[i]);
+				}
+			}
+			Console.WriteLine("Local variables: {0}", Function.CompiledFunction.DeclaredVariables.Length);
+			for (var i = 0; i < Function.CompiledFunction.DeclaredVariables.Length; i++) {
+				var variableName = Function.CompiledFunction.DeclaredVariables[i];
+				Console.WriteLine("{0} = {1}", variableName, LocalScope.GetVariable(variableName));
+			}
+			Console.WriteLine();
 		}
 
 		/// <summary>

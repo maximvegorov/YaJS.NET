@@ -284,6 +284,7 @@ namespace YaJS.Compiler {
 				if (!result.IsReference)
 					Errors.ThrowExpectedReference(startPos);
 				result = Lookahead.Type == TokenType.Inc ? Expression.PostfixInc(result) : Expression.PostfixDec(result);
+				ReadNextToken();
 			}
 			return (result);
 		}

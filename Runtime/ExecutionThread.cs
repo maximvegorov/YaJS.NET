@@ -16,8 +16,7 @@ namespace YaJS.Runtime {
 			GlobalScope = new GlobalVariableScope(vm.GlobalObject);
 			GlobalFunction = new JSManagedFunction(VM, GlobalScope, globalFunction, VM.Function);
 			CurrentFrame = new CallStackFrame(
-				null, VM, GlobalFunction, vm.GlobalObject, GlobalScope, new List<JSValue>()
-				);
+				null, VM, GlobalFunction, vm.GlobalObject, GlobalScope, JSFunction.EmptyArgumentList);
 		}
 
 		private void Switch(int tableIndex, JSValue selector) {
@@ -67,7 +66,7 @@ namespace YaJS.Runtime {
 				Unwind();
 		}
 
-		private void NewObject(JSFunction constructor, List<JSValue> args) {
+		private void NewObject(JSFunction constructor, JSValue[] args) {
 			if (constructor.IsNative)
 				CurrentFrame.Push(constructor.Construct(this, CurrentFrame.LocalScope, args));
 			else {
@@ -98,8 +97,9 @@ namespace YaJS.Runtime {
 
 		private void MakeArray(int memberCount) {
 			var items = new List<JSValue>(memberCount);
-			for (var i = memberCount - 1; i >= 0; i--)
-				items[i] = CurrentFrame.Pop();
+			for (var i = 0; i < memberCount; i++)
+				items.Add(CurrentFrame.Pop());
+			items.Reverse();
 			CurrentFrame.Push(VM.NewArray(items));
 		}
 
@@ -114,11 +114,14 @@ namespace YaJS.Runtime {
 		internal void CallFunction(
 			JSFunction function,
 			JSObject context,
-			List<JSValue> args,
+			JSValue[] args,
 			bool copyResult,
 			Action onCompleteCallback = null) {
-			if (function.IsNative)
-				CurrentFrame.Push(function.Invoke(this, context, CurrentFrame.LocalScope, args));
+			if (function.IsNative) {
+				var result = function.Invoke(this, context, CurrentFrame.LocalScope, args);
+				if (copyResult)
+					CurrentFrame.Push(result);
+			}
 			else {
 				var managedFunction = (JSManagedFunction)function;
 				CurrentFrame = new CallStackFrame(
@@ -139,7 +142,11 @@ namespace YaJS.Runtime {
 					case OpCode.Nop:
 						break;
 
-						#region Загрузка значений
+					case OpCode.Break:
+						currentFrame.Dump();
+						break;
+
+					#region Загрузка значений
 
 					case OpCode.LdUndefined:
 						currentFrame.Push(JSValue.Undefined);
@@ -364,8 +371,8 @@ namespace YaJS.Runtime {
 
 					case OpCode.CallMember: {
 						var arguments = currentFrame.PopArguments();
-						var context = currentFrame.Pop().ToObject(VM);
 						var function = currentFrame.Pop().RequireFunction();
+						var context = currentFrame.Pop().ToObject(VM);
 						CallFunction(function, context, arguments, currentFrame.CodeReader.ReadBoolean());
 						break;
 					}
@@ -402,9 +409,11 @@ namespace YaJS.Runtime {
 						#region Преобразования
 
 					case OpCode.CastToPrimitive: {
-						var obj = currentFrame.Pop();
-						if (obj.Type == JSValueType.Object)
-							obj.CastToPrimitiveValue(this, currentFrame.Push);
+						var top = currentFrame.Peek();
+						if (top.Type == JSValueType.Object) {
+							currentFrame.Pop();
+							top.CastToPrimitiveValue(this, currentFrame.Push);
+						}
 						break;
 					}
 
@@ -613,7 +622,7 @@ namespace YaJS.Runtime {
 		/// <param name="function">Функция</param>
 		/// <param name="context">Контекст</param>
 		/// <param name="args">Параметры</param>
-		public JSValue Invoke(JSFunction function, JSObject context, List<JSValue> args) {
+		public JSValue Invoke(JSFunction function, JSObject context, JSValue[] args) {
 			Contract.Requires<ArgumentNullException>(function != null, "function");
 			Contract.Requires<ArgumentNullException>(context != null, "context");
 			Contract.Requires<ArgumentNullException>(args != null, "args");

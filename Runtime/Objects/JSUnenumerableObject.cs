@@ -3,10 +3,10 @@ using System.Linq;
 
 namespace YaJS.Runtime.Objects {
 	/// <summary>
-	/// Прототип с неперечисляемыми свойствами
+	/// Объект с неперечисляемыми свойствами
 	/// </summary>
-	public class JSUnenumerablePrototype : JSObject {
-		public JSUnenumerablePrototype(VirtualMachine vm, JSObject inherited)
+	public class JSUnenumerableObject : JSObject {
+		public JSUnenumerableObject(VirtualMachine vm, JSObject inherited)
 			: base(vm, inherited) {
 		}
 

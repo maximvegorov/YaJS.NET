@@ -27,7 +27,7 @@ namespace YaJS.Runtime {
 			Contract.Requires(parameterNames != null);
 			Contract.Requires(declaredVariables != null);
 			Contract.Requires(nestedFunctions != null);
-			Contract.Requires(0 <= declaredFunctionCount && declaredFunctionCount < nestedFunctions.Length);
+			Contract.Requires(0 <= declaredFunctionCount && declaredFunctionCount <= nestedFunctions.Length);
 			Contract.Requires(!string.IsNullOrEmpty(source));
 			Contract.Requires(compiledCode != null && compiledCode.Length > 0);
 			Contract.Requires(switchJumpTables != null);

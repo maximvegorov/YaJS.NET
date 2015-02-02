@@ -15,6 +15,7 @@ namespace YaJS.Compiler.AST.Statements {
 
 		internal override void CompileBy(FunctionCompiler compiler) {
 			_expression.CompileBy(compiler, true);
+			compiler.MarkEndOfStatement();
 		}
 
 		public override string ToString() {

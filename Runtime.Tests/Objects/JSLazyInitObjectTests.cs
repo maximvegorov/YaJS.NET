@@ -6,15 +6,15 @@ using YaJS.Runtime.Objects;
 
 namespace YaJS.Runtime.Tests.Objects {
 	[TestClass]
-	public sealed class JSLazyInitPrototypeTests {
-		private class TestPrototype : JSLazyInitPrototype {
+	public sealed class JSLazyInitObjectTests {
+		private class TestPrototype : JSLazyInitObject {
 			public TestPrototype(VirtualMachine vm, JSObject inherited)
 				: base(vm, GetLazyMembers(), inherited) {
 			}
 
-			private static Dictionary<string, Func<VirtualMachine, JSValue>> GetLazyMembers() {
-				return (new Dictionary<string, Func<VirtualMachine, JSValue>> {
-					{ "a", vm => "a" }
+			private static Dictionary<string, Func<VirtualMachine, JSObject, JSValue>> GetLazyMembers() {
+				return (new Dictionary<string, Func<VirtualMachine, JSObject, JSValue>> {
+					{ "a", (vm, o) => "a" }
 				});
 			}
 		}

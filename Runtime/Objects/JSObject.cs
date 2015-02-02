@@ -125,7 +125,7 @@ namespace YaJS.Runtime.Objects {
 			thread.CallFunction(
 				valueOf.RequireFunction(),
 				this,
-				new List<JSValue>(),
+				JSFunction.EmptyArgumentList,
 				true,
 				() => onCompleteCallback(thread.CurrentFrame.Pop()));
 		}

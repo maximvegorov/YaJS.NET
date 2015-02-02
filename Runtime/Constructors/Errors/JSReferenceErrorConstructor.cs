@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using YaJS.Runtime.Objects;
+﻿using YaJS.Runtime.Objects;
 
 namespace YaJS.Runtime.Constructors.Errors {
 	/// <summary>
@@ -14,11 +13,11 @@ namespace YaJS.Runtime.Constructors.Errors {
 			return (VM.ReferenceError);
 		}
 
-		public override JSValue Construct(ExecutionThread thread, VariableScope outerScope, List<JSValue> args) {
-			return (VM.NewReferenceError(args.Count > 0 ? args[0].CastToString() : string.Empty));
+		public override JSValue Construct(ExecutionThread thread, VariableScope outerScope, JSValue[] args) {
+			return (VM.NewReferenceError(args.Length > 0 ? args[0].CastToString() : string.Empty));
 		}
 
-		public override JSValue Invoke(ExecutionThread thread, JSObject context, VariableScope outerScope, List<JSValue> args) {
+		public override JSValue Invoke(ExecutionThread thread, JSObject context, VariableScope outerScope, JSValue[] args) {
 			return (Construct(thread, outerScope, args));
 		}
 

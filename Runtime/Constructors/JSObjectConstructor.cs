@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using YaJS.Runtime.Objects;
+﻿using YaJS.Runtime.Objects;
 
 namespace YaJS.Runtime.Constructors {
 	/// <summary>
@@ -14,11 +13,11 @@ namespace YaJS.Runtime.Constructors {
 			return (VM.Object);
 		}
 
-		public override JSValue Construct(ExecutionThread thread, VariableScope outerScope, List<JSValue> args) {
-			return (args.Count == 0 ? VM.NewObject() : args[0].ToObject(VM));
+		public override JSValue Construct(ExecutionThread thread, VariableScope outerScope, JSValue[] args) {
+			return (args.Length == 0 ? VM.NewObject() : args[0].ToObject(VM));
 		}
 
-		public override JSValue Invoke(ExecutionThread thread, JSObject context, VariableScope outerScope, List<JSValue> args) {
+		public override JSValue Invoke(ExecutionThread thread, JSObject context, VariableScope outerScope, JSValue[] args) {
 			return (Construct(thread, outerScope, args));
 		}
 

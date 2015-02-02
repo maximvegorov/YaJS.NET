@@ -7,6 +7,10 @@
 			: base(vm, inherited) {
 		}
 
+		public override string ToString() {
+			return ("Native function");
+		}
+
 		/// <summary>
 		/// Native-функция?
 		/// </summary>

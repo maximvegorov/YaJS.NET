@@ -1,4 +1,5 @@
 ﻿using System;
+using yajs.Objects;
 using YaJS.Compiler;
 using YaJS.Runtime;
 
@@ -11,8 +12,10 @@ namespace yajs {
 					return (-1);
 				}
 				var vm = new VirtualMachine(new CompilerServices());
-				var program = CompilerServices.Compile(args[1]);
-				return (vm.Execute(program).CastToInteger());
+				vm.GlobalObject.OwnMembers.Add("console", new JSConsole(vm));
+				var program = CompilerServices.Compile(args[0]);
+				var exitCode = vm.Execute(program);
+				return (exitCode.CastToInteger());
 			}
 			catch (Exception ex) {
 				Console.WriteLine(ex.Message);

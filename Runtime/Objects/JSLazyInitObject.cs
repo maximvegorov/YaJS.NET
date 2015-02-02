@@ -5,14 +5,14 @@ using System.Linq;
 
 namespace YaJS.Runtime.Objects {
 	/// <summary>
-	/// Прототип объекта с отложенной инициализацией
+	/// Объект с отложенной инициализацией
 	/// </summary>
-	public abstract class JSLazyInitPrototype : JSObject {
-		private readonly Dictionary<string, Func<VirtualMachine, JSValue>> _lazyMemberFactories;
+	public abstract class JSLazyInitObject : JSObject {
+		private readonly Dictionary<string, Func<VirtualMachine, JSObject, JSValue>> _lazyMemberFactories;
 
-		protected JSLazyInitPrototype(
+		protected JSLazyInitObject(
 			VirtualMachine vm,
-			Dictionary<string, Func<VirtualMachine, JSValue>> lazyMemberFactories,
+			Dictionary<string, Func<VirtualMachine, JSObject, JSValue>> lazyMemberFactories,
 			JSObject inherited)
 			: base(vm, inherited) {
 			Contract.Requires(lazyMemberFactories != null);
@@ -32,9 +32,9 @@ namespace YaJS.Runtime.Objects {
 			var name = member.CastToString();
 			var result = base.GetMember(name);
 			if (result == null) {
-				Func<VirtualMachine, JSValue> factory;
+				Func<VirtualMachine, JSObject, JSValue> factory;
 				if (_lazyMemberFactories.TryGetValue(name, out factory)) {
-					result = factory(VM);
+					result = factory(VM, this);
 					OwnMembers.Add(name, result);
 				}
 			}

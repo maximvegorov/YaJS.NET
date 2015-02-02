@@ -57,6 +57,7 @@ namespace YaJS.Compiler.AST.Statements {
 			finally {
 				compiler.StatementEnds.Remove(this);
 			}
+			compiler.MarkEndOfStatement();
 		}
 
 		public Expression Expression {

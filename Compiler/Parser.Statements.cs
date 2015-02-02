@@ -103,13 +103,15 @@ namespace YaJS.Compiler {
 				if (Lookahead.Type != TokenType.Ident)
 					Errors.ThrowUnmatchedToken(TokenType.Ident, Lookahead);
 				var variableName = Lookahead.Value;
-				if (!_currentFunction.DeclaredKeyedVariables.Contains(variableName))
-					_currentFunction.DeclaredKeyedVariables.Add(variableName);
+				if (!_currentFunction.DeclaredVariables.Contains(variableName))
+					_currentFunction.DeclaredVariables.Add(variableName);
 				ReadNextToken();
 				if (Lookahead.Type != TokenType.Assign)
 					assignments.Add(Expression.SimpleAssign(Expression.Ident(variableName), Expression.Undefined()));
-				else
+				else {
+					ReadNextToken();
 					assignments.Add(Expression.SimpleAssign(Expression.Ident(variableName), ParseAssignmentExpression()));
+				}
 				if (Lookahead.Type != TokenType.Comma)
 					hasMore = false;
 				else
@@ -133,8 +135,8 @@ namespace YaJS.Compiler {
 				if (PeekNextToken().Type == TokenType.In) {
 					MoveForwardLookahead();
 					if (isVariableDeclaration) {
-						if (!_currentFunction.DeclaredKeyedVariables.Contains(variableName))
-							_currentFunction.DeclaredKeyedVariables.Add(variableName);
+						if (!_currentFunction.DeclaredVariables.Contains(variableName))
+							_currentFunction.DeclaredVariables.Add(variableName);
 					}
 					result = new ForInStatement(startPosition.LineNo, variableName, ParseExpression(), labelSet);
 				}

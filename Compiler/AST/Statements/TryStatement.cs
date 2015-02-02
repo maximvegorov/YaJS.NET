@@ -84,6 +84,8 @@ namespace YaJS.Compiler.AST.Statements {
 			else {
 				EmitTryFinally(compiler);
 			}
+
+			compiler.MarkEndOfStatement();
 		}
 
 		public TryBlockStatement TryBlock {

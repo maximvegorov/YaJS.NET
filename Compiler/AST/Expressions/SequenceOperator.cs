@@ -7,7 +7,7 @@ namespace YaJS.Compiler.AST.Expressions {
 	public sealed class SequenceOperator : Expression {
 		internal SequenceOperator(List<Expression> operands)
 			: base(ExpressionType.Sequence) {
-			Contract.Requires(operands != null && operands.Count > 1);
+			Contract.Requires(operands != null && operands.Count > 0);
 			Operands = operands;
 		}
 

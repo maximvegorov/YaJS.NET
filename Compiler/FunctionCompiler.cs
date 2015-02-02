@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using YaJS.Compiler.AST;
 using YaJS.Compiler.AST.Statements;
@@ -47,6 +48,11 @@ namespace YaJS.Compiler {
 					Function.FunctionBody.ToString(),
 					Emitter.ToCompiledCode(),
 					SwitchJumpTables.Count == 0 ? CompiledFunction.EmptySwitchJumpTables : SwitchJumpTables.ToArray()));
+		}
+
+		[Conditional("DEBUG")]
+		internal void MarkEndOfStatement() {
+			Emitter.Emit(OpCode.Break);
 		}
 
 		public static CompiledFunction Compile(Function function, CompiledFunction[] nestedFunctions) {

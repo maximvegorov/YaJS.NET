@@ -26,7 +26,7 @@ namespace YaJS.Compiler {
 			_name = name;
 			_lineNo = lineNo;
 			_parameterNames = parameterNames;
-			DeclaredKeyedVariables = new KeyedVariableCollection();
+			DeclaredVariables = new KeyedVariableCollection();
 			NestedFunctions = new KeyedFunctionCollection();
 			_isDeclaration = isDeclaration;
 		}
@@ -37,14 +37,14 @@ namespace YaJS.Compiler {
 					_name,
 					_lineNo,
 					_parameterNames.ToList(),
-					DeclaredKeyedVariables.ToList(),
+					DeclaredVariables.ToList(),
 					NestedFunctions.ToList(),
 					FunctionBody,
 					_isDeclaration));
 		}
 
 		public FunctionBuilder Outer { get; private set; }
-		public IKeyedVariableCollection DeclaredKeyedVariables { get; private set; }
+		public IKeyedVariableCollection DeclaredVariables { get; private set; }
 		public KeyedFunctionCollection NestedFunctions { get; private set; }
 
 		public FunctionBodyStatement FunctionBody {

@@ -17,6 +17,10 @@ namespace YaJS.Runtime.Objects {
 			CompiledFunction = compiledFunction;
 		}
 
+		public override string ToString() {
+			return ("Managed function");
+		}
+
 		/// <summary>
 		/// Область хранения внешних переменных
 		/// </summary>

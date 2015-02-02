@@ -14,11 +14,11 @@ namespace YaJS.Runtime.Constructors {
 			return (VM.Array);
 		}
 
-		public override JSValue Construct(ExecutionThread thread, VariableScope outerScope, List<JSValue> args) {
-			return (VM.NewArray(args));
+		public override JSValue Construct(ExecutionThread thread, VariableScope outerScope, JSValue[] args) {
+			return (VM.NewArray(new List<JSValue>(args)));
 		}
 
-		public override JSValue Invoke(ExecutionThread thread, JSObject context, VariableScope outerScope, List<JSValue> args) {
+		public override JSValue Invoke(ExecutionThread thread, JSObject context, VariableScope outerScope, JSValue[] args) {
 			return (Construct(thread, outerScope, args));
 		}
 

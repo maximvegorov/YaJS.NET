@@ -55,7 +55,7 @@ namespace YaJS.Compiler.AST {
 			var context = new CompilingContext(compiler);
 			try {
 				compiler.StatementStarts.Add(this, context.StartLabel);
-				compiler.StatementStarts.Add(this, context.EndLabel);
+				compiler.StatementEnds.Add(this, context.EndLabel);
 				compiler.Emitter.MarkLabel(context.StartLabel);
 				DoEmit(context);
 				compiler.Emitter.MarkLabel(context.EndLabel);
@@ -65,6 +65,7 @@ namespace YaJS.Compiler.AST {
 				compiler.StatementStarts.Remove(this);
 			}
 			DoEmitEpilog(compiler);
+			compiler.MarkEndOfStatement();
 		}
 
 		public Statement Statement {

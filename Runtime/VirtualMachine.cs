@@ -29,12 +29,12 @@ namespace YaJS.Runtime {
 			Array = new JSArrayPrototype(this, Object);
 			Function = new JSFunctionPrototype(this, Object);
 
-			Error = new JSUnenumerablePrototype(this, Object);
-			InternalError = new JSUnenumerablePrototype(this, Error);
-			ReferenceError = new JSUnenumerablePrototype(this, Error);
-			SyntaxError = new JSUnenumerablePrototype(this, Error);
-			TypeError = new JSUnenumerablePrototype(this, Error);
-			RangeError = new JSUnenumerablePrototype(this, Error);
+			Error = new JSUnenumerableObject(this, Object);
+			InternalError = new JSUnenumerableObject(this, Error);
+			ReferenceError = new JSUnenumerableObject(this, Error);
+			SyntaxError = new JSUnenumerableObject(this, Error);
+			TypeError = new JSUnenumerableObject(this, Error);
+			RangeError = new JSUnenumerableObject(this, Error);
 
 			// Инициализировать глобальный объект
 			GlobalObject.OwnMembers.Add("Object", new JSObjectConstructor(this, Function));
@@ -59,7 +59,10 @@ namespace YaJS.Runtime {
 
 		public JSValue Execute(CompiledFunction globalFunction) {
 			var thread = NewThread(globalFunction);
-			while (thread.ExecuteStep()) {
+			for (;;) {
+				var isTerminated = thread.ExecuteStep();
+				if (isTerminated)
+					break;
 			}
 			return (thread.Result);
 		}
@@ -93,6 +96,10 @@ namespace YaJS.Runtime {
 			Contract.Requires<ArgumentNullException>(outerScope != null, "outerScope");
 			Contract.Requires<ArgumentNullException>(compiledFunction != null, "compiledFunction");
 			return (new JSManagedFunction(this, outerScope, compiledFunction, Function));
+		}
+
+		internal JSArguments NewArguments(JSValue[] values) {
+			return (new JSArguments(this, values, Object));
 		}
 
 		public JSError NewError(string message) {

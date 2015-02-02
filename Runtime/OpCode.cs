@@ -4,6 +4,7 @@
 	/// </summary>
 	public enum OpCode : byte {
 		Nop, // Ничего не делать
+		Break, // Тоже самое что Nop, но используется для разделения операторов
 
 		LdUndefined, // Загрузить в стек undefined
 		LdNull, // Загрузить в стек null

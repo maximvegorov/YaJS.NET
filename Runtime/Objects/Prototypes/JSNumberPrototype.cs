@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 
 namespace YaJS.Runtime.Objects.Prototypes {
-	public sealed class JSNumberPrototype : JSUnenumerableLazyInitPrototype {
-		private static readonly Dictionary<string, Func<VirtualMachine, JSValue>> LazyMembers =
-			new Dictionary<string, Func<VirtualMachine, JSValue>>();
+	public sealed class JSNumberPrototype : JSUnenumerableLazyInitObject {
+		private static readonly Dictionary<string, Func<VirtualMachine, JSObject, JSValue>> LazyMembers =
+			new Dictionary<string, Func<VirtualMachine, JSObject, JSValue>>();
 
 		static JSNumberPrototype() {
 		}

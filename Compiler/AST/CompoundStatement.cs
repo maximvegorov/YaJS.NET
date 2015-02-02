@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Text;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST {
 	/// <summary>
@@ -58,6 +59,7 @@ namespace YaJS.Compiler.AST {
 		internal override void CompileBy(FunctionCompiler compiler) {
 			foreach (var statement in _statements)
 				statement.CompileBy(compiler);
+			compiler.MarkEndOfStatement();
 		}
 
 		public IReadOnlyList<Statement> Statements { get { return (_statements); } }

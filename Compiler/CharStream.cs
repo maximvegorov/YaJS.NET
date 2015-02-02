@@ -42,7 +42,7 @@ namespace YaJS.Compiler {
 						else
 							CurChar = '\n';
 						LineNo++;
-						ColumnNo = 0;
+						ColumnNo = 1;
 						break;
 					default:
 						ColumnNo++;

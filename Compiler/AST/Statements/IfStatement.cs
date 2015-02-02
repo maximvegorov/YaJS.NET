@@ -66,6 +66,7 @@ namespace YaJS.Compiler.AST.Statements {
 				_elseStatement.CompileBy(compiler);
 				compiler.Emitter.MarkLabel(endLabel);
 			}
+			compiler.MarkEndOfStatement();
 		}
 
 		public Expression Condition {
