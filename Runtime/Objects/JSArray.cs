@@ -56,7 +56,7 @@ namespace YaJS.Runtime.Objects {
 				var index = member.CastToInteger();
 				if (index >= 0) {
 					if (index >= Items.Count)
-						return (JSValue.Undefined);
+						return (Undefined);
 					return (Items[index] ?? Undefined);
 				}
 			}

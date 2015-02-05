@@ -1,4 +1,6 @@
-﻿using System.Diagnostics.Contracts;
+﻿using System;
+using System.Diagnostics.Contracts;
+using System.Text;
 
 namespace YaJS.Compiler.AST {
 	/// <summary>
@@ -11,6 +13,14 @@ namespace YaJS.Compiler.AST {
 			: base(StatementType.Reference) {
 			Contract.Requires(reference != null);
 			_reference = reference;
+		}
+
+		protected internal override void AppendTo(StringBuilder output, string indent) {
+			output.Append(indent)
+				.AppendLine("{");
+			_reference.AppendTo(output, indent + '\t');
+			output.Append(indent)
+				.AppendLine("}");
 		}
 
 		internal override void CompileBy(FunctionCompiler compiler) {

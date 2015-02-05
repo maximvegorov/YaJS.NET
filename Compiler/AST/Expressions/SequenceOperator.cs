@@ -14,7 +14,7 @@ namespace YaJS.Compiler.AST.Expressions {
 		public override string ToString() {
 			var result = new StringBuilder();
 			foreach (var operand in Operands)
-				result.Append('(').Append(operand).Append('(').Append(',');
+				result.Append(operand).Append(',');
 			result.Length -= 1;
 			return (result.ToString());
 		}

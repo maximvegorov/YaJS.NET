@@ -11,16 +11,16 @@ namespace YaJS.Runtime {
 			Property = property;
 		}
 
+		public override string ToString() {
+			return (Value.ToString());
+		}
+
 		internal override JSReference RequireReference() {
 			return (this);
 		}
 
 		public JSObject BaseValue { get; private set; }
 		public JSValue Property { get; private set; }
-
-		public JSValue Value {
-			get { return (BaseValue.GetMember(Property)); }
-			set { BaseValue.SetMember(Property, value); }
-		}
+		public JSValue Value { get { return (BaseValue.GetMember(Property)); } set { BaseValue.SetMember(Property, value); } }
 	}
 }

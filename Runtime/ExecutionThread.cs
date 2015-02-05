@@ -143,10 +143,10 @@ namespace YaJS.Runtime {
 						break;
 
 					case OpCode.Break:
-						currentFrame.Dump();
+//						currentFrame.Dump();
 						break;
 
-					#region Загрузка значений
+						#region Загрузка значений
 
 					case OpCode.LdUndefined:
 						currentFrame.Push(JSValue.Undefined);

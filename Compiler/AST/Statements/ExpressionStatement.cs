@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
+using System.Text;
 
 namespace YaJS.Compiler.AST.Statements {
 	/// <summary>
@@ -13,13 +14,15 @@ namespace YaJS.Compiler.AST.Statements {
 			_expression = expression;
 		}
 
+		protected internal override void AppendTo(StringBuilder output, string indent) {
+			output.Append(indent)
+				.Append(Expression)
+				.AppendLine(";");
+		}
+
 		internal override void CompileBy(FunctionCompiler compiler) {
 			_expression.CompileBy(compiler, true);
 			compiler.MarkEndOfStatement();
-		}
-
-		public override string ToString() {
-			return (Expression.ToString());
 		}
 
 		public Expression Expression { get { return (_expression); } }

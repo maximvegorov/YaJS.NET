@@ -1,4 +1,5 @@
-﻿using YaJS.Runtime;
+﻿using System.Text;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Statements {
 	/// <summary>
@@ -19,6 +20,22 @@ namespace YaJS.Compiler.AST.Statements {
 			_initialization = initialization;
 			_condition = condition;
 			_increment = increment;
+		}
+
+		protected internal override void AppendTo(StringBuilder output, string indent) {
+			output.Append(indent)
+				.Append("for (");
+			if (_initialization != null)
+				output.Append(_initialization);
+			output.Append(';');
+			if (_condition != null)
+				output.Append(_condition);
+			output.Append(';');
+			if (_increment != null)
+				output.Append(_increment);
+			output.AppendLine(") {");
+			Statement.AppendTo(output, indent + '\t');
+			output.AppendLine("}");
 		}
 
 		internal override void DoEmitProlog(FunctionCompiler compiler) {

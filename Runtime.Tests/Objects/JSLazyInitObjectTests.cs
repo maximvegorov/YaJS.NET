@@ -25,12 +25,11 @@ namespace YaJS.Runtime.Tests.Objects {
 			var vm = new VirtualMachine(compiler.Object);
 			var proto = new TestPrototype(vm, null);
 			proto.OwnMembers.Add("b", "b");
-			var expected = new HashSet<string>() { "a", "b" };
+			var expected = new HashSet<string> { "a", "b" };
 			var actual = new HashSet<string>();
 			var enumerator = proto.GetEnumerator();
-			while (enumerator.MoveNext()) {
+			while (enumerator.MoveNext())
 				actual.Add(enumerator.Current.CastToString());
-			}
 			Assert.IsTrue(actual.SetEquals(expected));
 		}
 

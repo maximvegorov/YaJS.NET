@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
 using YaJS.Runtime.Exceptions;
-using YaJS.Runtime.Objects;
 
 namespace YaJS.Runtime {
 	/// <summary>
@@ -34,7 +33,6 @@ namespace YaJS.Runtime {
 		}
 
 		public abstract bool ContainsVariable(string variableName);
-
 		protected abstract void DoSetVariable(string variableName, JSValue value);
 
 		public void SetVariable(string variableName, JSValue value) {

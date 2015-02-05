@@ -10,7 +10,7 @@ namespace YaJS.Runtime.Tests {
 		#region InstanceOf
 
 		[TestMethod]
-		[ExpectedException(typeof(TypeErrorException))]
+		[ExpectedException(typeof (TypeErrorException))]
 		public void InstanceOf_Undefined() {
 			var compiler = new Mock<ICompilerServices>();
 			var vm = new VirtualMachine(compiler.Object);
@@ -19,7 +19,7 @@ namespace YaJS.Runtime.Tests {
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(TypeErrorException))]
+		[ExpectedException(typeof (TypeErrorException))]
 		public void InstanceOf_Null() {
 			var compiler = new Mock<ICompilerServices>();
 			var vm = new VirtualMachine(compiler.Object);
@@ -28,7 +28,7 @@ namespace YaJS.Runtime.Tests {
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(TypeErrorException))]
+		[ExpectedException(typeof (TypeErrorException))]
 		public void InstanceOf_Boolean() {
 			var compiler = new Mock<ICompilerServices>();
 			var vm = new VirtualMachine(compiler.Object);
@@ -37,7 +37,7 @@ namespace YaJS.Runtime.Tests {
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(TypeErrorException))]
+		[ExpectedException(typeof (TypeErrorException))]
 		public void InstanceOf_Integer() {
 			var compiler = new Mock<ICompilerServices>();
 			var vm = new VirtualMachine(compiler.Object);
@@ -46,7 +46,7 @@ namespace YaJS.Runtime.Tests {
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(TypeErrorException))]
+		[ExpectedException(typeof (TypeErrorException))]
 		public void InstanceOf_Float() {
 			var compiler = new Mock<ICompilerServices>();
 			var vm = new VirtualMachine(compiler.Object);
@@ -55,7 +55,7 @@ namespace YaJS.Runtime.Tests {
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(TypeErrorException))]
+		[ExpectedException(typeof (TypeErrorException))]
 		public void InstanceOf_String() {
 			var compiler = new Mock<ICompilerServices>();
 			var vm = new VirtualMachine(compiler.Object);

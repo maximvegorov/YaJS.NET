@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
+using System.Text;
 
 namespace YaJS.Compiler.AST.Statements {
 	/// <summary>
@@ -13,6 +14,19 @@ namespace YaJS.Compiler.AST.Statements {
 			: base(StatementType.CaseClause, lineNo) {
 			Contract.Requires(expression != null);
 			_expression = expression;
+		}
+
+		public override string ToString() {
+			var result = new StringBuilder();
+			return (result.ToString());
+		}
+
+		protected internal override void AppendTo(StringBuilder output, string indent) {
+			output.Append(indent)
+				.Append("case ")
+				.Append(_expression)
+				.AppendLine(":");
+			_statements.AppendTo(output, indent + '\t');
 		}
 
 		internal override void Preprocess(FunctionCompiler compiler) {

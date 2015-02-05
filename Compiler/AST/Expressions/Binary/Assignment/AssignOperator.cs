@@ -42,6 +42,7 @@ namespace YaJS.Compiler.AST.Expressions {
 		public override bool CanHaveMutableMembers { get { return (RightOperand.CanHaveMutableMembers); } }
 		public override bool CanBeConstructor { get { return (RightOperand.CanBeConstructor); } }
 		public override bool CanBeFunction { get { return (RightOperand.CanBeFunction); } }
+		public override bool CanBeObject { get { return (RightOperand.CanBeObject); } }
 		public override bool IsConstant { get { return (false); } }
 	}
 }

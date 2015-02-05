@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Text;
-using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST {
 	/// <summary>
@@ -16,13 +15,9 @@ namespace YaJS.Compiler.AST {
 			_statements = new List<Statement>();
 		}
 
-		public override string ToString() {
-			var result = new StringBuilder();
-			result.AppendLine("{");
+		protected internal override void AppendTo(StringBuilder output, string indent) {
 			foreach (var statement in _statements)
-				result.Append(statement).Append(";");
-			result.AppendLine("}");
-			return (result.ToString());
+				statement.AppendTo(output, indent + '\t');
 		}
 
 		public void Add(Statement statement) {

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Text;
 using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Statements {
@@ -14,6 +15,23 @@ namespace YaJS.Compiler.AST.Statements {
 
 		public SwitchStatement(int lineNo, ILabelSet labelSet)
 			: base(StatementType.Switch, lineNo, labelSet) {
+		}
+
+		protected internal override void AppendTo(StringBuilder output, string indent) {
+			output.Append(indent)
+				.Append("switch (")
+				.Append(_expression)
+				.AppendLine(") {");
+			_beforeDefault.AppendTo(output, indent);
+			if (_defaultClause != null) {
+				output.Append(indent)
+					.AppendLine("default:");
+				_defaultClause.AppendTo(output, indent + '\t');
+				if (_afterDefault != null)
+					_afterDefault.AppendTo(output, indent);
+			}
+			output.Append(indent)
+				.AppendLine("}");
 		}
 
 		internal override void Preprocess(FunctionCompiler compiler) {

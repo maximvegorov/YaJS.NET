@@ -62,7 +62,7 @@ namespace YaJS.Compiler {
 			string name = null;
 			if (Lookahead.Type == TokenType.Ident) {
 				name = Lookahead.Value;
-				if (_currentFunction.Outer.NestedFunctions.Contains(name))
+				if (_currentFunction.Outer != null && _currentFunction.Outer.NestedFunctions.Contains(name))
 					Errors.ThrowFunctionAlreadyDeclared(startPosition, name);
 				ReadNextToken();
 			}

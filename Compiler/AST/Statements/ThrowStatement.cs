@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
+using System.Text;
 using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Statements {
@@ -12,6 +13,13 @@ namespace YaJS.Compiler.AST.Statements {
 			: base(StatementType.Throw, lineNo) {
 			Contract.Requires(expression != null);
 			_expression = expression;
+		}
+
+		protected internal override void AppendTo(StringBuilder output, string indent) {
+			output.Append(indent)
+				.Append("throw ")
+				.Append(Expression)
+				.AppendLine(";");
 		}
 
 		internal override void CompileBy(FunctionCompiler compiler) {

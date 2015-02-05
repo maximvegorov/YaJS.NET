@@ -9,57 +9,56 @@ namespace YaJS.Runtime {
 	/// </summary>
 	internal sealed class ByteCodeReader {
 		private readonly byte[] _compiledCode;
-		private int _offset;
 
 		public ByteCodeReader(byte[] compiledCode) {
 			Contract.Requires(compiledCode != null && compiledCode.Length > 0);
 			_compiledCode = compiledCode;
-			_offset = 0;
+			Offset = 0;
 		}
 
 		public OpCode ReadOpCode() {
-			if (_offset >= _compiledCode.Length)
+			if (Offset >= _compiledCode.Length)
 				throw new UnexpectedEndOfCodeException();
-			return ((OpCode)_compiledCode[_offset++]);
+			return ((OpCode)_compiledCode[Offset++]);
 		}
 
 		public bool ReadBoolean() {
-			if (_offset >= _compiledCode.Length)
+			if (Offset >= _compiledCode.Length)
 				throw new UnexpectedEndOfCodeException();
-			var result = _compiledCode[_offset] != 0;
-			_offset += sizeof(byte);
+			var result = _compiledCode[Offset] != 0;
+			Offset += sizeof (byte);
 			return (result);
 		}
 
 		public int ReadInteger() {
-			if (_offset + sizeof(int) > _compiledCode.Length)
+			if (Offset + sizeof (int) > _compiledCode.Length)
 				throw new UnexpectedEndOfCodeException();
-			var result = BitConverter.ToInt32(_compiledCode, _offset);
-			_offset += sizeof(int);
+			var result = BitConverter.ToInt32(_compiledCode, Offset);
+			Offset += sizeof (int);
 			return (result);
 		}
 
 		public double ReadFloat() {
-			if (_offset + sizeof(double) > _compiledCode.Length)
+			if (Offset + sizeof (double) > _compiledCode.Length)
 				throw new UnexpectedEndOfCodeException();
-			var result = BitConverter.ToDouble(_compiledCode, _offset);
-			_offset += sizeof(double);
+			var result = BitConverter.ToDouble(_compiledCode, Offset);
+			Offset += sizeof (double);
 			return (result);
 		}
 
 		public string ReadString() {
-			if (_offset + sizeof(int) > _compiledCode.Length)
+			if (Offset + sizeof (int) > _compiledCode.Length)
 				throw new UnexpectedEndOfCodeException();
-			var length = BitConverter.ToInt32(_compiledCode, _offset);
-			_offset += sizeof(int);
+			var length = BitConverter.ToInt32(_compiledCode, Offset);
+			Offset += sizeof (int);
 			if (length < 0)
 				throw new NegativeStringConstLengthException();
 			if (length == 0)
 				return (string.Empty);
-			if (_offset + length > _compiledCode.Length)
+			if (Offset + length > _compiledCode.Length)
 				throw new UnexpectedEndOfCodeException();
-			var result = Encoding.UTF8.GetString(_compiledCode, _offset, length);
-			_offset += length;
+			var result = Encoding.UTF8.GetString(_compiledCode, Offset, length);
+			Offset += length;
 			return (result);
 		}
 
@@ -67,9 +66,9 @@ namespace YaJS.Runtime {
 			// При переходе вперед должен быть доступен хотя бы один байт (код инструкции) 
 			if (newOffset < 0 || newOffset >= _compiledCode.Length - 1)
 				throw new InvalidGotoOffsetException();
-			_offset = newOffset;
+			Offset = newOffset;
 		}
 
-		public int Offset { get { return (_offset); } }
+		public int Offset { get; private set; }
 	}
 }

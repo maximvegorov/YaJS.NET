@@ -74,10 +74,12 @@ namespace YaJS.Runtime {
 		}
 
 		internal void Push(JSValue value) {
+			Contract.Requires(value != null);
 			_evalStack.Push(value);
 		}
 
 		internal void Push(JSNumberValue value) {
+			Contract.Requires(value != null);
 			_evalStack.Push(value);
 		}
 
@@ -99,6 +101,8 @@ namespace YaJS.Runtime {
 		}
 
 		internal JSFunction GetFunction(VirtualMachine vm, int index) {
+			Contract.Requires(vm != null);
+			Contract.Requires(0 <= index && index < Function.CompiledFunction.NestedFunctions.Length);
 			return (vm.NewFunction(LocalScope, Function.CompiledFunction.NestedFunctions[index]));
 		}
 
@@ -123,6 +127,7 @@ namespace YaJS.Runtime {
 		}
 
 		internal bool TryHandle(ExceptionObject exception) {
+			Contract.Requires(exception != null);
 			if (_currentTryBlock == null)
 				return (false);
 			LocalScope = _currentTryBlock.Scope;
@@ -149,9 +154,8 @@ namespace YaJS.Runtime {
 			if (_evalStack.Count > 0) {
 				var evalStackValues = new JSValue[_evalStack.Count];
 				_evalStack.CopyTo(evalStackValues, 0);
-				for (var i = evalStackValues.Length - 1; i >= 0; i--) {
+				for (var i = evalStackValues.Length - 1; i >= 0; i--)
 					Console.WriteLine("[{0:D3}] - {1}", i, evalStackValues[i]);
-				}
 			}
 			Console.WriteLine("Local variables: {0}", Function.CompiledFunction.DeclaredVariables.Length);
 			for (var i = 0; i < Function.CompiledFunction.DeclaredVariables.Length; i++) {

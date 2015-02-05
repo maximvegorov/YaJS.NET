@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
+using System.Text;
 using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Statements {
@@ -13,6 +14,30 @@ namespace YaJS.Compiler.AST.Statements {
 
 		public TryStatement(int lineNo)
 			: base(StatementType.Try, lineNo) {
+		}
+
+		protected internal override void AppendTo(StringBuilder output, string indent) {
+			output.Append(indent)
+				.AppendLine("try {");
+			_tryBlock.AppendTo(output, indent + '\t');
+			output.Append(indent)
+				.AppendLine("}");
+			if (_catchBlock != null) {
+				output.Append(indent)
+					.Append("catch (")
+					.Append(_catchBlockVariable)
+					.AppendLine(") {");
+				_catchBlock.AppendTo(output, indent + '\t');
+				output.Append(indent)
+					.AppendLine("}");
+			}
+			if (_finallyBlock != null) {
+				output.Append(indent)
+					.AppendLine("finally {");
+				_finallyBlock.AppendTo(output, indent + '\t');
+				output.Append(indent)
+					.AppendLine("}");
+			}
 		}
 
 		internal override void Preprocess(FunctionCompiler compiler) {
@@ -81,9 +106,8 @@ namespace YaJS.Compiler.AST.Statements {
 				else
 					EmitTryCatchFinally(compiler);
 			}
-			else {
+			else
 				EmitTryFinally(compiler);
-			}
 
 			compiler.MarkEndOfStatement();
 		}

@@ -4,18 +4,19 @@ using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Expressions {
 	public sealed class MemberOperator : Expression {
-		internal MemberOperator(Expression baseValue, Expression property)
+		internal MemberOperator(Expression baseValue, Expression property, bool isPropertyExpression)
 			: base(ExpressionType.Member) {
 			Contract.Requires(baseValue != null && baseValue.CanHaveMembers);
 			Contract.Requires(property != null);
 			BaseValue = baseValue;
 			Property = property;
+			IsPropertyExpression = isPropertyExpression;
 		}
 
 		public override string ToString() {
 			var result = new StringBuilder();
 			result.Append(BaseValue);
-			if (Property.Type == ExpressionType.Ident)
+			if (!IsPropertyExpression)
 				result.Append('.').Append(Property);
 			else
 				result.Append('[').Append(Property).Append(']');
@@ -23,7 +24,7 @@ namespace YaJS.Compiler.AST.Expressions {
 		}
 
 		internal void CompilePropertyBy(FunctionCompiler compiler) {
-			if (Property.Type == ExpressionType.Ident)
+			if (!IsPropertyExpression)
 				compiler.Emitter.Emit(OpCode.LdString, ((Identifier)Property).Value);
 			else
 				Property.CompileBy(compiler, false);
@@ -46,5 +47,6 @@ namespace YaJS.Compiler.AST.Expressions {
 		public override bool CanBeObject { get { return (true); } }
 		public Expression BaseValue { get; private set; }
 		public Expression Property { get; private set; }
+		public bool IsPropertyExpression { get; private set; }
 	}
 }

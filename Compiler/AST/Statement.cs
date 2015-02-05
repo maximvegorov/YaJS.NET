@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
+using System.Text;
 using YaJS.Compiler.AST.Statements;
 
 namespace YaJS.Compiler.AST {
@@ -35,6 +36,14 @@ namespace YaJS.Compiler.AST {
 		protected Statement(StatementType type) {
 			Type = type;
 		}
+
+		public override string ToString() {
+			var result = new StringBuilder();
+			AppendTo(result, string.Empty);
+			return (result.ToString());
+		}
+
+		protected internal abstract void AppendTo(StringBuilder output, string indent);
 
 		internal virtual bool IsBreakTarget(string targetLabel) {
 			Contract.Requires(targetLabel != null);

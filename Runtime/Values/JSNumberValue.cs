@@ -34,12 +34,12 @@ namespace YaJS.Runtime.Values {
 		public JSNumberValue IntDiv(JSNumberValue value) {
 			Contract.Requires(value != null);
 			Contract.Ensures(Contract.Result<JSNumberValue>().Type == JSValueType.Integer);
-			return (CastToInteger() / CastToInteger());
+			return (CastToInteger() / value.CastToInteger());
 		}
 
 		public JSNumberValue FltDiv(JSNumberValue value) {
 			Contract.Requires(value != null);
-			return (CastToFloat() / CastToFloat());
+			return (CastToFloat() / value.CastToFloat());
 		}
 
 		public virtual JSNumberValue Mod(JSNumberValue value) {

@@ -11,7 +11,6 @@ namespace YaJS.Compiler.Emitter {
 		private const int DefaultCapacity = 16;
 		private static readonly byte[] InvalidOffset = BitConverter.GetBytes(-1);
 		private byte[] _buffer = new byte[DefaultCapacity];
-		private int _offset;
 
 		private void Grow(int minDelta) {
 			Contract.Requires(minDelta > 0);
@@ -26,17 +25,17 @@ namespace YaJS.Compiler.Emitter {
 		}
 
 		private void Write(OpCode code) {
-			if (_buffer.Length == _offset)
+			if (_buffer.Length == Offset)
 				Grow(sizeof (byte));
-			_buffer[_offset] = (byte)code;
-			_offset++;
+			_buffer[Offset] = (byte)code;
+			Offset++;
 		}
 
 		private void Write(bool op) {
-			if (_buffer.Length == _offset)
+			if (_buffer.Length == Offset)
 				Grow(sizeof (byte));
-			_buffer[_offset] = (byte)(op ? 1 : 0);
-			_offset++;
+			_buffer[Offset] = (byte)(op ? 1 : 0);
+			Offset++;
 		}
 
 		public void Emit(OpCode code) {
@@ -45,10 +44,10 @@ namespace YaJS.Compiler.Emitter {
 
 		private void Write(byte[] bytes) {
 			Contract.Requires(bytes != null && bytes.Length > 0);
-			if (_buffer.Length < _offset + bytes.Length)
+			if (_buffer.Length < Offset + bytes.Length)
 				Grow(bytes.Length);
-			Buffer.BlockCopy(bytes, 0, _buffer, _offset, bytes.Length);
-			_offset += bytes.Length;
+			Buffer.BlockCopy(bytes, 0, _buffer, Offset, bytes.Length);
+			Offset += bytes.Length;
 		}
 
 		public void Emit(OpCode code, bool op) {
@@ -91,25 +90,25 @@ namespace YaJS.Compiler.Emitter {
 				Emit(op, label.Offset.Value);
 			else {
 				Emit(op);
-				label.AppendUnresolved(_offset);
+				label.AppendUnresolved(Offset);
 				Write(InvalidOffset);
 			}
 		}
 
 		public void MarkLabel(Label label) {
 			Contract.Requires(label != null);
-			label.Resolve(_offset);
+			label.Resolve(Offset);
 		}
 
 		public byte[] ToCompiledCode() {
-			if (_buffer.Length == _offset)
+			if (_buffer.Length == Offset)
 				return (_buffer);
-			var result = new byte[_offset];
-			Buffer.BlockCopy(_buffer, 0, result, 0, _offset);
+			var result = new byte[Offset];
+			Buffer.BlockCopy(_buffer, 0, result, 0, Offset);
 			return (result);
 		}
 
 		public byte[] RawBuffer { get { return (_buffer); } }
-		public int Offset { get { return (_offset); } }
+		public int Offset { get; private set; }
 	}
 }

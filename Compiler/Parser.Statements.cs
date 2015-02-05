@@ -35,14 +35,13 @@ namespace YaJS.Compiler {
 			string targetLabel;
 			if (Lookahead.IsAfterLineTerminator)
 				targetLabel = string.Empty;
-			else if (Lookahead.Type == TokenType.Ident) {
-				targetLabel = Lookahead.Value;
-				ReadNextToken();
-			}
 			else {
-				Errors.ThrowUnmatchedToken(TokenType.Ident, Lookahead);
-				// Для того чтобы не ругался компилятор
-				targetLabel = null;
+				if (Lookahead.Type != TokenType.Ident)
+					targetLabel = string.Empty;
+				else {
+					targetLabel = Lookahead.Value;
+					ReadNextToken();
+				}
 			}
 			return (new BreakStatement(startPosition.LineNo, targetLabel));
 		}
@@ -53,14 +52,13 @@ namespace YaJS.Compiler {
 			string targetLabel;
 			if (Lookahead.IsAfterLineTerminator)
 				targetLabel = string.Empty;
-			else if (Lookahead.Type == TokenType.Ident) {
-				targetLabel = Lookahead.Value;
-				ReadNextToken();
-			}
 			else {
-				Errors.ThrowUnmatchedToken(TokenType.Ident, Lookahead);
-				// Для того чтобы не ругался компилятор
-				targetLabel = null;
+				if (Lookahead.Type != TokenType.Ident)
+					targetLabel = string.Empty;
+				else {
+					targetLabel = Lookahead.Value;
+					ReadNextToken();
+				}
 			}
 			return (new ContinueStatement(startPosition.LineNo, targetLabel));
 		}
@@ -89,6 +87,8 @@ namespace YaJS.Compiler {
 			result.Condition = ParseExpression();
 			Match(TokenType.RParenthesis);
 			result.ThenStatement = ParseStatement(true);
+			if (result.ThenStatement.Type != StatementType.Compound && Lookahead.Type == TokenType.Semicolon)
+				ReadNextToken();
 			if (Lookahead.Type == TokenType.Else) {
 				ReadNextToken();
 				result.ElseStatement = ParseStatement(true);
@@ -227,7 +227,7 @@ namespace YaJS.Compiler {
 			if (!expression.CanBeUsedInCaseClause)
 				Errors.ThrowUnsupportedCaseClauseExpression(startPosition);
 			Match(TokenType.Colon);
-			return (new CaseClauseStatement(startPosition.LineNo, expression) {Statements = ParseStatementListStatement()});
+			return (new CaseClauseStatement(startPosition.LineNo, expression) { Statements = ParseStatementListStatement() });
 		}
 
 		private CaseClauseBlockStatement ParseCaseClauseBlockStatement() {

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
+using System.Text;
 using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Statements {
@@ -15,6 +16,18 @@ namespace YaJS.Compiler.AST.Statements {
 			Contract.Requires(enumerable != null);
 			_variableName = variableName;
 			_enumerable = enumerable;
+		}
+
+		protected internal override void AppendTo(StringBuilder output, string indent) {
+			output.Append(indent)
+				.Append("for (")
+				.Append(_variableName)
+				.Append(" in ")
+				.Append(_enumerable)
+				.AppendLine(") {");
+			Statement.AppendTo(output, indent + '\t');
+			output.Append(indent)
+				.AppendLine("}");
 		}
 
 		internal override void DoEmitProlog(FunctionCompiler compiler) {

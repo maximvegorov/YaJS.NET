@@ -165,8 +165,8 @@ namespace YaJS.Compiler.AST {
 			return (new GroupingOperator(operand));
 		}
 
-		public static Expression Member(Expression baseValue, Expression memberName) {
-			return (new MemberOperator(baseValue, memberName));
+		public static Expression Member(Expression baseValue, Expression memberName, bool isPropertyExpression) {
+			return (new MemberOperator(baseValue, memberName, isPropertyExpression));
 		}
 
 		public static Expression New(Expression constructor, List<Expression> argumentList) {

@@ -34,11 +34,13 @@ namespace YaJS.Compiler.AST {
 			// в порядке следования в исходном тексте. Необходимо для более быстрого
 			// нахождения FunctionDeclaration при инициализации LocalScope
 			for (var i = 0; i < NestedFunctions.Count; i++) {
-				if (NestedFunctions[i].IsDeclaration && i > FunctionDeclarationCount) {
-					var t = NestedFunctions[FunctionDeclarationCount];
-					NestedFunctions[FunctionDeclarationCount] = NestedFunctions[i];
-					NestedFunctions[i] = t;
-					NestedFunctions[FunctionDeclarationCount].Index = i;
+				if (NestedFunctions[i].IsDeclaration) {
+					if (i > FunctionDeclarationCount) {
+						var t = NestedFunctions[FunctionDeclarationCount];
+						NestedFunctions[FunctionDeclarationCount] = NestedFunctions[i];
+						NestedFunctions[i] = t;
+						NestedFunctions[FunctionDeclarationCount].Index = i;
+					}
 					FunctionDeclarationCount++;
 				}
 			}
@@ -60,8 +62,9 @@ namespace YaJS.Compiler.AST {
 					result.Append(parameterName).Append(",");
 				result.Length -= 1;
 			}
-			result.AppendLine(")");
-			result.Append(FunctionBody);
+			result.AppendLine(") {");
+			FunctionBody.AppendTo(result, "\t");
+			result.AppendLine("}");
 			return (result.ToString());
 		}
 

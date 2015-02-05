@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
+using System.Text;
 using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Statements {
@@ -12,6 +13,23 @@ namespace YaJS.Compiler.AST.Statements {
 
 		public IfStatement(int lineNo)
 			: base(StatementType.If, lineNo) {
+		}
+
+		protected internal override void AppendTo(StringBuilder output, string indent) {
+			output.Append(indent)
+				.Append("if (")
+				.Append(Condition)
+				.AppendLine(") {");
+			_thenStatement.AppendTo(output, indent + '\t');
+			output.Append(indent)
+				.AppendLine("}");
+			if (_elseStatement != null) {
+				output.Append(indent)
+					.AppendLine("else {");
+				_elseStatement.AppendTo(output, indent);
+				output.Append(indent)
+					.AppendLine("}");
+			}
 		}
 
 		protected internal override void InsertBefore(Statement position, Statement newStatement) {

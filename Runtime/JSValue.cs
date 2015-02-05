@@ -44,7 +44,7 @@ namespace YaJS.Runtime {
 		public JSValue Plus(JSValue value) {
 			Contract.Requires(value != null);
 			if (Type == JSValueType.String || value.Type == JSValueType.String)
-				return (CastToString() + CastToString());
+				return (CastToString() + value.CastToString());
 			return (ToNumber().Plus(value.ToNumber()));
 		}
 

@@ -58,7 +58,7 @@ namespace YaJS.Compiler.Emitter {
 			return (new UnresolvedOffsetSet(_offset1, _offset2, offset));
 		}
 
-		public IEnumerable<int> Offsets { get { return (new[] {_offset1, _offset2}); } }
+		public IEnumerable<int> Offsets { get { return (new[] { _offset1, _offset2 }); } }
 	}
 
 	/// <summary>
@@ -71,7 +71,7 @@ namespace YaJS.Compiler.Emitter {
 			Contract.Requires(offset1 >= 0);
 			Contract.Requires(offset2 >= 0);
 			Contract.Requires(offset3 >= 0);
-			_list = new List<int> {offset1, offset2, offset3};
+			_list = new List<int> { offset1, offset2, offset3 };
 		}
 
 		public IUnresolvedOffsetSet Append(int offset) {

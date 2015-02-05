@@ -15,8 +15,8 @@ namespace YaJS.Runtime.Constructors.Errors {
 
 		public override JSValue Construct(ExecutionThread thread, VariableScope outerScope, JSValue[] args) {
 			return (VM.NewInternalError(
-					args.Length > 0 ? args[0].CastToString() : string.Empty,
-					args.Length > 1 ? args[1].CastToString() : "Unknown"));
+				args.Length > 0 ? args[0].CastToString() : string.Empty,
+				args.Length > 1 ? args[1].CastToString() : "Unknown"));
 		}
 
 		public override JSValue Invoke(ExecutionThread thread, JSObject context, VariableScope outerScope, JSValue[] args) {

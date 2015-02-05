@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Text;
 
 namespace YaJS.Compiler.AST.Statements {
 	/// <summary>
@@ -13,6 +14,11 @@ namespace YaJS.Compiler.AST.Statements {
 		public CaseClauseBlockStatement(int lineNo)
 			: base(StatementType.CaseClauseBlock, lineNo) {
 			_caseClauses = new List<CaseClauseStatement>();
+		}
+
+		protected internal override void AppendTo(StringBuilder output, string indent) {
+			foreach (var caseClause in _caseClauses)
+				caseClause.AppendTo(output, indent + '\t');
 		}
 
 		public void Add(CaseClauseStatement caseClause) {

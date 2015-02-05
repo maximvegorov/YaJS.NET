@@ -30,7 +30,7 @@ namespace YaJS.Compiler {
 
 		private static Function ParseFile(string fileName) {
 			using (var reader = File.OpenText(fileName))
-				return (Parse("fileName", Enumerable.Empty<string>(), reader));
+				return (Parse(fileName, Enumerable.Empty<string>(), reader));
 		}
 
 		public static CompiledFunction Compile(TextReader reader) {

@@ -1,4 +1,6 @@
-﻿namespace YaJS.Compiler.AST.Statements {
+﻿using System.Text;
+
+namespace YaJS.Compiler.AST.Statements {
 	/// <summary>
 	/// Псевдооператор представляющий тело функции
 	/// </summary>

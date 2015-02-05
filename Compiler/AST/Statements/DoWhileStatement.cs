@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
+using System.Text;
 using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Statements {
@@ -10,6 +11,16 @@ namespace YaJS.Compiler.AST.Statements {
 
 		public DoWhileStatement(int lineNo, ILabelSet labelSet)
 			: base(StatementType.DoWhile, lineNo, labelSet) {
+		}
+
+		protected internal override void AppendTo(StringBuilder output, string indent) {
+			output.Append(indent)
+				.AppendLine("do {");
+			Statement.AppendTo(output, indent + '\t');
+			output.Append(indent)
+				.Append("} while (")
+				.Append(Condition)
+				.AppendLine(")");
 		}
 
 		internal override void DoEmit(CompilingContext context) {

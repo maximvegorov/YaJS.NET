@@ -13,12 +13,11 @@ namespace YaJS.Compiler.AST.Statements {
 			Expression = expression;
 		}
 
-		public override string ToString() {
-			var result = new StringBuilder();
-			result.Append("return");
-			if (Expression.Type != ExpressionType.UndefinedLiteral)
-				result.Append(" ").Append(Expression);
-			return (result.ToString());
+		protected internal override void AppendTo(StringBuilder output, string indent) {
+			output.Append(indent)
+				.Append("return ")
+				.Append(Expression)
+				.AppendLine(";");
 		}
 
 		internal override void Preprocess(FunctionCompiler compiler) {

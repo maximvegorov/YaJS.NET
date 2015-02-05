@@ -17,7 +17,7 @@ namespace YaJS.Runtime.Tests.Objects {
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(TypeErrorException))]
+		[ExpectedException(typeof (TypeErrorException))]
 		public void ConvEqualsTo() {
 			var compiler = new Mock<ICompilerServices>();
 			var vm = new VirtualMachine(compiler.Object);
@@ -41,7 +41,7 @@ namespace YaJS.Runtime.Tests.Objects {
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(TypeErrorException))]
+		[ExpectedException(typeof (TypeErrorException))]
 		public void CastToInteger() {
 			var compiler = new Mock<ICompilerServices>();
 			var vm = new VirtualMachine(compiler.Object);
@@ -49,7 +49,7 @@ namespace YaJS.Runtime.Tests.Objects {
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(TypeErrorException))]
+		[ExpectedException(typeof (TypeErrorException))]
 		public void CastToFloat() {
 			var compiler = new Mock<ICompilerServices>();
 			var vm = new VirtualMachine(compiler.Object);
@@ -57,7 +57,7 @@ namespace YaJS.Runtime.Tests.Objects {
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(TypeErrorException))]
+		[ExpectedException(typeof (TypeErrorException))]
 		public void CastToString() {
 			var compiler = new Mock<ICompilerServices>();
 			var vm = new VirtualMachine(compiler.Object);
@@ -65,7 +65,7 @@ namespace YaJS.Runtime.Tests.Objects {
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(TypeErrorException))]
+		[ExpectedException(typeof (TypeErrorException))]
 		public void ToNumber() {
 			var compiler = new Mock<ICompilerServices>();
 			var vm = new VirtualMachine(compiler.Object);

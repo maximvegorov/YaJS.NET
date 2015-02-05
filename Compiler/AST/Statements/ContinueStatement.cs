@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
+using System.Text;
 using YaJS.Compiler.Emitter;
 using YaJS.Runtime;
 
@@ -13,6 +14,16 @@ namespace YaJS.Compiler.AST.Statements {
 			: base(StatementType.Continue, lineNo) {
 			Contract.Requires(targetLabel != null);
 			_targetLabel = targetLabel;
+		}
+
+		protected internal override void AppendTo(StringBuilder output, string indent) {
+			output.Append(indent)
+				.Append("continue");
+			if (!string.IsNullOrEmpty(_targetLabel)) {
+				output.Append(' ')
+					.Append(_targetLabel);
+			}
+			output.AppendLine(";");
 		}
 
 		internal override void Preprocess(FunctionCompiler compiler) {

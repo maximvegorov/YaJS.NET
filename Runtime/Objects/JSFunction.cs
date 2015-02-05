@@ -9,7 +9,6 @@ namespace YaJS.Runtime.Objects {
 	/// </summary>
 	public abstract class JSFunction : JSObject {
 		private const string PrototypeMemberName = "prototype";
-
 		public static readonly JSValue[] EmptyArgumentList = new JSValue[0];
 
 		protected JSFunction(VirtualMachine vm, JSObject inherited)

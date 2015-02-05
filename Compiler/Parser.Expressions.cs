@@ -43,7 +43,7 @@ namespace YaJS.Compiler {
 				ReadNextToken();
 				return (EmptyArgumentList);
 			}
-			var result = new List<Expression> {ParseExpression()};
+			var result = new List<Expression> { ParseAssignmentExpression() };
 			while (Lookahead.Type == TokenType.Comma) {
 				ReadNextToken();
 				result.Add(ParseExpression());
@@ -180,13 +180,13 @@ namespace YaJS.Compiler {
 				var isLBracket = Lookahead.Type == TokenType.LBracket;
 				ReadNextToken();
 				if (isLBracket) {
-					result = Expression.Member(result, ParseExpression());
+					result = Expression.Member(result, ParseExpression(), true);
 					Match(TokenType.RBracket);
 				}
 				else {
 					if (Lookahead.Type != TokenType.Ident)
 						Errors.ThrowUnmatchedToken(TokenType.Ident, Lookahead);
-					result = Expression.Member(result, Expression.Ident(Lookahead.Value));
+					result = Expression.Member(result, Expression.Ident(Lookahead.Value), false);
 					ReadNextToken();
 				}
 			}
@@ -225,13 +225,13 @@ namespace YaJS.Compiler {
 					var isLBracket = Lookahead.Type == TokenType.LBracket;
 					ReadNextToken();
 					if (isLBracket) {
-						result = Expression.Member(result, ParseExpression());
+						result = Expression.Member(result, ParseExpression(), true);
 						Match(TokenType.RBracket);
 					}
 					else {
 						if (Lookahead.Type != TokenType.Ident)
 							Errors.ThrowUnmatchedToken(TokenType.Ident, Lookahead);
-						result = Expression.Member(result, Expression.Ident(Lookahead.Value));
+						result = Expression.Member(result, Expression.Ident(Lookahead.Value), false);
 						ReadNextToken();
 					}
 				}
@@ -295,7 +295,7 @@ namespace YaJS.Compiler {
 				case TokenType.Delete: {
 					ReadNextToken();
 					var startPos = Lookahead.StartPosition;
-					var operand = ParsePostfixExpression();
+					var operand = ParseUnaryExpression();
 					if (!operand.CanBeDeleted)
 						Errors.ThrowInvalidOperandType(startPos);
 					result = Expression.Delete(operand);
@@ -303,16 +303,16 @@ namespace YaJS.Compiler {
 				}
 				case TokenType.Void:
 					ReadNextToken();
-					result = Expression.Void(ParsePostfixExpression());
+					result = Expression.Void(ParseUnaryExpression());
 					break;
 				case TokenType.Typeof:
 					ReadNextToken();
-					result = Expression.TypeOf(ParsePostfixExpression());
+					result = Expression.TypeOf(ParseUnaryExpression());
 					break;
 				case TokenType.Inc: {
 					ReadNextToken();
 					var startPos = Lookahead.StartPosition;
-					var operand = ParsePostfixExpression();
+					var operand = ParseUnaryExpression();
 					if (!operand.IsReference)
 						Errors.ThrowExpectedReference(startPos);
 					result = Expression.Inc(operand);
@@ -321,7 +321,7 @@ namespace YaJS.Compiler {
 				case TokenType.Dec: {
 					ReadNextToken();
 					var startPos = Lookahead.StartPosition;
-					var operand = ParsePostfixExpression();
+					var operand = ParseUnaryExpression();
 					if (!operand.IsReference)
 						Errors.ThrowExpectedReference(startPos);
 					result = Expression.Dec(operand);
@@ -329,19 +329,19 @@ namespace YaJS.Compiler {
 				}
 				case TokenType.Plus:
 					ReadNextToken();
-					result = Expression.Pos(ParsePostfixExpression());
+					result = Expression.Pos(ParseUnaryExpression());
 					break;
 				case TokenType.Minus:
 					ReadNextToken();
-					result = Expression.Neg(ParsePostfixExpression());
+					result = Expression.Neg(ParseUnaryExpression());
 					break;
 				case TokenType.BitNot:
 					ReadNextToken();
-					result = Expression.BitNot(ParsePostfixExpression());
+					result = Expression.BitNot(ParseUnaryExpression());
 					break;
 				case TokenType.Not:
 					ReadNextToken();
-					result = Expression.Not(ParsePostfixExpression());
+					result = Expression.Not(ParseUnaryExpression());
 					break;
 				default:
 					result = ParsePostfixExpression();
@@ -531,6 +531,7 @@ namespace YaJS.Compiler {
 			var result = ParseLogicalOrExpression();
 			if (Lookahead.Type != TokenType.QuestionMark)
 				return (result);
+			ReadNextToken();
 			var trueOperand = ParseAssignmentExpression();
 			Match(TokenType.Colon);
 			var falseOperand = ParseAssignmentExpression();
@@ -621,7 +622,7 @@ namespace YaJS.Compiler {
 			var assignment = ParseAssignmentExpression();
 			if (Lookahead.Type != TokenType.Comma)
 				return (assignment);
-			var sequence = new List<Expression> {assignment};
+			var sequence = new List<Expression> { assignment };
 			do {
 				ReadNextToken();
 				sequence.Add(ParseAssignmentExpression());

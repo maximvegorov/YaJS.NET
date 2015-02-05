@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
+using System.Globalization;
 using YaJS.Compiler.AST;
 using YaJS.Compiler.AST.Statements;
 using YaJS.Compiler.Emitter;
@@ -37,7 +38,7 @@ namespace YaJS.Compiler {
 			Function.CompileBy(this);
 			return
 				(new CompiledFunction(
-					Function.Name,
+					Function.Name ?? string.Format("anonymous at {0}", Function.LineNo.ToString(CultureInfo.InvariantCulture)),
 					Function.LineNo,
 					Function.ParameterNames.Count == 0 ? CompiledFunction.EmptyParameterNames : Function.ParameterNames.ToArray(),
 					Function.DeclaredVariables.Count == 0
