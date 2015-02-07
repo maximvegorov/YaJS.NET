@@ -12,8 +12,9 @@ namespace YaJS.Compiler {
 	/// Преобразует FunctionBody в байт-код
 	/// </summary>
 	internal sealed class FunctionCompiler {
-		private FunctionCompiler(Function function) {
+		private FunctionCompiler(Function function, bool isEvalMode) {
 			Function = function;
+			IsEvalMode = isEvalMode;
 			Emitter = new ByteCodeEmitter();
 			SwitchJumpTables = new List<SwitchJumpTable>();
 			StatementStarts = new Dictionary<Statement, Label>();
@@ -51,19 +52,24 @@ namespace YaJS.Compiler {
 					SwitchJumpTables.Count == 0 ? CompiledFunction.EmptySwitchJumpTables : SwitchJumpTables.ToArray()));
 		}
 
+		/// <summary>
+		/// Помечает конец оператора в исходном коде
+		/// </summary>
 		[Conditional("DEBUG")]
 		internal void MarkEndOfStatement() {
 			Emitter.Emit(OpCode.Break);
 		}
 
-		public static CompiledFunction Compile(Function function, CompiledFunction[] nestedFunctions) {
+		public static CompiledFunction Compile(
+			Function function, CompiledFunction[] nestedFunctions, bool isEvalMode) {
 			Contract.Requires(function != null);
 			Contract.Requires(nestedFunctions != null && nestedFunctions.Length == function.NestedFunctions.Count);
-			var compiler = new FunctionCompiler(function);
+			var compiler = new FunctionCompiler(function, isEvalMode);
 			return (compiler.Compile(nestedFunctions));
 		}
 
 		public Function Function { get; private set; }
+		public bool IsEvalMode { get; private set; }
 		public ByteCodeEmitter Emitter { get; private set; }
 		public List<SwitchJumpTable> SwitchJumpTables { get; private set; }
 		public Dictionary<Statement, Label> StatementStarts { get; private set; }
