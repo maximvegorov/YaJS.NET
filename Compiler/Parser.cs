@@ -10,7 +10,7 @@ namespace YaJS.Compiler {
 	public partial class Parser {
 		private readonly LinkedList<Token> _peekTokens;
 		private readonly Tokenizer _tokenizer;
-		private FunctionBuilder _currentFunction;
+		private ParsingFunction _currentFunction;
 
 		public Parser(Tokenizer tokenizer) {
 			Contract.Requires<ArgumentNullException>(tokenizer != null, "tokenizer");
@@ -87,7 +87,7 @@ namespace YaJS.Compiler {
 			}
 			Match(TokenType.RParenthesis);
 
-			_currentFunction = new FunctionBuilder(_currentFunction, name, startPosition.LineNo, parameterNames, isDeclaration);
+			_currentFunction = new ParsingFunction(_currentFunction, name, startPosition.LineNo, parameterNames, isDeclaration);
 			Match(TokenType.LCurlyBrace);
 			_currentFunction.FunctionBody = ParseFunctionBody();
 			Match(TokenType.RCurlyBrace);
@@ -112,7 +112,7 @@ namespace YaJS.Compiler {
 			Contract.Requires<ArgumentNullException>(!string.IsNullOrEmpty(functionName), "functionName");
 			Contract.Requires<ArgumentNullException>(parameterNames != null, "parameterNames");
 			// ReSharper disable once UseObjectOrCollectionInitializer
-			_currentFunction = new FunctionBuilder(null, functionName, 1, ToVariableCollection(parameterNames), false);
+			_currentFunction = new ParsingFunction(null, functionName, 1, ToVariableCollection(parameterNames), false);
 			_currentFunction.FunctionBody = ParseFunctionBody();
 			Contract.Assert(Lookahead.Type == TokenType.Unknown);
 			return (_currentFunction.ToFunction());

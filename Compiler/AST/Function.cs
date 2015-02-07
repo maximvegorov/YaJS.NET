@@ -12,12 +12,14 @@ namespace YaJS.Compiler.AST {
 			string name,
 			int lineNo,
 			List<string> parameterNames,
+			HashSet<string> directives,
 			List<string> declaredVariables,
 			List<Function> nestedFunctions,
 			FunctionBodyStatement functionBody,
 			bool isDeclaration) {
 			Contract.Requires(!(isDeclaration && string.IsNullOrEmpty(name)));
 			Contract.Requires(parameterNames != null);
+			Contract.Requires(directives != null);
 			Contract.Requires(declaredVariables != null);
 			Contract.Requires(nestedFunctions != null);
 			Contract.Requires(functionBody != null);
@@ -25,6 +27,7 @@ namespace YaJS.Compiler.AST {
 			Name = name;
 			LineNo = lineNo;
 			ParameterNames = parameterNames;
+			Directives = directives;
 			DeclaredVariables = declaredVariables;
 			NestedFunctions = nestedFunctions;
 			FunctionBody = functionBody;
@@ -98,6 +101,11 @@ namespace YaJS.Compiler.AST {
 		/// Список имен параметров функции
 		/// </summary>
 		public List<string> ParameterNames { get; private set; }
+
+		/// <summary>
+		/// Директивы которые необходимо учитывать при компиляции функции
+		/// </summary>
+		public HashSet<string> Directives { get; private set; } 
 
 		/// <summary>
 		/// Список объявленных переменных

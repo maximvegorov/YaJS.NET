@@ -211,7 +211,7 @@
     <Compile Include="Exceptions\UnexpectedEndOfFileException.cs" />
     <Compile Include="Exceptions\InvalidTokenException.cs" />
     <Compile Include="Exceptions\UnmatchedTokenException.cs" />
-    <Compile Include="FunctionBuilder.cs" />
+    <Compile Include="ParsingFunction.cs" />
     <Compile Include="Errors.cs" />
     <Compile Include="CharStream.cs" />
     <Compile Include="Parser.cs" />

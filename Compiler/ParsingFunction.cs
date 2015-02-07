@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.Contracts;
+﻿using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using YaJS.Compiler.AST;
 using YaJS.Compiler.AST.Statements;
 
@@ -6,15 +7,16 @@ namespace YaJS.Compiler {
 	/// <summary>
 	/// Анализируемая parser-ом функция
 	/// </summary>
-	internal sealed class FunctionBuilder {
+	internal sealed class ParsingFunction {
 		private readonly bool _isDeclaration;
 		private readonly int _lineNo;
 		private readonly string _name;
 		private readonly IKeyedVariableCollection _parameterNames;
+		private readonly HashSet<string> _directives;
 		private FunctionBodyStatement _functionBody;
 
-		public FunctionBuilder(
-			FunctionBuilder outer,
+		public ParsingFunction(
+			ParsingFunction outer,
 			string name,
 			int lineNo,
 			IKeyedVariableCollection parameterNames,
@@ -26,9 +28,15 @@ namespace YaJS.Compiler {
 			_name = name;
 			_lineNo = lineNo;
 			_parameterNames = parameterNames;
+			_directives = new HashSet<string>();
 			DeclaredVariables = new KeyedVariableCollection();
 			NestedFunctions = new KeyedFunctionCollection();
 			_isDeclaration = isDeclaration;
+		}
+
+		public void AppendDirective(string directive) {
+			Contract.Requires(!string.IsNullOrEmpty(directive));
+			_directives.Add(directive);
 		}
 
 		public Function ToFunction() {
@@ -37,13 +45,14 @@ namespace YaJS.Compiler {
 					_name,
 					_lineNo,
 					_parameterNames.ToList(),
+					_directives,
 					DeclaredVariables.ToList(),
 					NestedFunctions.ToList(),
 					FunctionBody,
 					_isDeclaration));
 		}
 
-		public FunctionBuilder Outer { get; private set; }
+		public ParsingFunction Outer { get; private set; }
 		public IKeyedVariableCollection DeclaredVariables { get; private set; }
 		public KeyedFunctionCollection NestedFunctions { get; private set; }
 
