@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="CharStreamTests.cs" />
     <Compile Include="AST\ExpressionTests.cs" />
+    <Compile Include="ParserTests.cs" />
     <Compile Include="TokenizerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

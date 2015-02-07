@@ -342,6 +342,19 @@ namespace YaJS.Compiler {
 
 		private FunctionBodyStatement ParseFunctionBody() {
 			var result = new FunctionBodyStatement();
+
+			// Обработать директивы
+			while (Lookahead.Type == TokenType.String) {
+				var next = PeekNextToken();
+				if (next.Type == TokenType.Semicolon || next.IsAfterLineTerminator || next.Type == TokenType.Unknown) {
+					_currentFunction.AppendDirective(Lookahead.Value);
+					if (next.Type == TokenType.Semicolon || next.Type == TokenType.Unknown)
+						MoveForwardLookahead();
+					else
+						ReadNextToken();
+				}
+			}
+
 			for (;;) {
 				if (Lookahead.Type == TokenType.Function) {
 					// ReadNextToken вызовет ParseFunctionDeclaration
@@ -360,6 +373,7 @@ namespace YaJS.Compiler {
 						Errors.ThrowUnmatchedToken(TokenType.Semicolon, Lookahead);
 				}
 			}
+
 			return (result);
 		}
 	}
