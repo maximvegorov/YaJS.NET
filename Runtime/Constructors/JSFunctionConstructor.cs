@@ -26,7 +26,7 @@ namespace YaJS.Runtime.Constructors {
 				parameterNames = args.Take(args.Length - 1).Select(arg => arg.CastToString());
 				functionBody = args[args.Length - 1].CastToString();
 			}
-			return (VM.NewFunction(outerScope, VM.Compiler.Compile("f", parameterNames, functionBody)));
+			return (VM.NewFunction(outerScope, VM.Compiler.Compile("f", parameterNames, functionBody, false)));
 		}
 
 		public override JSValue Invoke(ExecutionThread thread, JSObject context, VariableScope outerScope, JSValue[] args) {

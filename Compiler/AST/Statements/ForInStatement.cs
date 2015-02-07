@@ -38,7 +38,18 @@ namespace YaJS.Compiler.AST.Statements {
 		internal override void DoEmit(CompilingContext context) {
 			context.Compiler.Emitter.Emit(OpCode.MoveNext, _variableName);
 			context.Compiler.Emitter.Emit(OpCode.GotoIfFalse, context.EndLabel);
+
+			// В случае режима eval необходимо переставить местами перечислитель
+			// и результат последнего ExpressionStatement в стеке вычислений
+			if (context.Compiler.IsEvalMode)
+				context.Compiler.Emitter.Emit(OpCode.Swap);
+
 			Statement.CompileBy(context.Compiler);
+
+			// В случае режима eval необходимо вернуть в исходное состояние стек вычислений
+			if (context.Compiler.IsEvalMode)
+				context.Compiler.Emitter.Emit(OpCode.Swap);
+
 			context.Compiler.Emitter.Emit(OpCode.Goto, context.StartLabel);
 		}
 

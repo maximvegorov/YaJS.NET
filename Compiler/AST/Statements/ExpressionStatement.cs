@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.Contracts;
 using System.Text;
+using YaJS.Runtime;
 
 namespace YaJS.Compiler.AST.Statements {
 	/// <summary>
@@ -21,7 +22,14 @@ namespace YaJS.Compiler.AST.Statements {
 		}
 
 		internal override void CompileBy(FunctionCompiler compiler) {
-			_expression.CompileBy(compiler, true);
+			if (compiler.IsEvalMode) {
+				// В случае режима eval необходимо оставлять результат последней операции в стеке вычислений,
+				// но прежде необходимо вытолкнуть предыдущий результат
+				compiler.Emitter.Emit(OpCode.Pop);
+				_expression.CompileBy(compiler, false);
+			}
+			else
+				_expression.CompileBy(compiler, true);
 			compiler.MarkEndOfStatement();
 		}
 
