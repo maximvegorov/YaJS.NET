@@ -45,14 +45,6 @@ namespace YaJS.Runtime.Values {
 			return (!string.IsNullOrEmpty(_value));
 		}
 
-		public override int CastToInteger() {
-			return (JSNumberValue.ParseInteger(_value));
-		}
-
-		public override double CastToFloat() {
-			return (JSNumberValue.ParseFloat(_value));
-		}
-
 		public override string CastToString() {
 			return (_value);
 		}
