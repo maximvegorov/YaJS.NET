@@ -26,8 +26,11 @@ namespace YaJS.Compiler.AST.Expressions {
 		internal void CompilePropertyBy(FunctionCompiler compiler) {
 			if (!IsPropertyExpression)
 				compiler.Emitter.Emit(OpCode.LdString, ((Identifier)Property).Value);
-			else
+			else {
 				Property.CompileBy(compiler, false);
+				if (Property.CanBeObject)
+					compiler.Emitter.Emit(OpCode.CastToPrimitive);
+			}
 		}
 
 		internal override void CompileBy(FunctionCompiler compiler, bool isLastOperator) {
