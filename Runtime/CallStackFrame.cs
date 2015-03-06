@@ -13,6 +13,10 @@ namespace YaJS.Runtime {
 	/// </summary>
 	public sealed class CallStackFrame {
 		/// <summary>
+		/// Привязанные функции
+		/// </summary>
+		private JSFunction[] _nestedFunctions;
+		/// <summary>
 		/// Стек вычислений
 		/// </summary>
 		private readonly Stack<JSValue> _evalStack;
@@ -42,6 +46,9 @@ namespace YaJS.Runtime {
 			Context = context;
 			LocalScope = localScope;
 
+			if (function.CompiledFunction.DeclaredFunctionCount > 0)
+				_nestedFunctions = new JSFunction[function.CompiledFunction.NestedFunctions.Length];
+
 			_evalStack = new Stack<JSValue>(4);
 
 			CodeReader = new ByteCodeReader(Function.CompiledFunction.CompiledCode);
@@ -62,8 +69,10 @@ namespace YaJS.Runtime {
 			// Создать привязки для объявленных функций
 			for (var i = 0; i < Function.CompiledFunction.DeclaredFunctionCount; i++) {
 				var declaredFunction = Function.CompiledFunction.NestedFunctions[i];
-				if (!LocalScope.ContainsVariable(declaredFunction.Name))
-					LocalScope.DeclareVariable(declaredFunction.Name, vm.NewFunction(LocalScope, declaredFunction));
+				if (!LocalScope.ContainsVariable(declaredFunction.Name)) {
+					LocalScope.DeclareVariable(
+						declaredFunction.Name, _nestedFunctions[i] = vm.NewFunction(LocalScope, declaredFunction));
+				}
 			}
 
 			// Создать привязки для объявленных переменных
@@ -103,7 +112,14 @@ namespace YaJS.Runtime {
 		internal JSFunction GetFunction(VirtualMachine vm, int index) {
 			Contract.Requires(vm != null);
 			Contract.Requires(0 <= index && index < Function.CompiledFunction.NestedFunctions.Length);
-			return (vm.NewFunction(LocalScope, Function.CompiledFunction.NestedFunctions[index]));
+			if (_nestedFunctions == null)
+				_nestedFunctions = new JSFunction[Function.CompiledFunction.NestedFunctions.Length];
+			var function = _nestedFunctions[index];
+			if (function == null) {
+				function = vm.NewFunction(LocalScope, Function.CompiledFunction.NestedFunctions[index]);
+				_nestedFunctions[index] = function;
+			}
+			return (function);
 		}
 
 		internal void BeginScope() {
