@@ -124,6 +124,7 @@ namespace YaJS.Runtime.Values {
 			}
 
 			private bool TryParseDecimalLiteralExponent(out int result) {
+				const int maxExponent = 308;
 				var neg = false;
 				if (_curChar == '+' || _curChar == '-') {
 					neg = _curChar == '-';
@@ -134,7 +135,9 @@ namespace YaJS.Runtime.Values {
 					return (false);
 				do {
 					var digit = (_curChar - '0');
-					result = checked(10 * result + digit);
+					result = 10 * result + digit;
+					if (result > maxExponent)
+						return (false);
 					ReadChar();
 				} while (char.IsDigit(_curChar));
 				if (neg)

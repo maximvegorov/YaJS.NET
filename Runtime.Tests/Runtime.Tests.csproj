@@ -62,6 +62,7 @@
     <Compile Include="Values\JSFloatValueTests.cs" />
     <Compile Include="Values\JSIntegerValueTests.cs" />
     <Compile Include="Values\JSNullValueTests.cs" />
+    <Compile Include="Values\JSNumberValueTests.cs" />
     <Compile Include="Values\JSStringValueTests.cs" />
     <Compile Include="Values\JSUndefinedValueTests.cs" />
   </ItemGroup>
