@@ -154,6 +154,7 @@
     <Compile Include="Objects\Prototypes\JSStringPrototype.cs" />
     <Compile Include="OpCode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SingletonVariableScope.cs" />
     <Compile Include="SwitchJumpTable.cs" />
     <Compile Include="TryBlockInfo.cs" />
     <Compile Include="Values\JSBooleanValue.cs" />
