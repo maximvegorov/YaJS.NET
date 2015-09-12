@@ -1,17 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Runtime", "Runtime\Runtime.csproj", "{7FB8A4C3-3B73-45B9-B97E-B86A769C7D40}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Runtime", "src\Runtime\Runtime.csproj", "{7FB8A4C3-3B73-45B9-B97E-B86A769C7D40}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compiler", "Compiler\Compiler.csproj", "{58C2C84D-4DF3-4F46-8FCA-186EAFA14E16}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compiler", "src\Compiler\Compiler.csproj", "{58C2C84D-4DF3-4F46-8FCA-186EAFA14E16}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compiler.Tests", "Compiler.Tests\Compiler.Tests.csproj", "{3967663E-9306-4B57-A52F-6FD545151CCD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compiler.Tests", "test\Compiler.Tests\Compiler.Tests.csproj", "{3967663E-9306-4B57-A52F-6FD545151CCD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Runtime.Tests", "Runtime.Tests\Runtime.Tests.csproj", "{51AC9012-BF6C-4967-BF28-570B6219DD8C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Runtime.Tests", "test\Runtime.Tests\Runtime.Tests.csproj", "{51AC9012-BF6C-4967-BF28-570B6219DD8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "yajs", "yajs\yajs.csproj", "{C430FBFC-8C23-418B-A0FD-C8E1AA8EDF7D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "yajs", "src\yajs\yajs.csproj", "{C430FBFC-8C23-418B-A0FD-C8E1AA8EDF7D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,0 +1,190 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{58C2C84D-4DF3-4F46-8FCA-186EAFA14E16}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>YaJS.Compiler</RootNamespace>
+    <AssemblyName>YaJS.Compiler</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <CodeContractsAssemblyMode>1</CodeContractsAssemblyMode>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AST\Expression.cs" />
+    <Compile Include="AST\Expressions\Binary\Assignment\SimpleAssignOperator.cs" />
+    <Compile Include="AST\Expressions\GroupingOperator.cs" />
+    <Compile Include="AST\Expressions\StringLiteral.cs" />
+    <Compile Include="AST\ExpressionType.cs" />
+    <Compile Include="AST\Function.cs" />
+    <Compile Include="AST\IterationStatement.cs" />
+    <Compile Include="AST\LabellableStatement.cs" />
+    <Compile Include="AST\LabelSet.cs" />
+    <Compile Include="AST\CompoundStatement.cs" />
+    <Compile Include="AST\LanguageStatement.cs" />
+    <Compile Include="AST\ReferenceStatement.cs" />
+    <Compile Include="AST\Statements\BreakStatement.cs" />
+    <Compile Include="AST\Statements\CaseClauseBlockStatement.cs" />
+    <Compile Include="AST\Statements\CaseClauseStatement.cs" />
+    <Compile Include="AST\Statements\EmptyStatement.cs" />
+    <Compile Include="AST\Statements\FunctionBodyStatement.cs" />
+    <Compile Include="AST\Statements\StatementListStatement.cs" />
+    <Compile Include="AST\Statements\TryBlockStatement.cs" />
+    <Compile Include="Emitter\ByteCodeEmitter.cs" />
+    <Compile Include="Emitter\Label.cs" />
+    <Compile Include="CompilerServices.cs" />
+    <Compile Include="Emitter\UnresolvedOffsetSet.cs" />
+    <Compile Include="Exceptions\CompilerException.cs" />
+    <Compile Include="Exceptions\ExpectedCaseClauseException.cs" />
+    <Compile Include="Exceptions\ExpectedStatementException.cs" />
+    <Compile Include="Exceptions\FunctionAlreadyDeclaredException.cs" />
+    <Compile Include="Exceptions\DuplicatedLabelException.cs" />
+    <Compile Include="Exceptions\InternalErrorException.cs" />
+    <Compile Include="Exceptions\InvalidOperandTypeException.cs" />
+    <Compile Include="Exceptions\TokenizerException.cs" />
+    <Compile Include="Exceptions\UnsupportedCaseClauseExpressionException.cs" />
+    <Compile Include="Exceptions\InvalidStatementException.cs" />
+    <Compile Include="Exceptions\ExpectedCatchOrFinallyException.cs" />
+    <Compile Include="Exceptions\ParameterAlreadyDeclaredException.cs" />
+    <Compile Include="Exceptions\ExpectedConstructorException.cs" />
+    <Compile Include="Exceptions\ExpectedFunctionException.cs" />
+    <Compile Include="Exceptions\ExpectedObjectException.cs" />
+    <Compile Include="Exceptions\ExpectedReferenceException.cs" />
+    <Compile Include="Exceptions\UnexpectedLineTerminatorException.cs" />
+    <Compile Include="Exceptions\UnreachableLabelException.cs" />
+    <Compile Include="KeyedFunctionCollection.cs" />
+    <Compile Include="AST\Expressions\Arguments.cs" />
+    <Compile Include="AST\Expressions\ArrayLiteral.cs" />
+    <Compile Include="AST\Expressions\BinaryOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\AndOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\Assignment\AssignOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\Assignment\BitAndAssignOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\Assignment\BitOrAssignOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\Assignment\BitXorAssignOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\Assignment\DivAssignOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\Assignment\MinusAssignOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\Assignment\ModAssignOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\Assignment\MulAssignOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\Assignment\PlusAssignOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\Assignment\ShlAssignOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\Assignment\ShrSAssignOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\Assignment\ShrUAssignOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\BitAndOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\BitOrOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\BitXorOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\DivOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\EqOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\GteOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\GtOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\InOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\InstanceOfOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\LteOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\LtOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\MinusOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\ModOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\MulOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\NeqOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\OrOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\PlusOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\ShlOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\ShrSOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\ShrUOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\StrictEqOperator.cs" />
+    <Compile Include="AST\Expressions\Binary\StrictNeqOperator.cs" />
+    <Compile Include="AST\Expressions\BooleanLiteral.cs" />
+    <Compile Include="AST\Expressions\CallOperator.cs" />
+    <Compile Include="AST\Expressions\ConditionalOperator.cs" />
+    <Compile Include="AST\Expressions\Eval.cs" />
+    <Compile Include="AST\Expressions\FloatLiteral.cs" />
+    <Compile Include="AST\Expressions\FunctionLiteral.cs" />
+    <Compile Include="AST\Expressions\Identifier.cs" />
+    <Compile Include="AST\Expressions\IntegerLiteral.cs" />
+    <Compile Include="AST\Expressions\MemberOperator.cs" />
+    <Compile Include="AST\Expressions\NewOperator.cs" />
+    <Compile Include="AST\Expressions\NullLiteral.cs" />
+    <Compile Include="AST\Expressions\ObjectLiteral.cs" />
+    <Compile Include="AST\Expressions\SequenceOperator.cs" />
+    <Compile Include="AST\Expressions\This.cs" />
+    <Compile Include="AST\Expressions\UnaryOperator.cs" />
+    <Compile Include="AST\Expressions\Unary\BitNotOperator.cs" />
+    <Compile Include="AST\Expressions\Unary\DecOperator.cs" />
+    <Compile Include="AST\Expressions\Unary\DeleteOperator.cs" />
+    <Compile Include="AST\Expressions\Unary\IncOperator.cs" />
+    <Compile Include="AST\Expressions\Unary\NegOperator.cs" />
+    <Compile Include="AST\Expressions\Unary\NotOperator.cs" />
+    <Compile Include="AST\Expressions\Unary\PosOperator.cs" />
+    <Compile Include="AST\Expressions\Unary\PostfixDecOperator.cs" />
+    <Compile Include="AST\Expressions\Unary\PostfixIncOperator.cs" />
+    <Compile Include="AST\Expressions\Unary\TypeOfOperator.cs" />
+    <Compile Include="AST\Expressions\Unary\VoidOperator.cs" />
+    <Compile Include="AST\Expressions\UndefinedLiteral.cs" />
+    <Compile Include="AST\Statement.cs" />
+    <Compile Include="AST\Statements\BlockStatement.cs" />
+    <Compile Include="AST\Statements\ContinueStatement.cs" />
+    <Compile Include="AST\Statements\DoWhileStatement.cs" />
+    <Compile Include="AST\Statements\ExpressionStatement.cs" />
+    <Compile Include="AST\Statements\ForInStatement.cs" />
+    <Compile Include="AST\Statements\ForStatement.cs" />
+    <Compile Include="AST\Statements\IfStatement.cs" />
+    <Compile Include="AST\Statements\ReturnStatement.cs" />
+    <Compile Include="AST\Statements\SwitchStatement.cs" />
+    <Compile Include="AST\Statements\ThrowStatement.cs" />
+    <Compile Include="AST\Statements\TryStatement.cs" />
+    <Compile Include="AST\Statements\WhileStatement.cs" />
+    <Compile Include="FunctionCompiler.cs" />
+    <Compile Include="KeyedVariableCollection.cs" />
+    <Compile Include="Exceptions\UnexpectedCharException.cs" />
+    <Compile Include="Exceptions\ParserException.cs" />
+    <Compile Include="Exceptions\UnexpectedEndOfFileException.cs" />
+    <Compile Include="Exceptions\InvalidTokenException.cs" />
+    <Compile Include="Exceptions\UnmatchedTokenException.cs" />
+    <Compile Include="ParsingFunction.cs" />
+    <Compile Include="Errors.cs" />
+    <Compile Include="CharStream.cs" />
+    <Compile Include="Parser.cs" />
+    <Compile Include="Parser.Expressions.cs" />
+    <Compile Include="Parser.Statements.cs" />
+    <Compile Include="Token.cs" />
+    <Compile Include="Tokenizer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Runtime\Runtime.csproj">
+      <Project>{7fb8a4c3-3b73-45b9-b97e-b86a769c7d40}</Project>
+      <Name>Runtime</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
