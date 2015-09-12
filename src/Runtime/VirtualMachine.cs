@@ -31,14 +31,14 @@ namespace YaJS.Runtime {
 			Function = new JSFunctionPrototype(this, Object);
 
 			Error = new JSUnenumerableObject(this, Object);
-			InternalError = new JSUnenumerableObject(this, Error);
 			ReferenceError = new JSUnenumerableObject(this, Error);
 			SyntaxError = new JSUnenumerableObject(this, Error);
 			TypeError = new JSUnenumerableObject(this, Error);
 			RangeError = new JSUnenumerableObject(this, Error);
+            InternalError = new JSUnenumerableObject(this, Error);
 
-			// Инициализировать глобальный объект
-			GlobalObject.OwnMembers.Add("Object", new JSObjectConstructor(this, Function));
+            // Инициализировать глобальный объект
+            GlobalObject.OwnMembers.Add("Object", new JSObjectConstructor(this, Function));
 			GlobalObject.OwnMembers.Add("Boolean", new JSBooleanConstructor(this, Function));
 			GlobalObject.OwnMembers.Add("Number", new JSNumberConstructor(this, Function));
 			GlobalObject.OwnMembers.Add("String", new JSStringConstructor(this, Function));
@@ -112,10 +112,6 @@ namespace YaJS.Runtime {
 			return (new JSError(this, message, Error));
 		}
 
-		internal JSError NewInternalError(string message, string stackTrace) {
-			return (new JSInternalError(this, message, stackTrace, InternalError));
-		}
-
 		public JSError NewReferenceError(string message) {
 			return (new JSReferenceError(this, message, ReferenceError));
 		}
@@ -132,31 +128,36 @@ namespace YaJS.Runtime {
 			return (new JSRangeError(this, message, RangeError));
 		}
 
-		/// <summary>
-		/// Компилятор
-		/// </summary>
-		public ICompilerServices Compiler { get; private set; }
+        internal JSError NewInternalError(string message, string stackTrace) {
+            return (new JSInternalError(this, message, stackTrace, InternalError));
+        }
+
+        /// <summary>
+        /// Компилятор
+        /// </summary>
+        public ICompilerServices Compiler { get; private set; }
 
 		/// <summary>
 		/// Глобальный объект
 		/// </summary>
-		public JSObject GlobalObject { get; private set; }
+		public JSObject GlobalObject { get; }
 
 		/// <summary>
 		/// Прототипы встроенных объектов
 		/// </summary>
-		public JSObject Object { get; private set; }
+		public JSObject Object { get; }
 
-		public JSObject Boolean { get; private set; }
-		public JSObject Number { get; private set; }
-		public JSObject String { get; private set; }
-		public JSObject Array { get; private set; }
-		public JSObject Function { get; private set; }
-		internal JSObject Error { get; private set; }
-		internal JSObject InternalError { get; private set; }
-		internal JSObject ReferenceError { get; private set; }
-		internal JSObject SyntaxError { get; private set; }
-		internal JSObject TypeError { get; private set; }
-		internal JSObject RangeError { get; private set; }
-	}
+		public JSObject Boolean { get; }
+		public JSObject Number { get; }
+		public JSObject String { get; }
+		public JSObject Array { get; }
+		public JSObject Function { get; }
+
+		internal JSObject Error { get; }
+		internal JSObject ReferenceError { get; }
+		internal JSObject SyntaxError { get; }
+		internal JSObject TypeError { get; }
+		internal JSObject RangeError { get; }
+        internal JSObject InternalError { get; }
+    }
 }

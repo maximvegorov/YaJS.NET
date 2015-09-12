@@ -10,7 +10,7 @@ namespace YaJS.Runtime {
 	/// Поток исполнения в рамках которого исполняется JS-функция
 	/// </summary>
 	public sealed class ExecutionThread {
-		internal ExecutionThread(VirtualMachine vm, CompiledFunction globalFunction, JSValue[] globalArguments) {
+        internal ExecutionThread(VirtualMachine vm, CompiledFunction globalFunction, JSValue[] globalArguments) {
 			Contract.Requires(vm != null);
 			Contract.Requires(globalFunction != null);
 			VM = vm;
@@ -49,8 +49,7 @@ namespace YaJS.Runtime {
 				throw new IllegalOpCodeException(OpCode.EnterCatch.ToString());
 			CurrentFrame.BeginScope();
 			CurrentFrame.LocalScope.DeclareVariable(
-				CurrentFrame.CodeReader.ReadString(), CurrentException.ThrownValue
-				);
+				CurrentFrame.CodeReader.ReadString(), CurrentException.ThrownValue);
 		}
 
 		private void LeaveCatch() {
@@ -142,482 +141,494 @@ namespace YaJS.Runtime {
 		}
 
 		private void ExecuteStep(CallStackFrame currentFrame) {
-			try {
-				switch (currentFrame.CodeReader.ReadOpCode()) {
-					case OpCode.Nop:
-						break;
+		    try {
+		        switch (currentFrame.CodeReader.ReadOpCode()) {
+		            case OpCode.Nop:
+		                break;
 
-					case OpCode.Break:
+		            case OpCode.Break:
 //						currentFrame.Dump();
-						break;
+		                break;
 
-						#region Загрузка значений
+		                #region Загрузка значений
 
-					case OpCode.LdUndefined:
-						currentFrame.Push(JSValue.Undefined);
-						break;
-					case OpCode.LdNull:
-						currentFrame.Push(JSValue.Null);
-						break;
-					case OpCode.LdBoolean:
-						currentFrame.Push(currentFrame.CodeReader.ReadBoolean());
-						break;
-					case OpCode.LdInteger:
-						currentFrame.Push(currentFrame.CodeReader.ReadInteger());
-						break;
-					case OpCode.LdFloat:
-						currentFrame.Push(currentFrame.CodeReader.ReadFloat());
-						break;
-					case OpCode.LdString:
-						currentFrame.Push(currentFrame.CodeReader.ReadString());
-						break;
+		            case OpCode.LdUndefined:
+		                currentFrame.Push(JSValue.Undefined);
+		                break;
+		            case OpCode.LdNull:
+		                currentFrame.Push(JSValue.Null);
+		                break;
+		            case OpCode.LdBoolean:
+		                currentFrame.Push(currentFrame.CodeReader.ReadBoolean());
+		                break;
+		            case OpCode.LdInteger:
+		                currentFrame.Push(currentFrame.CodeReader.ReadInteger());
+		                break;
+		            case OpCode.LdFloat:
+		                currentFrame.Push(currentFrame.CodeReader.ReadFloat());
+		                break;
+		            case OpCode.LdString:
+		                currentFrame.Push(currentFrame.CodeReader.ReadString());
+		                break;
 
-					case OpCode.LdThis:
-						currentFrame.Push(CurrentFrame.Context);
-						break;
+		            case OpCode.LdThis:
+		                currentFrame.Push(CurrentFrame.Context);
+		                break;
 
-						#endregion
+		                #endregion
 
-						#region Локальные переменные и функции
+		                #region Локальные переменные и функции
 
-					case OpCode.LdLocalFunc:
-						currentFrame.Push(currentFrame.GetFunction(VM, currentFrame.CodeReader.ReadInteger()));
-						break;
+		            case OpCode.LdLocalFunc:
+		                currentFrame.Push(currentFrame.GetFunction(VM, currentFrame.CodeReader.ReadInteger()));
+		                break;
 
-					case OpCode.LdLocal:
-						currentFrame.Push(currentFrame.LocalScope.GetVariable(currentFrame.CodeReader.ReadString()));
-						break;
-					case OpCode.StLocal:
-						currentFrame.LocalScope.SetVariable(currentFrame.CodeReader.ReadString(), currentFrame.Pop());
-						break;
+		            case OpCode.LdLocal:
+		                currentFrame.Push(currentFrame.LocalScope.GetVariable(currentFrame.CodeReader.ReadString()));
+		                break;
+		            case OpCode.StLocal:
+		                currentFrame.LocalScope.SetVariable(currentFrame.CodeReader.ReadString(), currentFrame.Pop());
+		                break;
 
-						#endregion
+		                #endregion
 
-						#region Свойства объектов
+		                #region Свойства объектов
 
-					case OpCode.IsMember: {
-						var obj = currentFrame.Pop().ToObject(VM);
-						var member = currentFrame.Pop();
-						currentFrame.Push(obj.ContainsMember(member));
-						break;
-					}
+		            case OpCode.IsMember: {
+		                var obj = currentFrame.Pop().ToObject(VM);
+		                var member = currentFrame.Pop();
+		                currentFrame.Push(obj.ContainsMember(member));
+		                break;
+		            }
 
-					case OpCode.MakeRef: {
-						var member = currentFrame.Pop();
-						var obj = currentFrame.Pop().ToObject(VM);
-						currentFrame.Push(new JSReference(obj, member));
-						break;
-					}
+		            case OpCode.MakeRef: {
+		                var member = currentFrame.Pop();
+		                var obj = currentFrame.Pop().ToObject(VM);
+		                currentFrame.Push(new JSReference(obj, member));
+		                break;
+		            }
 
-					case OpCode.LdMember: {
-						var member = currentFrame.Pop();
-						var obj = currentFrame.Pop().ToObject(VM);
-						currentFrame.Push(obj.GetMember(member));
-						break;
-					}
-					case OpCode.StMember: {
-						var value = currentFrame.Pop();
-						var member = currentFrame.Pop();
-						var obj = currentFrame.Pop().RequireObject();
-						obj.SetMember(member, value);
-						break;
-					}
-					case OpCode.StMemberDup: {
-						var value = currentFrame.Pop();
-						var member = currentFrame.Pop();
-						var obj = currentFrame.Pop().RequireObject();
-						obj.SetMember(member, value);
-						currentFrame.Push(value);
-						break;
-					}
+		            case OpCode.LdMember: {
+		                var member = currentFrame.Pop();
+		                var obj = currentFrame.Pop().ToObject(VM);
+		                currentFrame.Push(obj.GetMember(member));
+		                break;
+		            }
+		            case OpCode.StMember: {
+		                var value = currentFrame.Pop();
+		                var member = currentFrame.Pop();
+		                var obj = currentFrame.Pop().RequireObject();
+		                obj.SetMember(member, value);
+		                break;
+		            }
+		            case OpCode.StMemberDup: {
+		                var value = currentFrame.Pop();
+		                var member = currentFrame.Pop();
+		                var obj = currentFrame.Pop().RequireObject();
+		                obj.SetMember(member, value);
+		                currentFrame.Push(value);
+		                break;
+		            }
 
-					case OpCode.LdMemberByRef: {
-						var reference = currentFrame.Pop().RequireReference();
-						currentFrame.Push(reference.Value);
-						break;
-					}
-					case OpCode.StMemberByRef: {
-						var value = currentFrame.Pop();
-						var reference = currentFrame.Pop().RequireReference();
-						reference.Value = value;
-						break;
-					}
-					case OpCode.StMemberByRefDup: {
-						var value = currentFrame.Pop();
-						var reference = currentFrame.Pop().RequireReference();
-						reference.Value = value;
-						currentFrame.Push(value);
-						break;
-					}
+		            case OpCode.LdMemberByRef: {
+		                var reference = currentFrame.Pop().RequireReference();
+		                currentFrame.Push(reference.Value);
+		                break;
+		            }
+		            case OpCode.StMemberByRef: {
+		                var value = currentFrame.Pop();
+		                var reference = currentFrame.Pop().RequireReference();
+		                reference.Value = value;
+		                break;
+		            }
+		            case OpCode.StMemberByRefDup: {
+		                var value = currentFrame.Pop();
+		                var reference = currentFrame.Pop().RequireReference();
+		                reference.Value = value;
+		                currentFrame.Push(value);
+		                break;
+		            }
 
-					case OpCode.DelMember: {
-						var member = currentFrame.Pop();
-						var obj = currentFrame.Pop().RequireObject();
-						currentFrame.Push(obj.DeleteMember(member));
-						break;
-					}
+		            case OpCode.DelMember: {
+		                var member = currentFrame.Pop();
+		                var obj = currentFrame.Pop().RequireObject();
+		                currentFrame.Push(obj.DeleteMember(member));
+		                break;
+		            }
 
-						#endregion
+		                #endregion
 
-						#region Управляющие
+		                #region Управляющие
 
-					case OpCode.Dup:
-						currentFrame.Push(currentFrame.Peek());
-						break;
-					case OpCode.Dup2: {
-						var top = currentFrame.Pop();
-						var top1 = currentFrame.Peek();
-						currentFrame.Push(top);
-						currentFrame.Push(top1);
-						currentFrame.Push(top);
-						break;
-					}
-					case OpCode.Pop:
-						currentFrame.Pop();
-						break;
-					case OpCode.Pop2:
-						currentFrame.Pop();
-						currentFrame.Pop();
-						break;
-					case OpCode.Swap: {
-						var top = currentFrame.Pop();
-						var top1 = currentFrame.Pop();
-						currentFrame.Push(top);
-						currentFrame.Push(top1);
-						break;
-					}
-					case OpCode.SwapDup: {
-						var top = currentFrame.Pop();
-						var top1 = currentFrame.Pop();
-						currentFrame.Push(top);
-						currentFrame.Push(top1);
-						currentFrame.Push(top);
-						break;
-					}
+		            case OpCode.Dup:
+		                currentFrame.Push(currentFrame.Peek());
+		                break;
+		            case OpCode.Dup2: {
+		                var top = currentFrame.Pop();
+		                var top1 = currentFrame.Peek();
+		                currentFrame.Push(top);
+		                currentFrame.Push(top1);
+		                currentFrame.Push(top);
+		                break;
+		            }
+		            case OpCode.Pop:
+		                currentFrame.Pop();
+		                break;
+		            case OpCode.Pop2:
+		                currentFrame.Pop();
+		                currentFrame.Pop();
+		                break;
+		            case OpCode.Swap: {
+		                var top = currentFrame.Pop();
+		                var top1 = currentFrame.Pop();
+		                currentFrame.Push(top);
+		                currentFrame.Push(top1);
+		                break;
+		            }
+		            case OpCode.SwapDup: {
+		                var top = currentFrame.Pop();
+		                var top1 = currentFrame.Pop();
+		                currentFrame.Push(top);
+		                currentFrame.Push(top1);
+		                currentFrame.Push(top);
+		                break;
+		            }
 
-					case OpCode.Goto:
-						currentFrame.CodeReader.Seek(currentFrame.CodeReader.ReadInteger());
-						break;
-					case OpCode.GotoIfTrue: {
-						var offset = currentFrame.CodeReader.ReadInteger();
-						if (currentFrame.Pop().CastToBoolean())
-							currentFrame.CodeReader.Seek(offset);
-						break;
-					}
-					case OpCode.GotoIfFalse: {
-						var offset = currentFrame.CodeReader.ReadInteger();
-						if (!currentFrame.Pop().CastToBoolean())
-							currentFrame.CodeReader.Seek(offset);
-						break;
-					}
+		            case OpCode.Goto:
+		                currentFrame.CodeReader.Seek(currentFrame.CodeReader.ReadInteger());
+		                break;
+		            case OpCode.GotoIfTrue: {
+		                var offset = currentFrame.CodeReader.ReadInteger();
+		                if (currentFrame.Pop().CastToBoolean())
+		                    currentFrame.CodeReader.Seek(offset);
+		                break;
+		            }
+		            case OpCode.GotoIfFalse: {
+		                var offset = currentFrame.CodeReader.ReadInteger();
+		                if (!currentFrame.Pop().CastToBoolean())
+		                    currentFrame.CodeReader.Seek(offset);
+		                break;
+		            }
 
-					case OpCode.Switch:
-						Switch(currentFrame.CodeReader.ReadInteger(), currentFrame.Pop());
-						break;
+		            case OpCode.Switch:
+		                Switch(currentFrame.CodeReader.ReadInteger(), currentFrame.Pop());
+		                break;
 
-					case OpCode.BeginScope:
-						currentFrame.BeginScope();
-						break;
-					case OpCode.EndScope:
-						currentFrame.EndScope();
-						break;
+		            case OpCode.BeginScope:
+		                currentFrame.BeginScope();
+		                break;
+		            case OpCode.EndScope:
+		                currentFrame.EndScope();
+		                break;
 
-					case OpCode.EnterTry:
-						currentFrame.EnterTry();
-						break;
-					case OpCode.LeaveTry:
-						currentFrame.LeaveTry();
-						break;
+		            case OpCode.EnterTry:
+		                currentFrame.EnterTry();
+		                break;
+		            case OpCode.LeaveTry:
+		                currentFrame.LeaveTry();
+		                break;
 
-					case OpCode.EnterCatch:
-						EnterCatch();
-						break;
-					case OpCode.LeaveCatch:
-						LeaveCatch();
-						break;
+		            case OpCode.EnterCatch:
+		                EnterCatch();
+		                break;
+		            case OpCode.LeaveCatch:
+		                LeaveCatch();
+		                break;
 
-					case OpCode.Throw:
-						Throw(currentFrame.Pop());
-						break;
-					case OpCode.Rethrow:
-						Rethrow();
-						break;
+		            case OpCode.Throw:
+		                Throw(currentFrame.Pop());
+		                break;
+		            case OpCode.Rethrow:
+		                Rethrow();
+		                break;
 
-						#endregion
+		                #endregion
 
-						#region Вызовы функций
+		                #region Вызовы функций
 
-					case OpCode.NewObj: {
-						var arguments = currentFrame.PopArguments();
-						var constructor = currentFrame.Pop().RequireFunction();
-						NewObject(constructor, arguments);
-						break;
-					}
+		            case OpCode.NewObj: {
+		                var arguments = currentFrame.PopArguments();
+		                var constructor = currentFrame.Pop().RequireFunction();
+		                NewObject(constructor, arguments);
+		                break;
+		            }
 
-					case OpCode.MakeEmptyObject:
-						currentFrame.Push(VM.NewObject());
-						break;
-					case OpCode.MakeObject:
-						MakeObject(currentFrame.Pop().RequireInteger());
-						break;
-					case OpCode.MakeEmptyArray:
-						currentFrame.Push(VM.NewArray(new List<JSValue>()));
-						break;
-					case OpCode.MakeArray:
-						MakeArray(currentFrame.Pop().RequireInteger());
-						break;
+		            case OpCode.MakeEmptyObject:
+		                currentFrame.Push(VM.NewObject());
+		                break;
+		            case OpCode.MakeObject:
+		                MakeObject(currentFrame.Pop().RequireInteger());
+		                break;
+		            case OpCode.MakeEmptyArray:
+		                currentFrame.Push(VM.NewArray(new List<JSValue>()));
+		                break;
+		            case OpCode.MakeArray:
+		                MakeArray(currentFrame.Pop().RequireInteger());
+		                break;
 
-					case OpCode.Call: {
-						var arguments = currentFrame.PopArguments();
-						var function = currentFrame.Pop().RequireFunction();
-						CallFunction(function, VM.GlobalObject, arguments, currentFrame.CodeReader.ReadBoolean());
-						break;
-					}
+		            case OpCode.Call: {
+		                var arguments = currentFrame.PopArguments();
+		                var function = currentFrame.Pop().RequireFunction();
+		                CallFunction(function, VM.GlobalObject, arguments, currentFrame.CodeReader.ReadBoolean());
+		                break;
+		            }
 
-					case OpCode.CallMember: {
-						var arguments = currentFrame.PopArguments();
-						var function = currentFrame.Pop().RequireFunction();
-						var context = currentFrame.Pop().ToObject(VM);
-						CallFunction(function, context, arguments, currentFrame.CodeReader.ReadBoolean());
-						break;
-					}
+		            case OpCode.CallMember: {
+		                var arguments = currentFrame.PopArguments();
+		                var function = currentFrame.Pop().RequireFunction();
+		                var context = currentFrame.Pop().ToObject(VM);
+		                CallFunction(function, context, arguments, currentFrame.CodeReader.ReadBoolean());
+		                break;
+		            }
 
-					case OpCode.Return:
-						if (currentFrame.CopyResult) {
-							Contract.Assume(currentFrame.Caller != null);
-							CurrentFrame.Caller.Push(currentFrame.Pop());
-						}
-						CurrentFrame = currentFrame.Caller;
-				        currentFrame.OnCompleteCallback?.Invoke();
-				        break;
+		            case OpCode.Return:
+		                if (currentFrame.CopyResult) {
+		                    Contract.Assume(currentFrame.Caller != null);
+		                    CurrentFrame.Caller.Push(currentFrame.Pop());
+		                }
+		                CurrentFrame = currentFrame.Caller;
+		                currentFrame.OnCompleteCallback?.Invoke();
+		                break;
 
-						#endregion
+		                #endregion
 
-						#region Перечислители
+		                #region Перечислители
 
-					case OpCode.GetEnumerator:
-						currentFrame.Push(currentFrame.Pop().GetJSEnumerator());
-						break;
-					case OpCode.MoveNext: {
-						var enumerator = currentFrame.Peek().RequireEnumerator();
-						var hasMoreValue = enumerator.MoveNext();
-						currentFrame.LocalScope.SetVariable(
-							currentFrame.CodeReader.ReadString(),
-							hasMoreValue ? enumerator.Current : JSValue.Undefined);
-						currentFrame.Push(hasMoreValue);
-						break;
-					}
+		            case OpCode.GetEnumerator:
+		                currentFrame.Push(currentFrame.Pop().GetJSEnumerator());
+		                break;
+		            case OpCode.MoveNext: {
+		                var enumerator = currentFrame.Peek().RequireEnumerator();
+		                var hasMoreValue = enumerator.MoveNext();
+		                currentFrame.LocalScope.SetVariable(
+		                    currentFrame.CodeReader.ReadString(),
+		                    hasMoreValue ? enumerator.Current : JSValue.Undefined);
+		                currentFrame.Push(hasMoreValue);
+		                break;
+		            }
 
-						#endregion
+		                #endregion
 
-						#region Преобразования
+		                #region Преобразования
 
-					case OpCode.CastToPrimitive: {
-						var top = currentFrame.Peek();
-						if (top.Type == JSValueType.Object) {
-							currentFrame.Pop();
-							top.CastToPrimitiveValue(this, currentFrame.Push);
-						}
-						break;
-					}
+		            case OpCode.CastToPrimitive: {
+		                var top = currentFrame.Peek();
+		                if (top.Type == JSValueType.Object) {
+		                    currentFrame.Pop();
+		                    top.CastToPrimitiveValue(this, currentFrame.Push);
+		                }
+		                break;
+		            }
 
-						#endregion
+		                #endregion
 
-						#region Числовые
+		                #region Числовые
 
-					case OpCode.Inc:
-						currentFrame.Push(currentFrame.Pop().ToNumber().Inc());
-						break;
-					case OpCode.Dec:
-						currentFrame.Push(currentFrame.Pop().ToNumber().Dec());
-						break;
+		            case OpCode.Inc:
+		                currentFrame.Push(currentFrame.Pop().ToNumber().Inc());
+		                break;
+		            case OpCode.Dec:
+		                currentFrame.Push(currentFrame.Pop().ToNumber().Dec());
+		                break;
 
-					case OpCode.Pos:
-						currentFrame.Push(currentFrame.Pop().ToNumber());
-						break;
-					case OpCode.Neg:
-						currentFrame.Push(currentFrame.Pop().ToNumber().Neg());
-						break;
+		            case OpCode.Pos:
+		                currentFrame.Push(currentFrame.Pop().ToNumber());
+		                break;
+		            case OpCode.Neg:
+		                currentFrame.Push(currentFrame.Pop().ToNumber().Neg());
+		                break;
 
-					case OpCode.Plus: {
-						var op2 = currentFrame.Pop();
-						var op1 = currentFrame.Pop();
-						currentFrame.Push(op1.Plus(op2));
-						break;
-					}
-					case OpCode.Minus: {
-						var op2 = currentFrame.Pop().ToNumber();
-						var op1 = currentFrame.Pop().ToNumber();
-						currentFrame.Push(op1.Minus(op2));
-						break;
-					}
-					case OpCode.Mul: {
-						var op2 = currentFrame.Pop().ToNumber();
-						var op1 = currentFrame.Pop().ToNumber();
-						currentFrame.Push(op1.Mul(op2));
-						break;
-					}
-					case OpCode.IntDiv: {
-						var op2 = currentFrame.Pop().ToNumber();
-						var op1 = currentFrame.Pop().ToNumber();
-						currentFrame.Push(op1.IntDiv(op2));
-						break;
-					}
-					case OpCode.FltDiv: {
-						var op2 = currentFrame.Pop().ToNumber();
-						var op1 = currentFrame.Pop().ToNumber();
-						currentFrame.Push(op1.FltDiv(op2));
-						break;
-					}
-					case OpCode.Mod: {
-						var op2 = currentFrame.Pop().ToNumber();
-						var op1 = currentFrame.Pop().ToNumber();
-						currentFrame.Push(op1.Mod(op2));
-						break;
-					}
+		            case OpCode.Plus: {
+		                var op2 = currentFrame.Pop();
+		                var op1 = currentFrame.Pop();
+		                currentFrame.Push(op1.Plus(op2));
+		                break;
+		            }
+		            case OpCode.Minus: {
+		                var op2 = currentFrame.Pop().ToNumber();
+		                var op1 = currentFrame.Pop().ToNumber();
+		                currentFrame.Push(op1.Minus(op2));
+		                break;
+		            }
+		            case OpCode.Mul: {
+		                var op2 = currentFrame.Pop().ToNumber();
+		                var op1 = currentFrame.Pop().ToNumber();
+		                currentFrame.Push(op1.Mul(op2));
+		                break;
+		            }
+		            case OpCode.IntDiv: {
+		                var op2 = currentFrame.Pop().ToNumber();
+		                var op1 = currentFrame.Pop().ToNumber();
+		                currentFrame.Push(op1.IntDiv(op2));
+		                break;
+		            }
+		            case OpCode.FltDiv: {
+		                var op2 = currentFrame.Pop().ToNumber();
+		                var op1 = currentFrame.Pop().ToNumber();
+		                currentFrame.Push(op1.FltDiv(op2));
+		                break;
+		            }
+		            case OpCode.Mod: {
+		                var op2 = currentFrame.Pop().ToNumber();
+		                var op1 = currentFrame.Pop().ToNumber();
+		                currentFrame.Push(op1.Mod(op2));
+		                break;
+		            }
 
-					case OpCode.BitNot:
-						currentFrame.Push(currentFrame.Pop().ToNumber().BitNot());
-						break;
-					case OpCode.BitAnd: {
-						var op2 = currentFrame.Pop().ToNumber();
-						var op1 = currentFrame.Pop().ToNumber();
-						currentFrame.Push(op1.BitAnd(op2));
-						break;
-					}
-					case OpCode.BitOr: {
-						var op2 = currentFrame.Pop().ToNumber();
-						var op1 = currentFrame.Pop().ToNumber();
-						currentFrame.Push(op1.BitOr(op2));
-						break;
-					}
-					case OpCode.BitXor: {
-						var op2 = currentFrame.Pop().ToNumber();
-						var op1 = currentFrame.Pop().ToNumber();
-						currentFrame.Push(op1.BitXor(op2));
-						break;
-					}
+		            case OpCode.BitNot:
+		                currentFrame.Push(currentFrame.Pop().ToNumber().BitNot());
+		                break;
+		            case OpCode.BitAnd: {
+		                var op2 = currentFrame.Pop().ToNumber();
+		                var op1 = currentFrame.Pop().ToNumber();
+		                currentFrame.Push(op1.BitAnd(op2));
+		                break;
+		            }
+		            case OpCode.BitOr: {
+		                var op2 = currentFrame.Pop().ToNumber();
+		                var op1 = currentFrame.Pop().ToNumber();
+		                currentFrame.Push(op1.BitOr(op2));
+		                break;
+		            }
+		            case OpCode.BitXor: {
+		                var op2 = currentFrame.Pop().ToNumber();
+		                var op1 = currentFrame.Pop().ToNumber();
+		                currentFrame.Push(op1.BitXor(op2));
+		                break;
+		            }
 
-					case OpCode.Shl: {
-						var op2 = currentFrame.Pop().ToNumber();
-						var op1 = currentFrame.Pop().ToNumber();
-						currentFrame.Push(op1.BitShl(op2));
-						break;
-					}
-					case OpCode.ShrS: {
-						var op2 = currentFrame.Pop().ToNumber();
-						var op1 = currentFrame.Pop().ToNumber();
-						currentFrame.Push(op1.BitShrS(op2));
-						break;
-					}
-					case OpCode.ShrU: {
-						var op2 = currentFrame.Pop().ToNumber();
-						var op1 = currentFrame.Pop().ToNumber();
-						currentFrame.Push(op1.BitShrU(op2));
-						break;
-					}
+		            case OpCode.Shl: {
+		                var op2 = currentFrame.Pop().ToNumber();
+		                var op1 = currentFrame.Pop().ToNumber();
+		                currentFrame.Push(op1.BitShl(op2));
+		                break;
+		            }
+		            case OpCode.ShrS: {
+		                var op2 = currentFrame.Pop().ToNumber();
+		                var op1 = currentFrame.Pop().ToNumber();
+		                currentFrame.Push(op1.BitShrS(op2));
+		                break;
+		            }
+		            case OpCode.ShrU: {
+		                var op2 = currentFrame.Pop().ToNumber();
+		                var op1 = currentFrame.Pop().ToNumber();
+		                currentFrame.Push(op1.BitShrU(op2));
+		                break;
+		            }
 
-						#endregion
+		                #endregion
 
-						#region Логические
+		                #region Логические
 
-					case OpCode.Not:
-						currentFrame.Push(currentFrame.Pop().Not());
-						break;
-					case OpCode.And: {
-						var op2 = currentFrame.Pop();
-						var op1 = currentFrame.Pop();
-						currentFrame.Push(op1.And(op2));
-						break;
-					}
-					case OpCode.Or: {
-						var op2 = currentFrame.Pop();
-						var op1 = currentFrame.Pop();
-						currentFrame.Push(op1.Or(op2));
-						break;
-					}
+		            case OpCode.Not:
+		                currentFrame.Push(currentFrame.Pop().Not());
+		                break;
+		            case OpCode.And: {
+		                var op2 = currentFrame.Pop();
+		                var op1 = currentFrame.Pop();
+		                currentFrame.Push(op1.And(op2));
+		                break;
+		            }
+		            case OpCode.Or: {
+		                var op2 = currentFrame.Pop();
+		                var op1 = currentFrame.Pop();
+		                currentFrame.Push(op1.Or(op2));
+		                break;
+		            }
 
-						#endregion
+		                #endregion
 
-						#region Равенства
+		                #region Равенства
 
-					case OpCode.ConvEq: {
-						var op2 = currentFrame.Pop();
-						var op1 = currentFrame.Pop();
-						currentFrame.Push(op1.ConvEqualsTo(op2));
-						break;
-					}
-					case OpCode.StrictEq: {
-						var op2 = currentFrame.Pop();
-						var op1 = currentFrame.Pop();
-						currentFrame.Push(op1.StrictEqualsTo(op2));
-						break;
-					}
-					case OpCode.ConvNeq: {
-						var op2 = currentFrame.Pop();
-						var op1 = currentFrame.Pop();
-						currentFrame.Push(!op1.ConvEqualsTo(op2));
-						break;
-					}
-					case OpCode.StrictNeq: {
-						var op2 = currentFrame.Pop();
-						var op1 = currentFrame.Pop();
-						currentFrame.Push(!op1.StrictEqualsTo(op2));
-						break;
-					}
+		            case OpCode.ConvEq: {
+		                var op2 = currentFrame.Pop();
+		                var op1 = currentFrame.Pop();
+		                currentFrame.Push(op1.ConvEqualsTo(op2));
+		                break;
+		            }
+		            case OpCode.StrictEq: {
+		                var op2 = currentFrame.Pop();
+		                var op1 = currentFrame.Pop();
+		                currentFrame.Push(op1.StrictEqualsTo(op2));
+		                break;
+		            }
+		            case OpCode.ConvNeq: {
+		                var op2 = currentFrame.Pop();
+		                var op1 = currentFrame.Pop();
+		                currentFrame.Push(!op1.ConvEqualsTo(op2));
+		                break;
+		            }
+		            case OpCode.StrictNeq: {
+		                var op2 = currentFrame.Pop();
+		                var op1 = currentFrame.Pop();
+		                currentFrame.Push(!op1.StrictEqualsTo(op2));
+		                break;
+		            }
 
-						#endregion
+		                #endregion
 
-						#region Отношения
+		                #region Отношения
 
-					case OpCode.Lt: {
-						var op2 = currentFrame.Pop();
-						var op1 = currentFrame.Pop();
-						currentFrame.Push(op1.Lt(op2));
-						break;
-					}
-					case OpCode.Lte: {
-						var op2 = currentFrame.Pop();
-						var op1 = currentFrame.Pop();
-						currentFrame.Push(op1.Lte(op2));
-						break;
-					}
-					case OpCode.Gt: {
-						var op2 = currentFrame.Pop();
-						var op1 = currentFrame.Pop();
-						currentFrame.Push(op2.Lt(op1));
-						break;
-					}
-					case OpCode.Gte: {
-						var op2 = currentFrame.Pop();
-						var op1 = currentFrame.Pop();
-						currentFrame.Push(op2.Lte(op1));
-						break;
-					}
+		            case OpCode.Lt: {
+		                var op2 = currentFrame.Pop();
+		                var op1 = currentFrame.Pop();
+		                currentFrame.Push(op1.Lt(op2));
+		                break;
+		            }
+		            case OpCode.Lte: {
+		                var op2 = currentFrame.Pop();
+		                var op1 = currentFrame.Pop();
+		                currentFrame.Push(op1.Lte(op2));
+		                break;
+		            }
+		            case OpCode.Gt: {
+		                var op2 = currentFrame.Pop();
+		                var op1 = currentFrame.Pop();
+		                currentFrame.Push(op2.Lt(op1));
+		                break;
+		            }
+		            case OpCode.Gte: {
+		                var op2 = currentFrame.Pop();
+		                var op1 = currentFrame.Pop();
+		                currentFrame.Push(op2.Lte(op1));
+		                break;
+		            }
 
-					case OpCode.InstanceOf: {
-						var op2 = currentFrame.Pop().RequireFunction();
-						var op1 = currentFrame.Pop();
-						currentFrame.Push(op1.IsInstanceOf(op2));
-						break;
-					}
-					case OpCode.TypeOf:
-						currentFrame.Push(currentFrame.Pop().TypeOf());
-						break;
+		            case OpCode.InstanceOf: {
+		                var op2 = currentFrame.Pop().RequireFunction();
+		                var op1 = currentFrame.Pop();
+		                currentFrame.Push(op1.IsInstanceOf(op2));
+		                break;
+		            }
+		            case OpCode.TypeOf:
+		                currentFrame.Push(currentFrame.Pop().TypeOf());
+		                break;
 
-						#endregion
+		                #endregion
 
-					default:
-						throw new UnknownOpCodeException();
-				}
+		            default:
+		                throw new UnknownOpCodeException();
+		        }
 
-				IsTerminated = CurrentFrame == null;
-				if (IsTerminated)
-					Result = currentFrame.Pop();
-			}
-			catch (RuntimeErrorException ex) {
-				Throw(VM.NewInternalError(ex.Message, ex.StackTrace));
-			}
+		        IsTerminated = CurrentFrame == null;
+		        if (IsTerminated)
+		            Result = currentFrame.Pop();
+		    }
+		    catch (ReferenceErrorException ex) {
+                Throw(VM.NewReferenceError(ex.Message));
+            }
+            catch (SyntaxErrorException ex) {
+                Throw(VM.NewSyntaxError(ex.Message));
+            }
+            catch (TypeErrorException ex) {
+                Throw(VM.NewTypeError(ex.Message));
+            }
+            catch (RangeErrorException ex) {
+                Throw(VM.NewRangeError(ex.Message));
+            }
+            catch (RuntimeErrorException ex) {
+		        Throw(VM.NewInternalError(ex.Message, ex.StackTrace));
+		    }
 		}
 
 		/// <summary>
