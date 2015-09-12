@@ -3,20 +3,26 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using YaJS.Runtime.Exceptions;
 using YaJS.Runtime.Objects;
+using YaJS.Runtime.Scopes;
 
 namespace YaJS.Runtime {
 	/// <summary>
 	/// Поток исполнения в рамках которого исполняется JS-функция
 	/// </summary>
 	public sealed class ExecutionThread {
-		internal ExecutionThread(VirtualMachine vm, CompiledFunction globalFunction) {
+		internal ExecutionThread(VirtualMachine vm, CompiledFunction globalFunction, JSValue[] globalArguments) {
 			Contract.Requires(vm != null);
 			Contract.Requires(globalFunction != null);
 			VM = vm;
 			GlobalScope = new GlobalVariableScope(vm.GlobalObject);
-			GlobalFunction = new JSManagedFunction(VM, GlobalScope, globalFunction, VM.Function);
+	        GlobalFunction = new JSManagedFunction(VM, GlobalScope, globalFunction, VM.Function);
 			CurrentFrame = new CallStackFrame(
-				null, VM, GlobalFunction, vm.GlobalObject, GlobalScope, JSFunction.EmptyArgumentList);
+				null,
+                VM,
+                GlobalFunction,
+                vm.GlobalObject,
+                GlobalScope,
+                globalArguments ?? JSFunction.EmptyArgumentList);
 		}
 
 		private void Switch(int tableIndex, JSValue selector) {
@@ -34,9 +40,8 @@ namespace YaJS.Runtime {
 					return;
 				}
 			}
-			if (OnUnhandledException != null)
-				OnUnhandledException.Invoke(CurrentException);
-			throw new UnhandledExceptionException(CurrentException.ThrownValue.CastToString());
+		    OnUnhandledException?.Invoke(CurrentException);
+		    throw new UnhandledExceptionException(CurrentException.ThrownValue.CastToString());
 		}
 
 		private void EnterCatch() {
@@ -379,13 +384,12 @@ namespace YaJS.Runtime {
 
 					case OpCode.Return:
 						if (currentFrame.CopyResult) {
-							Contract.Assert(currentFrame.Caller != null);
+							Contract.Assume(currentFrame.Caller != null);
 							CurrentFrame.Caller.Push(currentFrame.Pop());
 						}
 						CurrentFrame = currentFrame.Caller;
-						if (currentFrame.OnCompleteCallback != null)
-							currentFrame.OnCompleteCallback();
-						break;
+				        currentFrame.OnCompleteCallback?.Invoke();
+				        break;
 
 						#endregion
 

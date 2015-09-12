@@ -110,6 +110,6 @@ namespace YaJS.Runtime.Objects {
 		/// <summary>
 		/// Элементы массива
 		/// </summary>
-		public List<JSValue> Items { get; private set; }
+		public List<JSValue> Items { get; }
 	}
 }

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.Contracts;
+﻿using System;
+using System.Diagnostics.Contracts;
 using YaJS.Runtime.Exceptions;
 
 namespace YaJS.Runtime {
@@ -13,14 +14,16 @@ namespace YaJS.Runtime {
 		public virtual void DeclareVariable(string variableName, JSValue initialValue) {
 			Contract.Requires(!string.IsNullOrEmpty(variableName));
 			Contract.Requires(initialValue != null);
+            throw new NotSupportedException();
 		}
 
 		public virtual void DeclareVariableIfNotExists(string variableName, JSValue initialValue) {
 			Contract.Requires(!string.IsNullOrEmpty(variableName));
 			Contract.Requires(initialValue != null);
-		}
+            throw new NotSupportedException();
+        }
 
-		protected abstract bool TryGetValue(string variableName, out JSValue value);
+        protected abstract bool TryGetValue(string variableName, out JSValue value);
 
 		public virtual JSValue GetVariable(string variableName) {
 			Contract.Requires(!string.IsNullOrEmpty(variableName));
@@ -50,6 +53,6 @@ namespace YaJS.Runtime {
 		/// <summary>
 		/// Внешняя область видимости переменных
 		/// </summary>
-		public VariableScope OuterScope { get; private set; }
+		public VariableScope OuterScope { get; }
 	}
 }

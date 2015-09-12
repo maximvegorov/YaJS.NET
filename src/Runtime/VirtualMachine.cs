@@ -6,6 +6,7 @@ using YaJS.Runtime.Constructors.Errors;
 using YaJS.Runtime.Objects;
 using YaJS.Runtime.Objects.Errors;
 using YaJS.Runtime.Objects.Prototypes;
+using YaJS.Runtime.Scopes;
 using YaJS.Runtime.Values;
 
 namespace YaJS.Runtime {
@@ -52,13 +53,13 @@ namespace YaJS.Runtime {
 			GlobalObject.OwnMembers.Add("RangeError", new JSRangeErrorConstructor(this, Function));
 		}
 
-		public ExecutionThread NewThread(CompiledFunction globalFunction) {
+		public ExecutionThread NewThread(CompiledFunction globalFunction, JSValue[] globalArguments = null) {
 			Contract.Requires<ArgumentNullException>(globalFunction != null, "globalFunction");
-			return (new ExecutionThread(this, globalFunction));
+			return (new ExecutionThread(this, globalFunction, globalArguments));
 		}
 
-		public JSValue Execute(CompiledFunction globalFunction) {
-			var thread = NewThread(globalFunction);
+		public JSValue Execute(CompiledFunction globalFunction, JSValue[] globalArguments = null) {
+			var thread = NewThread(globalFunction, globalArguments);
 			for (;;) {
 				var isTerminated = thread.ExecuteStep();
 				if (isTerminated)
@@ -95,7 +96,12 @@ namespace YaJS.Runtime {
 		public JSFunction NewFunction(VariableScope outerScope, CompiledFunction compiledFunction) {
 			Contract.Requires<ArgumentNullException>(outerScope != null, "outerScope");
 			Contract.Requires<ArgumentNullException>(compiledFunction != null, "compiledFunction");
-			return (new JSManagedFunction(this, outerScope, compiledFunction, Function));
+            if (string.IsNullOrEmpty(compiledFunction.Name))
+			    return (new JSManagedFunction(this, outerScope, compiledFunction, Function));
+            var functionScope = new NamedFunctionVariableScope(outerScope);
+		    var function = new JSManagedFunction(this, functionScope, compiledFunction, Function);
+            functionScope.Bind(function);
+		    return (function);
 		}
 
 		internal JSArguments NewArguments(JSValue[] values) {

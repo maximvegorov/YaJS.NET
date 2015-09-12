@@ -5,6 +5,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using YaJS.Runtime.Exceptions;
 using YaJS.Runtime.Objects;
+using YaJS.Runtime.Scopes;
 using YaJS.Runtime.Values;
 
 namespace YaJS.Runtime {
@@ -12,10 +13,6 @@ namespace YaJS.Runtime {
 	/// Кадр вызова функции
 	/// </summary>
 	public sealed class CallStackFrame {
-		/// <summary>
-		/// Привязанные функции
-		/// </summary>
-		private JSFunction[] _nestedFunctions;
 		/// <summary>
 		/// Стек вычислений
 		/// </summary>
@@ -46,9 +43,6 @@ namespace YaJS.Runtime {
 			Context = context;
 			LocalScope = localScope;
 
-			if (function.CompiledFunction.DeclaredFunctionCount > 0)
-				_nestedFunctions = new JSFunction[function.CompiledFunction.NestedFunctions.Length];
-
 			_evalStack = new Stack<JSValue>(4);
 
 			CodeReader = new ByteCodeReader(Function.CompiledFunction.CompiledCode);
@@ -60,10 +54,11 @@ namespace YaJS.Runtime {
 			var n = Math.Min(parameterNames.Length, parameterValues.Length);
 			for (var i = 0; i < n; i++)
 				LocalScope.DeclareVariable(parameterNames[i], parameterValues[i]);
-			for (var i = n; i < parameterNames.Length; i++)
-				LocalScope.DeclareVariable(parameterNames[i], JSValue.Undefined);
+		    for (var i = n; i < parameterNames.Length; i++) {
+		        LocalScope.DeclareVariable(parameterNames[i], JSValue.Undefined);
+		    }
 
-			// Создать привязку для arguments
+		    // Создать привязку для arguments
 			LocalScope.DeclareVariable("arguments", vm.NewArguments(parameterValues));
 
 			// Создать привязки для объявленных функций
@@ -71,14 +66,13 @@ namespace YaJS.Runtime {
 				var declaredFunction = Function.CompiledFunction.NestedFunctions[i];
 				if (!LocalScope.ContainsVariable(declaredFunction.Name)) {
 					LocalScope.DeclareVariable(
-						declaredFunction.Name, _nestedFunctions[i] = vm.NewFunction(LocalScope, declaredFunction));
+						declaredFunction.Name, vm.NewFunction(LocalScope, declaredFunction));
 				}
 			}
 
 			// Создать привязки для объявленных переменных
-			for (var i = 0; i < Function.CompiledFunction.DeclaredVariables.Length; i++) {
-				var variableName = Function.CompiledFunction.DeclaredVariables[i];
-				LocalScope.DeclareVariableIfNotExists(variableName, JSValue.Undefined);
+			foreach (var variableName in Function.CompiledFunction.DeclaredVariables) {
+			    LocalScope.DeclareVariableIfNotExists(variableName, JSValue.Undefined);
 			}
 		}
 
@@ -112,14 +106,7 @@ namespace YaJS.Runtime {
 		internal JSFunction GetFunction(VirtualMachine vm, int index) {
 			Contract.Requires(vm != null);
 			Contract.Requires(0 <= index && index < Function.CompiledFunction.NestedFunctions.Length);
-			if (_nestedFunctions == null)
-				_nestedFunctions = new JSFunction[Function.CompiledFunction.NestedFunctions.Length];
-			var function = _nestedFunctions[index];
-			if (function == null) {
-				function = vm.NewFunction(LocalScope, Function.CompiledFunction.NestedFunctions[index]);
-				_nestedFunctions[index] = function;
-			}
-			return (function);
+			return (vm.NewFunction(LocalScope, Function.CompiledFunction.NestedFunctions[index]));
 		}
 
 		internal void BeginScope() {
@@ -174,9 +161,8 @@ namespace YaJS.Runtime {
 					Console.WriteLine("[{0:D3}] - {1}", i, evalStackValues[i]);
 			}
 			Console.WriteLine("Local variables: {0}", Function.CompiledFunction.DeclaredVariables.Length);
-			for (var i = 0; i < Function.CompiledFunction.DeclaredVariables.Length; i++) {
-				var variableName = Function.CompiledFunction.DeclaredVariables[i];
-				Console.WriteLine("{0} = {1}", variableName, LocalScope.GetVariable(variableName));
+			foreach (var variableName in Function.CompiledFunction.DeclaredVariables) {
+			    Console.WriteLine("{0} = {1}", variableName, LocalScope.GetVariable(variableName));
 			}
 			Console.WriteLine();
 		}

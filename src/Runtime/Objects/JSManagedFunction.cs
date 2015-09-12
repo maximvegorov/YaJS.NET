@@ -29,9 +29,9 @@ namespace YaJS.Runtime.Objects {
 		/// <summary>
 		/// Откомпилированная функция
 		/// </summary>
-		public CompiledFunction CompiledFunction { get; private set; }
+		public CompiledFunction CompiledFunction { get; }
 
-		public override bool IsNative { get { return (false); } }
-		public override int ParameterCount { get { return (CompiledFunction.ParameterNames.Length); } }
+		public override bool IsNative => false;
+	    public override int ParameterCount => CompiledFunction.ParameterNames.Length;
 	}
 }

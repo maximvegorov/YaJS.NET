@@ -7,7 +7,7 @@
     <ProjectGuid>{C430FBFC-8C23-418B-A0FD-C8E1AA8EDF7D}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>yajs</RootNamespace>
+    <RootNamespace>YaJS</RootNamespace>
     <AssemblyName>yajs</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

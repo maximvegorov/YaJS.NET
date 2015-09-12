@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
-namespace YaJS.Runtime {
+namespace YaJS.Runtime.Scopes {
 	/// <summary>
 	/// Область хранения локальных переменных
 	/// </summary>
-	public sealed class LocalVariableScope : VariableScope {
+	internal sealed class LocalVariableScope : VariableScope {
 		private readonly Dictionary<string, JSValue> _variables;
 
-		internal LocalVariableScope(VariableScope outerScope)
+		public LocalVariableScope(VariableScope outerScope)
 			: base(outerScope) {
 			Contract.Requires(outerScope != null);
 			_variables = new Dictionary<string, JSValue>();

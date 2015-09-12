@@ -1,11 +1,11 @@
 ﻿using System.Diagnostics.Contracts;
 using YaJS.Runtime.Objects;
 
-namespace YaJS.Runtime {
+namespace YaJS.Runtime.Scopes {
 	/// <summary>
 	/// Область хранения глобальных переменных
 	/// </summary>
-	public sealed class GlobalVariableScope : VariableScope {
+	internal sealed class GlobalVariableScope : VariableScope {
 		private readonly JSObject _globalObject;
 
 		public GlobalVariableScope(JSObject globalObject)
